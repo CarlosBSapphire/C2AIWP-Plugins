@@ -108,7 +108,10 @@
                 tab.setAttribute("aria-selected", "true");
                 tab.tabIndex = 0;
                 currentTabIndex = idx;
-                loadTab(tab.dataset.tab);
+                // Delay loadTab slightly to let the UI repaint
+                setTimeout(() => {
+                    loadTab(tab.dataset.tab);
+                }, 0);
             });
         });
 
