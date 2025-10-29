@@ -111,6 +111,7 @@
                 tab.setAttribute("aria-selected", "true");
                 tab.tabIndex = 0;
                 currentTabIndex = idx;
+                tab.blur(); // ← ADD THIS LINE
                 // Delay loadTab slightly to let the UI repaint
                 setTimeout(() => {
                     console.log("Before loadTab - still active?", tab.classList.contains("active"));
