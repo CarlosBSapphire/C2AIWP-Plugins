@@ -151,7 +151,7 @@ class Widget extends Widget_Base {
     protected function render() {
         static $call_count = 0;
         $call_count++;
-        echo "RENDER CALL #$call_count<br>";
+    
         $settings = $this->get_settings_for_display();
         $demo_tabs = $settings['demo_tabs'];
 
@@ -167,20 +167,15 @@ class Widget extends Widget_Base {
             ];
         }
 
-        echo '$demo_tabs: ';
-        print_r($demo_tabs);
-
-        echo '$tab_data: ';
-        print_r($tab_data);
     ?>
     
     <div class="customer2ai-demo-player-widget" data-config='<?php echo esc_attr(json_encode($tab_data)); ?>'>
         <div class="demo-player_tabs">
             <?php 
-            echo "LOOP START<br>";
+            
             $index = 0;
             foreach ($tab_data as $key => $data): 
-                echo "LOOP COUNT: $index<br>";
+                
             ?>
                 <button 
                     class="demo-player_tabs-item <?php echo $index === 0 ? 'active' : ''; ?>"
