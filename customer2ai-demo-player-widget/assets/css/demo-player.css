@@ -22,7 +22,7 @@
     transition: all 0.3s;
 }
 
-.demo-player_tabs-item:hover {
+.demo-player_tabs-item:hover:not(.active) {
     background-color: #00EEFF;
 }
 
@@ -31,7 +31,6 @@
     border-color: #00EEFF;
     color: #fff;
 }
-
 .demo-player_card {
     background: #fff;
     border-radius: 12px;
