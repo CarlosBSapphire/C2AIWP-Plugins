@@ -1,0 +1,231 @@
+.customer2ai-demo-player-widget {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.demo-player_tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.demo-player_tabs-item {
+    border: 1px solid #e5dfd5;
+    background-color: #f7f7f5;
+    color: #282825;
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.demo-player_tabs-item:hover {
+    background-color: #e5dfd5;
+}
+
+.demo-player_tabs-item.active {
+    background-color: #d35224;
+    border-color: #d35224;
+    color: #fff;
+}
+
+.demo-player_card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+}
+
+.demo-player_controls-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.demo-player_controls-play,
+.demo-player_controls-restart {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #d35224;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.demo-player_controls-play:hover,
+.demo-player_controls-restart:hover {
+    transform: scale(1.05);
+}
+
+.demo-player_controls-icon {
+    width: 20px;
+    height: 20px;
+    display: none;
+}
+
+.demo-player_controls-icon.is-visible {
+    display: flex;
+}
+
+.demo-player_progress-wrap {
+    flex: 1;
+}
+
+.demo-player_progress-bar {
+    width: 100%;
+    height: 8px;
+    border-radius: 999px;
+    appearance: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.demo-player_time-wrap {
+    display: flex;
+    gap: 6px;
+    font-size: 0.875rem;
+    color: #666;
+    margin-top: 6px;
+}
+
+.demo-player_transcript-wrap {
+    position: relative;
+    min-height: 300px;
+}
+
+.demo-player_transcript-window {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 12px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.bubble {
+    max-width: 84%;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 0.98rem;
+    line-height: 1.46;
+    opacity: 0;
+    animation: bubble-in 0.36s ease-out forwards;
+}
+
+@keyframes bubble-in {
+    to {
+        opacity: 1;
+    }
+}
+
+.bubble.agent {
+    background: #d35224;
+    color: #fff;
+    align-self: flex-start;
+}
+
+.bubble.caller {
+    background: #f7f7f5;
+    color: #282825;
+    align-self: flex-end;
+}
+
+.bubble.human {
+    background: #e5dfd5;
+    color: #282825;
+    align-self: flex-start;
+}
+
+.bubble.is-current {
+    box-shadow: 0 0 0 4px rgba(211, 82, 36, 0.24);
+}
+
+.demo-player_speaker-indicator-wrap {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.speaker-indicator {
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    background: #f7f7f5;
+    border: 1px solid #e5dfd5;
+    transition: all 0.2s;
+}
+
+.speaker-indicator.active {
+    box-shadow: 0 0 0 4px rgba(211, 82, 36, 0.24);
+}
+
+.speaker-indicator.is-hidden {
+    display: none;
+}
+
+.demo-player_pill-container {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+.pill {
+    background: #fff;
+    color: #282825;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 0.84rem;
+    border: 1px solid #d6cfc2;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.demo-transcript_overlay-wrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: opacity 0.3s;
+}
+
+.demo-transcript_overlay-wrap.is-off {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.demo-transcript_overlay-block {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+}
+
+.demo-player_controls-play.is-overlay {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    z-index: 2;
+}
