@@ -99,18 +99,23 @@
         // Tab click handlers
         tabButtons.forEach((tab, idx) => {
             tab.addEventListener("click", () => {
+                    console.log("Click fired");
+                if (currentTabIndex === idx) return;
                 tabButtons.forEach((b) => {
                     b.classList.remove("active");
                     b.setAttribute("aria-selected", "false");
                     b.tabIndex = -1;
                 });
                 tab.classList.add("active");
+                console.log("Active class added:", tab.classList.contains("active"));
                 tab.setAttribute("aria-selected", "true");
                 tab.tabIndex = 0;
                 currentTabIndex = idx;
                 // Delay loadTab slightly to let the UI repaint
                 setTimeout(() => {
+                    console.log("Before loadTab - still active?", tab.classList.contains("active"));
                     loadTab(tab.dataset.tab);
+                    console.log("After loadTab - still active?", tab.classList.contains("active"));
                 }, 0);
             });
         });
