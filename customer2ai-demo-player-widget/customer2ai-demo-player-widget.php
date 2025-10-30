@@ -131,5 +131,6 @@ final class Customer2AI_Demo_Player_Widget {
             }
         }
     }
+}
 
 Customer2AI_Demo_Player_Widget::instance();
