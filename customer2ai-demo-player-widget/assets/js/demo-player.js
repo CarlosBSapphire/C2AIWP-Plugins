@@ -522,12 +522,11 @@
         }
 
         // ---- Init
-        console.log('Tab Button Length', tabButtons.length);
-        console.log('Tab Button 0',  tabButtons[0].dataset.tab);
+    
         if (tabButtons.length) {
             const firstTabKey = tabButtons[0].dataset.tab;
             console.log('Inside if, 1st tab button object',  tabButtons[0]);
-            const firstImageUrl = tabData[firstTabKey]?.image;
+            const firstImageUrl = tabData[firstTabKey]?.overlayImage;
             console.log('Inside if, firstImageUrl',  firstImageUrl);
             if (firstImageUrl) {
                 setOverlayImageImmediate(firstImageUrl);
