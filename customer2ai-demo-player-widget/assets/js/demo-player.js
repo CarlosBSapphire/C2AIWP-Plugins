@@ -204,7 +204,6 @@
 
             audio = new Audio();
             audio.preload = "auto";
-            audio.crossOrigin = "anonymous";
             audio.src = src;
 
             bindAudioEvents();
