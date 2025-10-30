@@ -16,9 +16,7 @@
     });
 
     function initDemoPlayer($widget, tabData) {
-        console.log('Demo Player initialized', tabData);
-        console.log('Widget element:', $widget);
-        console.log('Play button:', $widget.find("#playPauseBtn")[0]);
+        
         // ---- Elements
         const tabsRoot = $widget.find(".demo-player_tabs")[0];
         const playBtn = $widget.find("#playPauseBtn")[0];
@@ -74,14 +72,7 @@
         }
 
         function setOverlayImageImmediate(imageUrl) {
-                        // After line 409, add:
-            console.log('Loading tab image:', imageUrl);
-            console.log('Overlay element:', demoOverlay);
-            console.log('tabData for current tab:', tabData[tabKey]);
-
-            // After line 417, add:
-            console.log('First tab image URL:', firstImageUrl);
-            console.log('First tab data:', tabData[firstTabKey]);
+            
             if (!demoOverlay || !imageUrl) return;
             demoOverlay.style.backgroundImage = `url("${imageUrl}")`;
         }
@@ -192,7 +183,7 @@
                     demoOverlay.style.backgroundImage = 'none';
                 }
                 
-                const imageUrl = tabData[tabKey]?.imageOverlay;
+                const imageUrl = tabData[tabKey]?.image;
                 if (imageUrl) {
                     updateOverlayImage(imageUrl);
                 }
@@ -221,10 +212,7 @@
         // ---- Controls
         playBtn.addEventListener("click", async (e) => {
             e.preventDefault();
-            console.log('Play button clicked');
-            console.log('Audio object:', audio);
-            console.log('Audio src:', audio?.src);
-            console.log('Audio paused:', audio?.paused);
+        
             
             if (!audio) {
                 console.error('No audio object exists!');
