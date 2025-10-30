@@ -184,9 +184,7 @@
                 }
                 
                 const imageUrl = tabData[tabKey]?.overlayImage;
-                console.log('Loading tab image:', imageUrl);
-                console.log('Overlay element:', demoOverlay);
-                console.log('tabData for current tab:', tabData[tabKey]);
+                
                 if (imageUrl) {
                     updateOverlayImage(imageUrl);
                 }
@@ -525,9 +523,7 @@
     
         if (tabButtons.length) {
             const firstTabKey = tabButtons[0].dataset.tab;
-            console.log('Inside if, 1st tab button object',  tabButtons[0]);
             const firstImageUrl = tabData[firstTabKey]?.overlayImage;
-            console.log('Inside if, firstImageUrl',  firstImageUrl);
             if (firstImageUrl) {
                 setOverlayImageImmediate(firstImageUrl);
             }
