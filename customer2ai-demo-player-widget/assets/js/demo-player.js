@@ -184,7 +184,7 @@
                     demoOverlay.style.backgroundImage = 'none';
                 }
                 
-                const imageUrl = tabData[tabKey]?.image;
+                const imageUrl = tabData[tabKey]?.imageOverlay;
                 if (imageUrl) {
                     updateOverlayImage(imageUrl);
                 }
@@ -196,7 +196,7 @@
             
             isFirstLoad = false;
 
-            const src = tabData[tabKey]?.audio;
+            const src = tabData[tabKey]?.audioUrl;
             if (!src) {
                 console.error(`No audio source for tab "${tabKey}"`);
                 return;
