@@ -183,7 +183,7 @@
                     demoOverlay.style.backgroundImage = 'none';
                 }
                 
-                const imageUrl = tabData[tabKey]?.image;
+                const imageUrl = tabData[tabKey]?.overlayImage;
                 console.log('Loading tab image:', imageUrl);
                 console.log('Overlay element:', demoOverlay);
                 console.log('tabData for current tab:', tabData[tabKey]);
