@@ -524,7 +524,7 @@
         // ---- Init
         if (tabButtons.length) {
             const firstTabKey = tabButtons[0].dataset.tab;
-            const firstImageUrl = tabData[firstTabKey]?.image;
+            const firstImageUrl = tabData[firstTabKey]?.imageOverlay;
             if (firstImageUrl) {
                 setOverlayImageImmediate(firstImageUrl);
             }
