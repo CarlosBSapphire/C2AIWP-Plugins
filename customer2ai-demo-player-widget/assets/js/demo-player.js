@@ -327,8 +327,21 @@
             }
         }
 
+        // sets transcription for rendering
         function getCues() {
             const tab = tabData[currentTab] || {};
+            // Check if transcript is in the new detailed format with segments
+            if (tab.transcript && tab.transcript.segments && Array.isArray(tab.transcript.segments)) {
+                    // Convert detailed format to simple format
+                    return tab.transcript.segments.map(segment => ({
+                        time: segment.start_time,
+                        speaker: segment.speaker.id === "speaker_0" ? "agent" : "caller",
+                        text: segment.text.trim()
+                    })
+                );
+            }
+            
+            // Otherwise use the simple array format
             return Array.isArray(tab.transcript) ? tab.transcript : [];
         }
 
