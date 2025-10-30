@@ -26,6 +26,7 @@ final class Customer2AI_Demo_Player_Widget {
 
     public function __construct() {
         add_action('plugins_loaded', [$this, 'init']);
+        add_action('init', [$this, 'add_cors_headers']);
     }
 
     public function init() {
@@ -110,6 +111,25 @@ final class Customer2AI_Demo_Player_Widget {
             self::VERSION
         );
     }
-}
+
+    //add cors headers for audio files
+    public function add_cors_headers() {
+        if (strpos($_SERVER['REQUEST_URI'], '/wp-content/uploads/') !== false) {
+            $allowed_extensions = ['mp3', 'wav', 'ogg', 'm4a', 'aac'];
+            $file_extension = pathinfo($_SERVER['REQUEST_URI'], PATHINFO_EXTENSION);
+            
+            if (in_array(strtolower($file_extension), $allowed_extensions)) {
+                header('Access-Control-Allow-Origin: *');
+                header('Access-Control-Allow-Methods: GET, OPTIONS');
+                header('Access-Control-Allow-Headers: Content-Type, Range');
+                
+                // Handle preflight requests
+                if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+                    header('Access-Control-Max-Age: 86400');
+                    exit(0);
+                }
+            }
+        }
+    }
 
 Customer2AI_Demo_Player_Widget::instance();
