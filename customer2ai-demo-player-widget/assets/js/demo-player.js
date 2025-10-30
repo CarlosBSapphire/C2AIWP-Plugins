@@ -17,7 +17,8 @@
 
     function initDemoPlayer($widget, tabData) {
         console.log('Demo Player initialized', tabData);
-        
+        console.log('Widget element:', $widget);
+        console.log('Play button:', $widget.find("#playPauseBtn")[0]);
         // ---- Elements
         const tabsRoot = $widget.find(".demo-player_tabs")[0];
         const playBtn = $widget.find("#playPauseBtn")[0];
@@ -213,7 +214,15 @@
         // ---- Controls
         playBtn.addEventListener("click", async (e) => {
             e.preventDefault();
-            if (!audio) return;
+            console.log('Play button clicked');
+            console.log('Audio object:', audio);
+            console.log('Audio src:', audio?.src);
+            console.log('Audio paused:', audio?.paused);
+            
+            if (!audio) {
+                console.error('No audio object exists!');
+                return;
+            }
             try {
                 if (audio.paused) {
                     await audio.play();
