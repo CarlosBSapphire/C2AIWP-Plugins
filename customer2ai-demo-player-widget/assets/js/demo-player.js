@@ -528,7 +528,7 @@
             
             const firstTabKey = tabButtons[0].dataset.tab;
             const firstImageUrl = tabData[firstTabKey]?.imageOverlay;
-            console.log('Inside if, firstImageUrl',  fristImageUrl);
+            console.log('Inside if, firstImageUrl',  firstImageUrl);
             if (firstImageUrl) {
                 setOverlayImageImmediate(firstImageUrl);
             }
