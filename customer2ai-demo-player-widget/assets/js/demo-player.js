@@ -74,6 +74,14 @@
         }
 
         function setOverlayImageImmediate(imageUrl) {
+                        // After line 409, add:
+            console.log('Loading tab image:', imageUrl);
+            console.log('Overlay element:', demoOverlay);
+            console.log('tabData for current tab:', tabData[tabKey]);
+
+            // After line 417, add:
+            console.log('First tab image URL:', firstImageUrl);
+            console.log('First tab data:', tabData[firstTabKey]);
             if (!demoOverlay || !imageUrl) return;
             demoOverlay.style.backgroundImage = `url("${imageUrl}")`;
         }
