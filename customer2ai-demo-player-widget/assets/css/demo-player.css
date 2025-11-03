@@ -8,7 +8,7 @@
     display: flex;
     gap: 8px;
     margin-bottom: 20px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .demo-player_tabs-item {
@@ -16,10 +16,14 @@
     background-color: #f7f7f5;
     color: #282825;
     border-radius: 20px;
-    padding: 8px 14px;
-    font-size: 1rem;
+    padding: 8px 12 px;
+    font-size: clamp(0.75rem, 2vw, 1rem);
     cursor: pointer;
     transition: all 0.3s;
+    flex: 1 1 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .demo-player_tabs-item.active {
@@ -27,6 +31,14 @@
     border-color: #00EEFF;
     color: #fff;
 }
+
+@media (max-width: 600px) {
+    .demo-player_tabs-item {
+        padding: 6px 8px;
+        font-size: 0.75rem;
+    }
+}
+
 .demo-player_card {
     background: #fff;
     border-radius: 12px;
