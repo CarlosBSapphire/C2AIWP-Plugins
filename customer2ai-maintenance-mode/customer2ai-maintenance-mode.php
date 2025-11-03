@@ -350,15 +350,15 @@ class Customer2AI_Maintenance_Mode {
             height: 400px;
             border-radius: 50%;
             background: linear-gradient(135deg, rgba(255, 165, 0, 0.1) 0%, rgba(255, 140, 0, 0.1) 100%);
-            border: 3px solid;
-            border-image: linear-gradient(135deg, #ffa500, #ffa500) 1;
+            border: 3px solid #ffa500;
+            /*border-image: linear-gradient(135deg, #ffa500, #ffa500) 1;*/
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         
-        .robot-circle::before {
+        /*.robot-circle::before {
             content: '';
             position: absolute;
             inset: -3px;
@@ -369,7 +369,7 @@ class Customer2AI_Maintenance_Mode {
             -webkit-mask-composite: xor;
             overflow: hidden;
             mask-composite: exclude;
-        }
+        }*/
         
         .robot-image {
             width: 85%;
@@ -380,32 +380,6 @@ class Customer2AI_Maintenance_Mode {
             z-index: 2;
         }
         
-        /*.caution-tape {
-            position: absolute;
-            width: 120%;
-            height: 60px;
-            background: repeating-linear-gradient(
-                45deg,
-                #000000,
-                #000000 20px,
-                #fbbf24 20px,
-                #fbbf24 40px
-            );
-            z-index: 3;
-            opacity: 0.9;
-        }*/
-        
-        /*.caution-tape.top {
-            top: 30%;
-            left: -10%;
-            transform: rotate(-5deg);
-        }
-        
-        .caution-tape.bottom {
-            bottom: 30%;
-            right: -10%;
-            transform: rotate(-5deg);
-        }*/
         
         /* Social Icons */
         .social-icons {
