@@ -358,7 +358,7 @@ class Customer2AI_Maintenance_Mode {
             justify-content: center;
         }
         
-        .robot-circle::before {
+        /*.robot-circle::before {
             content: '';
             position: absolute;
             inset: -3px;
@@ -368,7 +368,7 @@ class Customer2AI_Maintenance_Mode {
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
-        }
+        }*/
         
         .robot-image {
             width: 85%;
