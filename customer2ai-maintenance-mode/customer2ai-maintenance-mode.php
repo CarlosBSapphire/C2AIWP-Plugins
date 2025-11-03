@@ -378,7 +378,7 @@ class Customer2AI_Maintenance_Mode {
             z-index: 2;
         }
         
-        .caution-tape {
+        /*.caution-tape {
             position: absolute;
             width: 120%;
             height: 60px;
@@ -391,7 +391,7 @@ class Customer2AI_Maintenance_Mode {
             );
             z-index: 3;
             opacity: 0.9;
-        }
+        }*/
         
         /*.caution-tape.top {
             top: 30%;
