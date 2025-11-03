@@ -250,11 +250,11 @@ class Customer2AI_Maintenance_Mode {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
+        * /*{
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
+        }*/
         
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -350,7 +350,7 @@ class Customer2AI_Maintenance_Mode {
             border-radius: 50%;
             background: linear-gradient(135deg, rgba(255, 165, 0, 0.1) 0%, rgba(255, 140, 0, 0.1) 100%);
             border: 3px solid;
-            border-image: linear-gradient(135deg, #ff8c00, #ffa500) 1;
+            border-image: linear-gradient(135deg, #ffa500, #ffa500) 1;
             overflow: hidden;
             display: flex;
             align-items: center;
