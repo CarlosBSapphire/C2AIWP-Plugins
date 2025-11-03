@@ -16,7 +16,7 @@
     background-color: #f7f7f5;
     color: #282825;
     border-radius: 20px;
-    padding: 8px 12 px;
+    padding: 8px 12px;
     font-size: clamp(0.75rem, 2vw, 1rem);
     cursor: pointer;
     transition: all 0.3s;
