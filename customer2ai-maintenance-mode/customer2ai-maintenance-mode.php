@@ -250,11 +250,11 @@ class Customer2AI_Maintenance_Mode {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * /*{
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }*/
+        }
         
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
