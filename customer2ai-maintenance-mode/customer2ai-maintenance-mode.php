@@ -92,6 +92,29 @@ class Customer2AI_Maintenance_Mode {
         }
         
         $options = get_option($this->option_name);
+        // Set defaults if options don't exist or are false
+        if ($options === false || !is_array($options)) {
+            $options = array(
+                'enabled' => false,
+                'title' => 'UNDER MAINTENANCE',
+                'message' => 'We apologize for the inconvenience, we will be back shortly.',
+                'show_social' => true,
+                'linkedin_url' => '#',
+                'facebook_url' => '#',
+                'instagram_url' => '#'
+            );
+        }
+        
+        // Ensure all keys exist with defaults
+        $options = wp_parse_args($options, array(
+            'enabled' => false,
+            'title' => 'UNDER MAINTENANCE',
+            'message' => 'We apologize for the inconvenience, we will be back shortly.',
+            'show_social' => true,
+            'linkedin_url' => '#',
+            'facebook_url' => '#',
+            'instagram_url' => '#'
+        ));
         ?>
         <div class="wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
