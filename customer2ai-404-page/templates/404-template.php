@@ -9,11 +9,11 @@
 </head>
 <body class="error404">
     
-    <div class="c2-404-container">
+    <div class="c2ai-404-container">
         
         <!-- Header -->
-        <header class="c2-404-header">
-            <div class="c2-404-logo">
+        <header class="c2ai-404-header">
+            <div class="c2ai-404-logo">
                 <?php if (has_custom_logo()) : ?>
                     <?php the_custom_logo(); ?>
                 <?php else : ?>
@@ -23,7 +23,7 @@
                 <?php endif; ?>
             </div>
             
-            <nav class="c2-404-nav">
+            <nav class="c2ai-404-nav">
                 <a href="<?php echo esc_url(home_url('/platform')); ?>">PLATFORM</a>
                 <a href="<?php echo esc_url(home_url('/features')); ?>">FEATURES</a>
                 <a href="<?php echo esc_url(home_url('/testimonials')); ?>">TESTIMONIALS</a>
@@ -32,39 +32,39 @@
                 <a href="<?php echo esc_url(home_url('/blog')); ?>">BLOG</a>
             </nav>
             
-            <div class="c2-404-dashboard">
+            <div class="c2ai-404-dashboard">
                 <a href="<?php echo esc_url(home_url('/dashboard')); ?>" class="dashboard-btn">DASHBOARD</a>
             </div>
         </header>
 
         <!-- Main 404 Content -->
-        <main class="c2-404-main">
-            <div class="c2-404-content">
+        <main class="c2ai-404-main">
+            <div class="c2ai-404-content">
                 
                 <!-- Large 404 with image -->
-                <div class="c2-404-number">
+                <div class="c2ai-404-number">
                     <span class="number-text">404</span>
-                    <div class="c2-404-image-container">
+                    <div class="c2ai-404-image-container">
                         <img src="<?php echo C2_404_PLUGIN_URL; ?>assets/images/robot-space.webp" 
                              alt="Lost robot in space" 
-                             class="c2-404-image">
+                             class="c2ai-404-image">
                     </div>
                 </div>
                 
                 <!-- Text Content -->
-                <div class="c2-404-text">
-                    <h1 class="c2-404-title">PAGE NOT FOUND</h1>
-                    <p class="c2-404-subtitle">It seems you got a little bit lost.</p>
+                <div class="c2ai-404-text">
+                    <h1 class="c2ai-404-title">PAGE NOT FOUND</h1>
+                    <p class="c2ai-404-subtitle">It seems you got a little bit lost.</p>
                     
                     <a href="<?php echo esc_url(get_option('c2_404_home_url', home_url('/'))); ?>" 
-                       class="c2-404-home-btn">Return Home</a>
+                       class="c2ai-404-home-btn">Return Home</a>
                 </div>
                 
             </div>
         </main>
 
         <!-- Social Media Icons -->
-        <div class="c2-404-social">
+        <div class="c2ai-404-social">
             <?php if ($linkedin = get_option('c2_404_linkedin_url')) : ?>
             <a href="<?php echo esc_url($linkedin); ?>" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -91,7 +91,7 @@
         </div>
 
         <!-- Footer -->
-        <footer class="c2-404-footer">
+        <footer class="c2ai-404-footer">
             <div class="footer-content">
                 <div class="footer-logo">
                     <?php if (has_custom_logo()) : ?>
