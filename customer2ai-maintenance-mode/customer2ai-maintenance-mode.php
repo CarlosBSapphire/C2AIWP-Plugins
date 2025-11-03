@@ -393,7 +393,7 @@ class Customer2AI_Maintenance_Mode {
             opacity: 0.9;
         }
         
-        .caution-tape.top {
+        /*.caution-tape.top {
             top: 30%;
             left: -10%;
             transform: rotate(-5deg);
@@ -403,7 +403,7 @@ class Customer2AI_Maintenance_Mode {
             bottom: 30%;
             right: -10%;
             transform: rotate(-5deg);
-        }
+        }*/
         
         /* Social Icons */
         .social-icons {
@@ -613,8 +613,6 @@ class Customer2AI_Maintenance_Mode {
         <div class="robot-container">
             <div class="robot-circle">
                 <img src="<?php echo esc_url($robot_image); ?>" alt="Robot under maintenance" class="robot-image">
-                <div class="caution-tape top"></div>
-                <div class="caution-tape bottom"></div>
             </div>
         </div>
         
