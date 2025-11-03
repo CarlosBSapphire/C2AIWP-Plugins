@@ -120,9 +120,9 @@ body.error404 {
 
 .c2ai-404-image-container {
     position: absolute;
-    top: 50%;
+    top: 60%;
     left: 50%;
-    transform: translate(-50%, -30%);
+    transform: translate(-50%, -50%);
     z-index: 2;  
     width: 60%;
     aspect-ratio: 1 / 1;  
