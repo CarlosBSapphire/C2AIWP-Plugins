@@ -135,6 +135,11 @@ class N8nClient
      */
     public function chargeCustomer($chargeData)
     {
+        $this->log('[chargeCustomer] Starting charge', 'info', [
+            'amount' => $chargeData['total_to_charge'] ?? null,
+            'email' => $chargeData['email'] ?? null
+        ]);
+
         // Sanitize input
         $chargeData = SecurityValidator::sanitizeInput($chargeData);
 
@@ -142,6 +147,9 @@ class N8nClient
         $required = ['card_token', 'total_to_charge', 'email'];
         foreach ($required as $field) {
             if (empty($chargeData[$field])) {
+                $this->log('[chargeCustomer] Validation failed', 'error', [
+                    'missing_field' => $field
+                ]);
                 return [
                     'success' => false,
                     'data' => null,
@@ -150,7 +158,18 @@ class N8nClient
             }
         }
 
-        return $this->request(self::ENDPOINT_CHARGE_CUSTOMER, 'POST', $chargeData);
+        $this->log('[chargeCustomer] Sending request to charge-customer webhook', 'info', [
+            'endpoint' => self::ENDPOINT_CHARGE_CUSTOMER
+        ]);
+
+        $result = $this->request(self::ENDPOINT_CHARGE_CUSTOMER, 'POST', $chargeData);
+
+        $this->log('[chargeCustomer] Response received', 'info', [
+            'success' => $result['success'] ?? false,
+            'error' => $result['error'] ?? null
+        ]);
+
+        return $result;
     }
 
     /**
@@ -221,9 +240,14 @@ class N8nClient
      */
     public function submitOrder($orderData)
     {
-        $this->log('submit_order', 'info', [
+        $this->log('[submitOrder] Starting order submission', 'info', [
             'products' => $orderData['products'] ?? [],
-            'addons' => $orderData['addons'] ?? []
+            'addons' => $orderData['addons'] ?? [],
+            'setup_total' => $orderData['setup_total'] ?? 0
+        ]);
+
+        $this->log('[submitOrder] Sending to webhook', 'info', [
+            'endpoint' => self::ENDPOINT_WEBSITE_PAYLOAD_PURCHASE
         ]);
 
         $response = $this->request(
@@ -232,13 +256,28 @@ class N8nClient
             $orderData
         );
 
+        $this->log('[submitOrder] Response received', 'info', [
+            'success' => $response['success'] ?? false,
+            'has_data' => !empty($response['data']),
+            'error' => $response['error'] ?? null,
+            'full_response' => $response
+        ]);
+
         if (isset($response['success']) && $response['success']) {
+            $this->log('[submitOrder] Order submitted successfully', 'info', [
+                'order_id' => $response['data']['order_id'] ?? null
+            ]);
             return [
                 'success' => true,
                 'data' => $response['data'] ?? [],
                 'error' => null
             ];
         }
+
+        $this->log('[submitOrder] Order submission failed', 'error', [
+            'error' => $response['error'] ?? 'Failed to submit order',
+            'response' => $response
+        ]);
 
         return [
             'success' => false,

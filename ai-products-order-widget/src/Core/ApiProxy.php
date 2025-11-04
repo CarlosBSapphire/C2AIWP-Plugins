@@ -181,11 +181,21 @@ class ApiProxy
      */
     private function handleCompleteOrder($data)
     {
+        $this->log('info', '[handleCompleteOrder] Starting order completion', [
+            'has_payment' => !empty($data['payment']),
+            'setup_total' => $data['setup_total'] ?? 0,
+            'products' => $data['products'] ?? [],
+        ]);
+
         $payment = $data['payment'] ?? [];
         $setupTotal = $data['setup_total'] ?? 0;
 
         // Step 1: Charge customer using Stripe token
         if (!empty($payment['stripe_token']) && $setupTotal > 0) {
+            $this->log('info', '[handleCompleteOrder] Processing payment', [
+                'stripe_token' => substr($payment['stripe_token'], 0, 10) . '...',
+                'amount' => $setupTotal
+            ]);
             // Format data to match n8n charge-customer webhook expectations
             $chargeData = [
                 'name' => trim(($payment['first_name'] ?? '') . ' ' . ($payment['last_name'] ?? '')),
@@ -205,7 +215,17 @@ class ApiProxy
 
             $chargeResult = $this->n8nClient->chargeCustomer($chargeData);
 
+            $this->log('info', '[handleCompleteOrder] Charge result', [
+                'success' => $chargeResult['success'],
+                'error' => $chargeResult['error'] ?? null,
+                'charge_id' => $chargeResult['data']['charge_id'] ?? null
+            ]);
+
             if (!$chargeResult['success']) {
+                $this->log('error', '[handleCompleteOrder] Payment failed', [
+                    'error' => $chargeResult['error'] ?? 'Unknown error',
+                    'full_result' => $chargeResult
+                ]);
                 return [
                     'success' => false,
                     'error' => 'Payment failed: ' . ($chargeResult['error'] ?? 'Unknown error'),
@@ -215,6 +235,9 @@ class ApiProxy
 
             // Store charge ID in payment info
             $payment['charge_id'] = $chargeResult['data']['charge_id'] ?? null;
+            $this->log('info', '[handleCompleteOrder] Payment successful', [
+                'charge_id' => $payment['charge_id']
+            ]);
         }
 
         // Step 2: Prepare complete order payload for n8n webhook
@@ -238,11 +261,31 @@ class ApiProxy
         ];
 
         // Step 3: Submit to n8n website-payload-purchase webhook
+        $this->log('info', '[handleCompleteOrder] Submitting order to n8n', [
+            'products_count' => count($orderPayload['products']),
+            'has_call_setup' => !empty($orderPayload['call_setup'])
+        ]);
+
         $result = $this->n8nClient->submitOrder($orderPayload);
 
+        $this->log('info', '[handleCompleteOrder] Submit order result', [
+            'success' => $result['success'],
+            'error' => $result['error'] ?? null,
+            'order_id' => $result['data']['order_id'] ?? null
+        ]);
+
         if (!$result['success']) {
+            $this->log('error', '[handleCompleteOrder] Order submission failed', [
+                'error' => $result['error'] ?? 'Unknown error',
+                'full_result' => $result
+            ]);
             return $result;
         }
+
+        $this->log('info', '[handleCompleteOrder] Order completed successfully', [
+            'order_id' => $result['data']['order_id'] ?? uniqid('order_'),
+            'charge_id' => $payment['charge_id'] ?? null
+        ]);
 
         return [
             'success' => true,

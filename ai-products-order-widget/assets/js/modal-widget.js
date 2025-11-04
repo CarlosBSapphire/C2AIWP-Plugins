@@ -770,6 +770,8 @@
          * Complete the order
          */
         async completeOrder() {
+            console.log('=== ORDER COMPLETION STARTED ===');
+
             this.showLoading('Completing your order...');
 
             try {
@@ -795,26 +797,45 @@
                     } : null
                 };
 
+                console.log('Order data prepared:', JSON.stringify(orderData, null, 2));
+
                 // Send to n8n webhook via ApiProxy
+                console.log('Calling complete_order API...');
                 const response = await this.apiCall('complete_order', orderData);
 
+                console.log('Complete order response:', response);
+
                 if (response.success) {
+                    console.log('Order completed successfully!');
                     this.showSuccess();
 
                     // If BYO/Porting, send LOA via email
                     if (this.state.setupType === 'byo') {
+                        console.log('Setup type is BYO, sending porting LOA...');
                         await this.apiCall('send_porting_loa', {
                             email: this.state.paymentInfo.email,
                             customer_name: `${this.state.paymentInfo.first_name} ${this.state.paymentInfo.last_name}`,
                             number_count: this.state.numberCount
                         });
+                        console.log('Porting LOA sent');
                     }
                 } else {
+                    console.error('Order completion failed:', response);
+                    console.error('Error details:', {
+                        error: response.error,
+                        error_code: response.error_code,
+                        data: response.data,
+                        full_response: response
+                    });
                     alert('Order completion failed: ' + (response.error || 'Unknown error'));
                 }
             } catch (error) {
+                console.error('Exception during order completion:', error);
+                console.error('Error stack:', error.stack);
                 alert('Error: ' + error.message);
             }
+
+            console.log('=== ORDER COMPLETION ENDED ===');
         }
 
         /**
@@ -856,23 +877,44 @@
          * API call helper (uses proxy)
          */
         async apiCall(action, data) {
-            const response = await fetch(this.config.apiProxy, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    action: 'aipw_' + action,
-                    nonce: this.config.nonce,
-                    data: data
-                })
-            });
+            console.log(`[apiCall] Starting ${action} request`);
+            console.log('[apiCall] Request data:', data);
 
-            if (!response.ok) {
-                throw new Error('API call failed');
+            const requestBody = {
+                action: 'aipw_' + action,
+                nonce: this.config.nonce,
+                data: data
+            };
+
+            console.log('[apiCall] Request body:', requestBody);
+            console.log('[apiCall] API endpoint:', this.config.apiProxy);
+
+            try {
+                const response = await fetch(this.config.apiProxy, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                console.log(`[apiCall] Response status: ${response.status} ${response.statusText}`);
+
+                if (!response.ok) {
+                    console.error('[apiCall] Response not OK:', response);
+                    const errorText = await response.text();
+                    console.error('[apiCall] Error response body:', errorText);
+                    throw new Error(`API call failed: ${response.status} ${response.statusText}`);
+                }
+
+                const jsonResponse = await response.json();
+                console.log(`[apiCall] ${action} response:`, jsonResponse);
+
+                return jsonResponse;
+            } catch (error) {
+                console.error(`[apiCall] Exception in ${action}:`, error);
+                throw error;
             }
-
-            return await response.json();
         }
 
         /**
