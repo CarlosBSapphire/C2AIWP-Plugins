@@ -1062,7 +1062,7 @@
 
                 console.log('Payment info stored:', this.state.paymentInfo);
                 // Complete order immediately if no calls
-                const { paymentMethod, error } = await this.stripe.createPaymentMethod({ type: "card", card: this.cardElement});
+                const { paymentMethod, error } = await this.stripe.createPaymentMethod({ type: "card", card: result});
                 console.log('Payment method result:', { paymentMethod, error });
                 
                 if (!error) {
