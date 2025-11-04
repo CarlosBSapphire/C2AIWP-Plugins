@@ -181,18 +181,61 @@ class ApiProxy
      */
     private function handleCompleteOrder($data)
     {
-        // Prepare complete order payload for n8n webhook
+        $payment = $data['payment'] ?? [];
+        $setupTotal = $data['setup_total'] ?? 0;
+
+        // Step 1: Charge customer using Stripe token
+        if (!empty($payment['stripe_token']) && $setupTotal > 0) {
+            $chargeData = [
+                'amount' => $setupTotal,
+                'currency' => 'usd',
+                'payment_method' => [
+                    'stripe_token' => $payment['stripe_token']
+                ],
+                'customer' => [
+                    'first_name' => $payment['first_name'] ?? '',
+                    'last_name' => $payment['last_name'] ?? '',
+                    'email' => $payment['email'] ?? '',
+                    'phone' => $payment['phone_number'] ?? ''
+                ],
+                'billing_address' => [
+                    'address' => $payment['shipping_address'] ?? '',
+                    'city' => $payment['shipping_city'] ?? '',
+                    'zip' => $payment['shipping_zip'] ?? '',
+                    'country' => $payment['shipping_country'] ?? 'US'
+                ],
+                'metadata' => [
+                    'products' => $data['products'] ?? [],
+                    'addons' => $data['addons'] ?? []
+                ]
+            ];
+
+            $chargeResult = $this->n8nClient->chargeCustomer($chargeData);
+
+            if (!$chargeResult['success']) {
+                return [
+                    'success' => false,
+                    'error' => 'Payment failed: ' . ($chargeResult['error'] ?? 'Unknown error'),
+                    'error_code' => 'PAYMENT_FAILED'
+                ];
+            }
+
+            // Store charge ID in payment info
+            $payment['charge_id'] = $chargeResult['data']['charge_id'] ?? null;
+        }
+
+        // Step 2: Prepare complete order payload for n8n webhook
         $orderPayload = [
             // Products and addons
             'products' => $data['products'] ?? [],
             'addons' => $data['addons'] ?? [],
 
             // Pricing
-            'setup_total' => $data['setup_total'] ?? 0,
+            'setup_total' => $setupTotal,
             'weekly_cost' => $data['weekly_cost'] ?? 0,
 
-            // Payment info (includes Stripe token)
-            'payment' => $data['payment'] ?? [],
+            // Payment info (includes Stripe token and charge ID)
+            'payment' => $payment,
 
             // Call setup (if applicable)
             'call_setup' => $data['call_setup'] ?? null,
@@ -201,7 +244,7 @@ class ApiProxy
             'submitted_at' => date('Y-m-d H:i:s')
         ];
 
-        // Submit to n8n website-payload-purchase webhook
+        // Step 3: Submit to n8n website-payload-purchase webhook
         $result = $this->n8nClient->submitOrder($orderPayload);
 
         if (!$result['success']) {
@@ -212,6 +255,7 @@ class ApiProxy
             'success' => true,
             'data' => [
                 'order_id' => $result['data']['order_id'] ?? uniqid('order_'),
+                'charge_id' => $payment['charge_id'] ?? null,
                 'message' => 'Order completed successfully'
             ],
             'error' => null
