@@ -18,12 +18,12 @@ class N8nClient
     /**
      * n8n webhook endpoints
      */
-    const isTest = true;
-    const ENDPOINT_SELECT = 'https://n8n.workflows.organizedchaos.cc/webhook/da176ae9-496c-4f08-baf5-6a78a6a42adb';
-    const ENDPOINT_CREATE_USER = 'https://n8n.workflows.organizedchaos.cc/webhook/users/create';
-    const ENDPOINT_CHARGE_CUSTOMER = $isTest ? 'https://n8n.workflows.organizedchaos.cc/webhook/charge-test' : 'https://n8n.workflows.organizedchaos.cc/webhook/charge-customer';
-    const ENDPOINT_WEBSITE_PAYLOAD_PURCHASE = 'https://n8n.workflows.organizedchaos.cc/webhook/website-payload-purchase';
+    private bool $isTest = true;
 
+    public string $ENDPOINT_SELECT;
+    public string $ENDPOINT_CREATE_USER;
+    public string $ENDPOINT_CHARGE_CUSTOMER;
+    public string $ENDPOINT_WEBSITE_PAYLOAD_PURCHASE;
     /**
      * HTTP client adapter
      *
@@ -57,6 +57,13 @@ class N8nClient
         $this->httpClient = $httpClient;
         $this->logger = $logger;
         $this->cache = $cache;
+
+        $this->ENDPOINT_SELECT = 'https://n8n.workflows.organizedchaos.cc/webhook/da176ae9-496c-4f08-baf5-6a78a6a42adb';
+        $this->ENDPOINT_CREATE_USER = 'https://n8n.workflows.organizedchaos.cc/webhook/users/create';
+        $this->ENDPOINT_CHARGE_CUSTOMER = $this->isTest
+            ? 'https://n8n.workflows.organizedchaos.cc/webhook/charge-test'
+            : 'https://n8n.workflows.organizedchaos.cc/webhook/charge-customer';
+        $this->ENDPOINT_WEBSITE_PAYLOAD_PURCHASE = 'https://n8n.workflows.organizedchaos.cc/webhook/website-payload-purchase';
     }
 
     /**
@@ -102,7 +109,7 @@ class N8nClient
         ];
 
         // Execute request
-        return $this->request(self::ENDPOINT_SELECT, 'POST', $payload);
+        return $this->request($this->ENDPOINT_SELECT, 'POST', $payload);
     }
 
     /**
@@ -125,7 +132,7 @@ class N8nClient
             ];
         }
 
-        return $this->request(self::ENDPOINT_CREATE_USER, 'POST', $userData);
+        return $this->request($this->ENDPOINT_CREATE_USER, 'POST', $userData);
     }
 
     /**
@@ -160,10 +167,10 @@ class N8nClient
         }
 
         $this->log('[chargeCustomer] Sending request to charge-customer webhook', 'info', [
-            'endpoint' => self::ENDPOINT_CHARGE_CUSTOMER
+            'endpoint' => $this->ENDPOINT_CHARGE_CUSTOMER
         ]);
 
-        $result = $this->request(self::ENDPOINT_CHARGE_CUSTOMER, 'POST', $chargeData);
+        $result = $this->request($this->ENDPOINT_CHARGE_CUSTOMER, 'POST', $chargeData);
 
         $this->log('[chargeCustomer] Response received', 'info', [
             'success' => $result['success'] ?? false,
@@ -248,11 +255,11 @@ class N8nClient
         ]);
 
         $this->log('[submitOrder] Sending to webhook', 'info', [
-            'endpoint' => self::ENDPOINT_WEBSITE_PAYLOAD_PURCHASE
+            'endpoint' => $this->ENDPOINT_WEBSITE_PAYLOAD_PURCHASE
         ]);
 
         $response = $this->request(
-            self::ENDPOINT_WEBSITE_PAYLOAD_PURCHASE,
+            $this->ENDPOINT_WEBSITE_PAYLOAD_PURCHASE,
             'POST',
             $orderData
         );
