@@ -40,8 +40,8 @@
             ];
 
             this.pricing = {
-                setup: 999.99,
-                weekly: 150.00
+                setup: 99999,
+                weekly: 15000
             };
 
             // Stripe elements
@@ -1067,6 +1067,8 @@
                     this.renderStep(3); // Go to call setup
                 } else {
                     // Complete order immediately if no calls
+                    const { paymentMethod, error } = await stripe.createPaymentMethod({ type: "card", card: card });
+                    this.state.paymentInfo.card_token = result.paymentMethod;
                     await this.completeOrder();
                 }
             } catch (error) {
