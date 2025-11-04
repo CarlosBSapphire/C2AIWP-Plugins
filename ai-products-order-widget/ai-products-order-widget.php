@@ -179,8 +179,15 @@ class AI_Products_Order_Widget
      */
     public function handle_api_proxy()
     {
-        // Verify nonce
-        if (!check_ajax_referer('aipw_api_proxy', 'nonce', false)) {
+        // Get request data from JSON body
+        $input = file_get_contents('php://input');
+        $request = json_decode($input, true);
+
+        $nonce = $request['nonce'] ?? '';
+
+        // Verify nonce manually since it's in JSON body
+        if (!wp_verify_nonce($nonce, 'aipw_api_proxy')) {
+            error_log('[AIPW] Nonce verification failed: ' . $nonce);
             wp_send_json_error([
                 'message' => 'Security verification failed',
                 'error_code' => 'INVALID_NONCE'
@@ -188,12 +195,10 @@ class AI_Products_Order_Widget
             return;
         }
 
-        // Get request data
-        $input = file_get_contents('php://input');
-        $request = json_decode($input, true);
-
         $action = $request['action'] ?? '';
         $data = $request['data'] ?? [];
+
+        error_log('[AIPW] API proxy request: ' . $action);
 
         // Remove 'aipw_' prefix if present
         $action = str_replace('aipw_', '', $action);
