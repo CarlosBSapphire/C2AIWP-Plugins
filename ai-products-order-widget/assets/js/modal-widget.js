@@ -15,6 +15,7 @@
             this.config = {
                 apiProxy: config.apiProxy || '/wp-admin/admin-ajax.php',
                 nonce: config.nonce || '',
+                stripePublicKey: config.stripePublicKey || 'pk_test_51RO1TFI6Mo3ACLGTuEJTA0vmAS6XovFb3ym9oTp9kPW6OO7s9IZI9DTsxQfLaAdzLQqBB4bzQeFfDu6Ux4YpB2hw002QJW8iRr',
                 ...config
             };
 
@@ -42,6 +43,10 @@
                 setup: 999.99,
                 weekly: 150.00
             };
+
+            // Stripe elements
+            this.stripe = null;
+            this.cardElement = null;
 
             this.init();
         }
@@ -438,18 +443,9 @@
                     </div>
 
                     <div class="aipw-form-group full-width">
-                        <label class="aipw-form-label">Card Number</label>
-                        <input type="text" class="aipw-form-input" name="card_number" placeholder="1234 5678 9012 3456" required>
-                    </div>
-
-                    <div class="aipw-form-group">
-                        <label class="aipw-form-label">Card Expiration</label>
-                        <input type="text" class="aipw-form-input" name="card_expire" placeholder="MM/YY" required>
-                    </div>
-
-                    <div class="aipw-form-group">
-                        <label class="aipw-form-label">CVV</label>
-                        <input type="text" class="aipw-form-input" name="card_cvv" placeholder="123" required>
+                        <label class="aipw-form-label">Card Information</label>
+                        <div id="card-element" class="aipw-stripe-element"></div>
+                        <div id="card-errors" class="aipw-stripe-errors" role="alert"></div>
                     </div>
                 </form>
             `;
@@ -463,6 +459,55 @@
             document.getElementById('aipwUseSameAddress').addEventListener('change', (e) => {
                 document.getElementById('aipwBillingAddress').style.display =
                     e.target.checked ? 'none' : 'grid';
+            });
+
+            // Initialize Stripe Elements
+            this.initializeStripe();
+        }
+
+        /**
+         * Initialize Stripe Elements
+         */
+        initializeStripe() {
+            if (!window.Stripe) {
+                console.error('Stripe.js not loaded');
+                return;
+            }
+
+            // Initialize Stripe
+            this.stripe = Stripe(this.config.stripePublicKey);
+            const elements = this.stripe.elements();
+
+            // Create card element with themed styles
+            this.cardElement = elements.create('card', {
+                style: {
+                    base: {
+                        color: '#e8eefc',
+                        fontFamily: '"Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif',
+                        fontSize: '16px',
+                        iconColor: '#7aa2ff',
+                        '::placeholder': {
+                            color: 'rgba(232,238,252,0.6)'
+                        }
+                    },
+                    invalid: {
+                        color: '#ff8a80',
+                        iconColor: '#ff8a80'
+                    }
+                }
+            });
+
+            // Mount card element
+            this.cardElement.mount('#card-element');
+
+            // Handle real-time validation errors
+            this.cardElement.on('change', (event) => {
+                const displayError = document.getElementById('card-errors');
+                if (event.error) {
+                    displayError.textContent = event.error.message;
+                } else {
+                    displayError.textContent = '';
+                }
             });
         }
 
@@ -482,26 +527,30 @@
             this.showLoading('Processing payment...');
 
             try {
-                // Call payment proxy
-                const response = await this.apiCall('process_payment', {
-                    ...Object.fromEntries(formData),
-                    products: this.state.selectedProducts,
-                    addons: this.state.selectedAddons,
-                    amount: this.pricing.setup
-                });
+                // Create Stripe token
+                const {token, error} = await this.stripe.createToken(this.cardElement);
 
-                if (response.success) {
-                    // Check if calls selected
-                    if (this.state.selectedProducts.includes('inbound_outbound_calls')) {
-                        this.renderStep(3); // Go to call setup
-                    } else {
-                        this.showSuccess();
-                    }
+                if (error) {
+                    // Show error to user
+                    document.getElementById('card-errors').textContent = error.message;
+                    this.renderStep(2); // Go back to payment form
+                    return;
+                }
+
+                // Store payment info for later
+                this.state.paymentInfo = Object.fromEntries(formData);
+                this.state.paymentInfo.stripe_token = token.id;
+
+                // Check if calls selected
+                if (this.state.selectedProducts.includes('inbound_outbound_calls')) {
+                    this.renderStep(3); // Go to call setup
                 } else {
-                    alert('Payment failed: ' + response.error);
+                    // Complete order immediately if no calls
+                    await this.completeOrder();
                 }
             } catch (error) {
                 alert('Payment error: ' + error.message);
+                this.renderStep(2);
             }
         }
 
@@ -681,7 +730,30 @@
             this.showLoading('Completing your order...');
 
             try {
-                const response = await this.apiCall('complete_order', this.state);
+                // Prepare complete order payload
+                const orderData = {
+                    // Products and addons
+                    products: this.state.selectedProducts,
+                    addons: this.state.selectedAddons,
+
+                    // Pricing
+                    setup_total: this.pricing.setup,
+                    weekly_cost: this.pricing.weekly,
+
+                    // Payment info
+                    payment: this.state.paymentInfo,
+
+                    // Call setup (if applicable)
+                    call_setup: this.state.selectedProducts.includes('inbound_outbound_calls') ? {
+                        setup_type: this.state.setupType,
+                        number_count: this.state.numberCount,
+                        assignment_type: this.state.assignmentType,
+                        agent_style: this.state.agentStyle
+                    } : null
+                };
+
+                // Send to n8n webhook via ApiProxy
+                const response = await this.apiCall('complete_order', orderData);
 
                 if (response.success) {
                     this.showSuccess();
@@ -695,7 +767,7 @@
                         });
                     }
                 } else {
-                    alert('Order completion failed: ' + response.error);
+                    alert('Order completion failed: ' + (response.error || 'Unknown error'));
                 }
             } catch (error) {
                 alert('Error: ' + error.message);

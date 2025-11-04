@@ -567,3 +567,24 @@
     font-size: 16px;
     color: #666;
 }
+
+/* Stripe Element Styles */
+.aipw-stripe-element {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #f9f9f9;
+    transition: border-color 0.3s ease;
+}
+
+.aipw-stripe-element:focus-within {
+    border-color: #000;
+    outline: none;
+}
+
+.aipw-stripe-errors {
+    color: #ff8a80;
+    font-size: 14px;
+    margin-top: 8px;
+    min-height: 20px;
+}

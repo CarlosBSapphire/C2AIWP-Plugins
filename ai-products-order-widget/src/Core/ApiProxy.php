@@ -181,32 +181,37 @@ class ApiProxy
      */
     private function handleCompleteOrder($data)
     {
-        // Create user account if needed
-        $userData = [
-            'email' => $data['paymentInfo']['email'] ?? '',
-            'first_name' => $data['paymentInfo']['first_name'] ?? '',
-            'last_name' => $data['paymentInfo']['last_name'] ?? '',
-            'phone_number' => $data['paymentInfo']['phone_number'] ?? '',
-            'company' => $data['paymentInfo']['company'] ?? '',
-            'selected_products' => $data['selectedProducts'] ?? [],
-            'selected_addons' => $data['selectedAddons'] ?? [],
-            'setup_type' => $data['setupType'] ?? '',
-            'agent_style' => $data['agentStyle'] ?? '',
-            'number_count' => $data['numberCount'] ?? 1,
-            'assignment_type' => $data['assignmentType'] ?? ''
+        // Prepare complete order payload for n8n webhook
+        $orderPayload = [
+            // Products and addons
+            'products' => $data['products'] ?? [],
+            'addons' => $data['addons'] ?? [],
+
+            // Pricing
+            'setup_total' => $data['setup_total'] ?? 0,
+            'weekly_cost' => $data['weekly_cost'] ?? 0,
+
+            // Payment info (includes Stripe token)
+            'payment' => $data['payment'] ?? [],
+
+            // Call setup (if applicable)
+            'call_setup' => $data['call_setup'] ?? null,
+
+            // Timestamp
+            'submitted_at' => date('Y-m-d H:i:s')
         ];
 
-        $userResult = $this->n8nClient->createUser($userData);
+        // Submit to n8n website-payload-purchase webhook
+        $result = $this->n8nClient->submitOrder($orderPayload);
 
-        if (!$userResult['success']) {
-            return $userResult;
+        if (!$result['success']) {
+            return $result;
         }
 
         return [
             'success' => true,
             'data' => [
-                'user_id' => $userResult['data']['id'] ?? null,
-                'order_id' => $userResult['data']['order_id'] ?? null,
+                'order_id' => $result['data']['order_id'] ?? uniqid('order_'),
                 'message' => 'Order completed successfully'
             ],
             'error' => null

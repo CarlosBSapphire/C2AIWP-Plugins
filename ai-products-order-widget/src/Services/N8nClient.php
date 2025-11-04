@@ -21,6 +21,7 @@ class N8nClient
     const ENDPOINT_SELECT = 'https://n8n.workflows.organizedchaos.cc/webhook/da176ae9-496c-4f08-baf5-6a78a6a42adb';
     const ENDPOINT_CREATE_USER = 'https://n8n.workflows.organizedchaos.cc/webhook/users/create';
     const ENDPOINT_CHARGE_CUSTOMER = 'https://n8n.workflows.organizedchaos.cc/webhook/charge-customer';
+    const ENDPOINT_WEBSITE_PAYLOAD_PURCHASE = 'https://n8n.workflows.organizedchaos.cc/webhook/website-payload-purchase';
 
     /**
      * HTTP client adapter
@@ -210,6 +211,40 @@ class N8nClient
         }
 
         return $result;
+    }
+
+    /**
+     * Submit complete order to website-payload-purchase webhook
+     *
+     * @param array $orderData Complete order payload
+     * @return array
+     */
+    public function submitOrder($orderData)
+    {
+        $this->log('submit_order', 'info', [
+            'products' => $orderData['products'] ?? [],
+            'addons' => $orderData['addons'] ?? []
+        ]);
+
+        $response = $this->request(
+            self::ENDPOINT_WEBSITE_PAYLOAD_PURCHASE,
+            'POST',
+            $orderData
+        );
+
+        if (isset($response['success']) && $response['success']) {
+            return [
+                'success' => true,
+                'data' => $response['data'] ?? [],
+                'error' => null
+            ];
+        }
+
+        return [
+            'success' => false,
+            'data' => null,
+            'error' => $response['error'] ?? 'Failed to submit order'
+        ];
     }
 
     /**

@@ -273,6 +273,15 @@ class AI_Products_Order_Widget
             return;
         }
 
+        // Enqueue Stripe.js v3
+        wp_enqueue_script(
+            'stripe-js',
+            'https://js.stripe.com/v3/',
+            [],
+            '3.0',
+            true
+        );
+
         // Enqueue libphonenumber-js for client-side validation
         wp_enqueue_script(
             'libphonenumber',
@@ -286,7 +295,7 @@ class AI_Products_Order_Widget
         wp_enqueue_script(
             'aipw-modal-widget',
             AIPW_PLUGIN_URL . 'assets/js/modal-widget.js',
-            ['libphonenumber'],
+            ['stripe-js', 'libphonenumber'],
             AIPW_VERSION,
             true
         );
@@ -296,6 +305,7 @@ class AI_Products_Order_Widget
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('aipw_api_proxy'),
             'apiProxy' => admin_url('admin-ajax.php') . '?action=aipw_api_proxy',
+            'stripePublicKey' => 'pk_test_51RO1TFI6Mo3ACLGTuEJTA0vmAS6XovFb3ym9oTp9kPW6OO7s9IZI9DTsxQfLaAdzLQqBB4bzQeFfDu6Ux4YpB2hw002QJW8iRr',
             'version' => AIPW_VERSION
         ]);
 
