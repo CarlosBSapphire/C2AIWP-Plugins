@@ -668,7 +668,7 @@
                         <div class="aipw-form-group">
                             <label class="aipw-form-label">Country</label>
                             <select class="aipw-form-select" name="billing_country">
-                                <select class="aipw-form-select" name="billing_country" required>
+                            <option value="">Select Country</option>
                             <option value="AF">Afghanistan</option>
                             <option value="AL">Albania</option>
                             <option value="DZ">Algeria</option>
