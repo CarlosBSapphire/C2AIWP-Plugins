@@ -18,9 +18,10 @@ class N8nClient
     /**
      * n8n webhook endpoints
      */
+    const isTest = true;
     const ENDPOINT_SELECT = 'https://n8n.workflows.organizedchaos.cc/webhook/da176ae9-496c-4f08-baf5-6a78a6a42adb';
     const ENDPOINT_CREATE_USER = 'https://n8n.workflows.organizedchaos.cc/webhook/users/create';
-    const ENDPOINT_CHARGE_CUSTOMER = 'https://n8n.workflows.organizedchaos.cc/webhook/charge-customer';
+    const ENDPOINT_CHARGE_CUSTOMER = $isTest ? 'https://n8n.workflows.organizedchaos.cc/webhook/charge-test' : 'https://n8n.workflows.organizedchaos.cc/webhook/charge-customer';
     const ENDPOINT_WEBSITE_PAYLOAD_PURCHASE = 'https://n8n.workflows.organizedchaos.cc/webhook/website-payload-purchase';
 
     /**
