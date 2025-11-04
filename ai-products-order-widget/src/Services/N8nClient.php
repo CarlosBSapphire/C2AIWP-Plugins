@@ -138,8 +138,8 @@ class N8nClient
         // Sanitize input
         $chargeData = SecurityValidator::sanitizeInput($chargeData);
 
-        // Validate required fields
-        $required = ['amount', 'currency', 'payment_method'];
+        // Validate required fields for charge-customer webhook
+        $required = ['card_token', 'total_to_charge', 'email'];
         foreach ($required as $field) {
             if (empty($chargeData[$field])) {
                 return [

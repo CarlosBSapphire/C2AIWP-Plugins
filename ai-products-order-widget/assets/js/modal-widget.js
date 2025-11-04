@@ -523,19 +523,23 @@
                 return;
             }
 
-            // Show loading
-            this.showLoading('Processing payment...');
-
             try {
-                // Create Stripe token
+                // Create Stripe token BEFORE showing loading (to avoid unmounting the element)
                 const {token, error} = await this.stripe.createToken(this.cardElement);
 
                 if (error) {
                     // Show error to user
-                    document.getElementById('card-errors').textContent = error.message;
-                    this.renderStep(2); // Go back to payment form
+                    const errorElement = document.getElementById('card-errors');
+                    if (errorElement) {
+                        errorElement.textContent = error.message;
+                    } else {
+                        alert('Card error: ' + error.message);
+                    }
                     return;
                 }
+
+                // Now show loading after we have the token
+                this.showLoading('Processing payment...');
 
                 // Store payment info for later
                 this.state.paymentInfo = Object.fromEntries(formData);

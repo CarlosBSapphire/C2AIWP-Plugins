@@ -186,28 +186,21 @@ class ApiProxy
 
         // Step 1: Charge customer using Stripe token
         if (!empty($payment['stripe_token']) && $setupTotal > 0) {
+            // Format data to match n8n charge-customer webhook expectations
             $chargeData = [
-                'amount' => $setupTotal,
-                'currency' => 'usd',
-                'payment_method' => [
-                    'stripe_token' => $payment['stripe_token']
-                ],
-                'customer' => [
-                    'first_name' => $payment['first_name'] ?? '',
-                    'last_name' => $payment['last_name'] ?? '',
-                    'email' => $payment['email'] ?? '',
-                    'phone' => $payment['phone_number'] ?? ''
-                ],
-                'billing_address' => [
-                    'address' => $payment['shipping_address'] ?? '',
-                    'city' => $payment['shipping_city'] ?? '',
-                    'zip' => $payment['shipping_zip'] ?? '',
-                    'country' => $payment['shipping_country'] ?? 'US'
-                ],
-                'metadata' => [
-                    'products' => $data['products'] ?? [],
-                    'addons' => $data['addons'] ?? []
-                ]
+                'name' => trim(($payment['first_name'] ?? '') . ' ' . ($payment['last_name'] ?? '')),
+                'first_name' => $payment['first_name'] ?? '',
+                'last_name' => $payment['last_name'] ?? '',
+                'email' => $payment['email'] ?? '',
+                'phone_number' => $payment['phone_number'] ?? '',
+                'address_line_1' => $payment['shipping_address'] ?? '',
+                'address_line_2' => '',
+                'city' => $payment['shipping_city'] ?? '',
+                'state' => $payment['shipping_state'] ?? '',
+                'Country' => $payment['shipping_country'] ?? 'United States',
+                'Zip_Code' => $payment['shipping_zip'] ?? '',
+                'card_token' => $payment['stripe_token'],
+                'total_to_charge' => $setupTotal
             ];
 
             $chargeResult = $this->n8nClient->chargeCustomer($chargeData);
