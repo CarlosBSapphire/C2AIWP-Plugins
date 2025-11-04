@@ -78,35 +78,6 @@
                     <div class="aipw-summary" id="aipwSummary">
                         <div class="aipw-summary-title">Summary</div>
                         <div id="aipwSummaryContent"></div>
-                        <div class="aipw-addons-section">
-                    <h2 class="aipw-modal-title">Addons</h2>
-                    <div class="aipw-addons-grid">
-                        <div class="aipw-addon-item" data-addon="Quality Assurance">
-                            <div class="aipw-addon-checkbox"></div>
-                            <div class="aipw-addon-name">Quality Assurance</div>
-                        </div>
-                        <div class="aipw-addon-item" data-addon="AVS Match">
-                            <div class="aipw-addon-checkbox"></div>
-                            <div class="aipw-addon-name">AVS Match</div>
-                        </div>
-                        <div class="aipw-addon-item" data-addon="Custom Packages">
-                            <div class="aipw-addon-checkbox"></div>
-                            <div class="aipw-addon-name">Custom Packages</div>
-                        </div>
-                        <div class="aipw-addon-item" data-addon="Phone Numbers">
-                            <div class="aipw-addon-checkbox"></div>
-                            <div class="aipw-addon-name">Phone Numbers</div>
-                        </div>
-                        <div class="aipw-addon-item" data-addon="Lead Verification">
-                            <div class="aipw-addon-checkbox"></div>
-                            <div class="aipw-addon-name">Lead Verification</div>
-                        </div>
-                        <div class="aipw-addon-item" data-addon="Transcriptions & Recordings">
-                            <div class="aipw-addon-checkbox"></div>
-                            <div class="aipw-addon-name">Transcriptions & Recordings</div>
-                        </div>
-                    </div>
-                </div>
                     </div>
                 </div>
             `;
@@ -273,7 +244,7 @@
                     </div>
                 </div>
 
-/*                 <div class="aipw-addons-section">
+                <div class="aipw-addons-section">
                     <h2 class="aipw-modal-title">Addons</h2>
                     <div class="aipw-addons-grid">
                         <div class="aipw-addon-item" data-addon="Quality Assurance">
@@ -301,7 +272,7 @@
                             <div class="aipw-addon-name">Transcriptions & Recordings</div>
                         </div>
                     </div>
-                </div> */
+                </div>
 
                 <div class="aipw-terms-agreement">
                     <div class="aipw-terms-checkbox">
