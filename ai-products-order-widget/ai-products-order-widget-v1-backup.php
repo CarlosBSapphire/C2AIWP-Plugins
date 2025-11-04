@@ -1,15 +1,18 @@
 <?php
 
 /**
- * Plugin Name: AI Products Order Widget
- * Plugin URI: https://customer2.ai
- * Description: A comprehensive order widget for AI Calls, AI Emails, and AI Chat with addons and user account creation
- * Version: 1.0.0
- * Author: Ian Fry
- * Author URI: https://customer2.ai
- * License: GPL v2 or later
- * Text Domain: ai-products-widget
+ * BACKUP FILE - DO NOT LOAD
+ * This is a backup of the original v1.0 plugin
+ *
+ * Original Plugin Name: AI Products Order Widget
+ * Original Version: 1.0.0
+ * Backed up: 2025-11-04
+ *
+ * DO NOT ACTIVATE - For reference only
  */
+
+// Prevent loading
+return;
 
 // Prevent direct access
 if (!defined('ABSPATH')) {

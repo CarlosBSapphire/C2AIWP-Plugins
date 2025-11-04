@@ -35,22 +35,31 @@ wp-config.php
 # htaccess
 /.htaccess
 
-# ai-products-order-widget extra to not push
+# ai-products-order-widget - Exclude development files
+# Documentation (keep only essential docs in repo)
 /ai-products-order-widget/CLAUDE_MEMORY.md
-/ai-products-order-widget/README.md
-/ai-products-order-widget/schemas/
-/ai-products-order-widget/docs/
-/ai-products-order-widget/assets/pdf_templates/
-/ai-products-order-widget/ai-products-order-widget.php.backup
-/ai-products-order-widget/ai-products-order-widget-v1-backup
-/ai-products-order-widget/ARCHITECTURE.md
 /ai-products-order-widget/CLAUDE_MEMORY_v1.md.backup
+/ai-products-order-widget/MIGRATION_GUIDE.md
+/ai-products-order-widget/ARCHITECTURE.md
 /ai-products-order-widget/IMPLEMENTATION_SUMMARY.md
-/ai-products-order-widget/order_products_step_1.jpg
-/ai-products-order-widget/order_products_step_2.jpg
-/ai-products-order-widget/order_products_step_3.jpg
-/ai-products-order-widget/order_products_step_4.jpg
-/ai-products-order-widget/order_products_step_5.jpg
+/ai-products-order-widget/README.md
+
+# Backup files
+/ai-products-order-widget/*.backup
+/ai-products-order-widget/*-backup.php
+/ai-products-order-widget/ai-products-order-widget-v1-backup.php
+
+# Development/reference files
+/ai-products-order-widget/schemas/
+/ai-products-order-widget/assets/pdf_templates/
+/ai-products-order-widget/order_products_step_*.jpg
+/ai-products-order-widget/*.csv
+
+# Composer dependencies (will be installed via composer install)
+/ai-products-order-widget/vendor/
+
+# Node modules (if using npm in future)
+/ai-products-order-widget/node_modules/
 
 # All plugins
 #
