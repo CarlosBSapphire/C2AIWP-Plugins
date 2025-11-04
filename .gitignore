@@ -35,6 +35,23 @@ wp-config.php
 # htaccess
 /.htaccess
 
+# ai-products-order-widget extra to not push
+/ai-products-order-widget/CLAUDE_MEMORY.md
+/ai-products-order-widget/README.md
+/ai-products-order-widget/schemas/
+/ai-products-order-widget/docs/
+/ai-products-order-widget/assets/pdf_templates/
+/ai-products-order-widget/ai-products-order-widget.php.backup
+/ai-products-order-widget/ai-products-order-widget-v1-backup
+/ai-products-order-widget/ARCHITECTURE.md
+/ai-products-order-widget/CLAUDE_MEMORY_v1.md.backup
+/ai-products-order-widget/IMPLEMENTATION_SUMMARY.md
+/ai-products-order-widget/order_products_step_1.jpg
+/ai-products-order-widget/order_products_step_2.jpg
+/ai-products-order-widget/order_products_step_3.jpg
+/ai-products-order-widget/order_products_step_4.jpg
+/ai-products-order-widget/order_products_step_5.jpg
+
 # All plugins
 #
 # Note: If you wish to whitelist plugins,

@@ -1,0 +1,26 @@
+{
+  "name": "ai-products-order-widget",
+  "version": "1.0.0",
+  "description": "WordPress plugin for AI product ordering with Figma design support",
+  "scripts": {
+    "sass": "sass assets/scss/widget-styles.scss assets/css/widget-styles.css",
+    "sass:watch": "sass assets/scss/widget-styles.scss assets/css/widget-styles.css --watch",
+    "sass:build": "sass assets/scss/widget-styles.scss assets/css/widget-styles.css --style=compressed",
+    "dev": "npm run sass:watch",
+    "build": "npm run sass:build"
+  },
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "ai",
+    "order-widget"
+  ],
+  "author": "Organized Chaos",
+  "license": "GPL-2.0-or-later",
+  "devDependencies": {
+    "sass": "^1.69.0"
+  },
+  "dependencies": {
+    "libphonenumber-js": "^1.12.25"
+  }
+}
