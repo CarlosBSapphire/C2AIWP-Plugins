@@ -641,7 +641,7 @@
                     </div>
 
                     <div class="aipw-form-group">
-                        <label class="aipw-form-label">City</label>
+                        <label class="aipw-form-label">State</label>
                         <input type="text" class="aipw-form-input" name="shipping_state" required>
                     </div>
 
@@ -668,7 +668,7 @@
                         <div class="aipw-form-group">
                             <label class="aipw-form-label">Country</label>
                             <select class="aipw-form-select" name="billing_country">
-                                <select class="aipw-form-select" name="shipping_country" required>
+                                <select class="aipw-form-select" name="billing_country" required>
                             <option value="AF">Afghanistan</option>
                             <option value="AL">Albania</option>
                             <option value="DZ">Algeria</option>
