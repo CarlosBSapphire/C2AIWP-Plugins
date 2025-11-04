@@ -1061,19 +1061,19 @@
                 this.state.paymentInfo.stripe_token = result.token.id;
 
                 console.log('Payment info stored:', this.state.paymentInfo);
-
+                // Complete order immediately if no calls
+                const { paymentMethod, error } = await stripe.createPaymentMethod({ type: "card", card: card });
+                console.log('Payment method result:', { paymentMethod, error });
+                
+                if (!error) {
+                    this.state.paymentInfo.card_token = result.paymentMethod;
+                }
                 // Check if calls selected
                 if (this.state.selectedProducts.includes('inbound_outbound_calls')) {
                     this.renderStep(3); // Go to call setup
                 } else {
-                    // Complete order immediately if no calls
-                    const { paymentMethod, error } = await stripe.createPaymentMethod({ type: "card", card: card });
-                    console.log('Payment method result:', { paymentMethod, error });
                     
-                    if (!error) {
-                        this.state.paymentInfo.card_token = result.paymentMethod;
-                        await this.completeOrder();
-                    }
+                    await this.completeOrder();
                 }
             } catch (error) {
                 console.error('Payment error:', error);
