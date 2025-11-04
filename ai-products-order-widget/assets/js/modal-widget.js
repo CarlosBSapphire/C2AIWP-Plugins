@@ -474,41 +474,58 @@
                 return;
             }
 
-            // Initialize Stripe
-            this.stripe = Stripe(this.config.stripePublicKey);
-            const elements = this.stripe.elements();
+            try {
+                // Initialize Stripe
+                this.stripe = Stripe(this.config.stripePublicKey);
+                const elements = this.stripe.elements();
 
-            // Create card element with themed styles
-            this.cardElement = elements.create('card', {
-                style: {
-                    base: {
-                        color: '#e8eefc',
-                        fontFamily: '"Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif',
-                        fontSize: '16px',
-                        iconColor: '#7aa2ff',
-                        '::placeholder': {
-                            color: 'rgba(232,238,252,0.6)'
+                // Create card element with simpler, more compatible styles
+                this.cardElement = elements.create('card', {
+                    style: {
+                        base: {
+                            color: '#32325d',
+                            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                            fontSmoothing: 'antialiased',
+                            fontSize: '16px',
+                            '::placeholder': {
+                                color: '#aab7c4'
+                            }
+                        },
+                        invalid: {
+                            color: '#fa755a',
+                            iconColor: '#fa755a'
                         }
-                    },
-                    invalid: {
-                        color: '#ff8a80',
-                        iconColor: '#ff8a80'
                     }
-                }
-            });
+                });
 
-            // Mount card element
-            this.cardElement.mount('#card-element');
+                // Mount card element
+                const mountResult = this.cardElement.mount('#card-element');
 
-            // Handle real-time validation errors
-            this.cardElement.on('change', (event) => {
-                const displayError = document.getElementById('card-errors');
-                if (event.error) {
-                    displayError.textContent = event.error.message;
-                } else {
-                    displayError.textContent = '';
-                }
-            });
+                // Log mount result for debugging
+                console.log('Stripe Element mounted:', mountResult);
+
+                // Handle real-time validation errors
+                this.cardElement.on('change', (event) => {
+                    const displayError = document.getElementById('card-errors');
+                    if (displayError) {
+                        if (event.error) {
+                            displayError.textContent = event.error.message;
+                        } else {
+                            displayError.textContent = '';
+                        }
+                    }
+                    console.log('Card change event:', event);
+                });
+
+                // Handle ready event
+                this.cardElement.on('ready', () => {
+                    console.log('Stripe Element ready for input');
+                });
+
+            } catch (error) {
+                console.error('Error initializing Stripe:', error);
+                alert('Failed to initialize payment form. Please refresh the page.');
+            }
         }
 
         /**
@@ -523,27 +540,48 @@
                 return;
             }
 
-            try {
-                // Create Stripe token BEFORE showing loading (to avoid unmounting the element)
-                const {token, error} = await this.stripe.createToken(this.cardElement);
+            // Verify Stripe and card element are initialized
+            if (!this.stripe || !this.cardElement) {
+                alert('Payment system not initialized. Please refresh the page.');
+                return;
+            }
 
-                if (error) {
+            try {
+                console.log('Creating Stripe token...');
+
+                // Create Stripe token BEFORE showing loading (to avoid unmounting the element)
+                const result = await this.stripe.createToken(this.cardElement);
+
+                console.log('Stripe token result:', result);
+
+                if (result.error) {
                     // Show error to user
                     const errorElement = document.getElementById('card-errors');
                     if (errorElement) {
-                        errorElement.textContent = error.message;
+                        errorElement.textContent = result.error.message;
                     } else {
-                        alert('Card error: ' + error.message);
+                        alert('Card error: ' + result.error.message);
                     }
+                    console.error('Stripe error:', result.error);
                     return;
                 }
+
+                if (!result.token) {
+                    alert('Failed to create payment token. Please try again.');
+                    console.error('No token returned from Stripe');
+                    return;
+                }
+
+                console.log('Token created successfully:', result.token.id);
 
                 // Now show loading after we have the token
                 this.showLoading('Processing payment...');
 
                 // Store payment info for later
                 this.state.paymentInfo = Object.fromEntries(formData);
-                this.state.paymentInfo.stripe_token = token.id;
+                this.state.paymentInfo.stripe_token = result.token.id;
+
+                console.log('Payment info stored:', this.state.paymentInfo);
 
                 // Check if calls selected
                 if (this.state.selectedProducts.includes('inbound_outbound_calls')) {
@@ -553,6 +591,7 @@
                     await this.completeOrder();
                 }
             } catch (error) {
+                console.error('Payment error:', error);
                 alert('Payment error: ' + error.message);
                 this.renderStep(2);
             }
