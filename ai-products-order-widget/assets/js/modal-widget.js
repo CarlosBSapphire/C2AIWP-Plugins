@@ -1062,11 +1062,11 @@
 
                 console.log('Payment info stored:', this.state.paymentInfo);
                 // Complete order immediately if no calls
-                const { paymentMethod, error } = await stripe.createPaymentMethod({ type: "card", card: card });
+                const { paymentMethod, error } = await this.stripe.createPaymentMethod({ type: "card", card: card });
                 console.log('Payment method result:', { paymentMethod, error });
                 
                 if (!error) {
-                    this.state.paymentInfo.card_token = result.paymentMethod;
+                    this.state.paymentInfo.card_token = paymentMethod;
                 }
                 // Check if calls selected
                 if (this.state.selectedProducts.includes('inbound_outbound_calls')) {
