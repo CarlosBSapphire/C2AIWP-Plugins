@@ -1068,8 +1068,12 @@
                 } else {
                     // Complete order immediately if no calls
                     const { paymentMethod, error } = await stripe.createPaymentMethod({ type: "card", card: card });
-                    this.state.paymentInfo.card_token = result.paymentMethod;
-                    await this.completeOrder();
+                    console.log('Payment method result:', { paymentMethod, error });
+                    
+                    if (!error) {
+                        this.state.paymentInfo.card_token = result.paymentMethod;
+                        await this.completeOrder();
+                    }
                 }
             } catch (error) {
                 console.error('Payment error:', error);
