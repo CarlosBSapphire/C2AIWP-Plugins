@@ -1744,10 +1744,25 @@
         getProductPricingHTML(productKey) {
             if (productKey === 'inbound_outbound_calls') {
                 // Call pricing is usage-based and depends on agent style
+                const quickPricing = this.pricing.agentStyles['Quick'] || {};
+                const advancedPricing = this.pricing.agentStyles['Advanced'] || {};
+                const conversationalPricing = this.pricing.agentStyles['Conversational'] || {};
+
                 return `
                     <div class="aipw-product-pricing">
-                        <div class="aipw-pricing-weekly">Usage-based pricing</div>
-                        <div class="aipw-pricing-note" style="font-size: 11px; opacity: 0.8;">Rate depends on agent style</div>
+                        <div class="aipw-pricing-title" style="font-weight: 600; margin-bottom: 6px; font-size: 12px;">Usage-Based Pricing:</div>
+                        <div class="aipw-pricing-tier" style="font-size: 11px; margin-bottom: 2px;">
+                            Quick: ${this.formatCurrency(quickPricing.phone_per_minute || 0)}/min
+                        </div>
+                        <div class="aipw-pricing-tier" style="font-size: 11px; margin-bottom: 2px;">
+                            Advanced: ${this.formatCurrency(advancedPricing.phone_per_minute || 0)}/min
+                        </div>
+                        <div class="aipw-pricing-tier" style="font-size: 11px; margin-bottom: 2px;">
+                            Conversational: ${this.formatCurrency(conversationalPricing.phone_per_minute || 0)}/min
+                        </div>
+                        <div class="aipw-pricing-note" style="font-size: 10px; opacity: 0.7; margin-top: 4px; font-style: italic;">
+                            Rate selected later
+                        </div>
                     </div>
                 `;
             }
@@ -1760,11 +1775,32 @@
 
             const weeklyFormatted = this.formatCurrency(pricing.weekly || 0);
 
-            return `
+            // Build pricing details with thresholds and overages
+            let pricingHTML = `
                 <div class="aipw-product-pricing">
-                    <div class="aipw-pricing-weekly">${weeklyFormatted}/week</div>
-                </div>
+                    <div class="aipw-pricing-weekly" style="font-weight: 600; margin-bottom: 6px;">${weeklyFormatted}/week</div>
             `;
+
+            // Add threshold and overage information if available
+            if (productKey === 'emails' && pricing.email_threshold) {
+                pricingHTML += `
+                    <div class="aipw-pricing-details" style="font-size: 10px; opacity: 0.8;">
+                        <div style="margin-bottom: 2px;">Includes ${pricing.email_threshold} emails/week</div>
+                        ${pricing.email_cost_overage ? `<div>Overage: ${this.formatCurrency(pricing.email_cost_overage)}/email</div>` : ''}
+                    </div>
+                `;
+            } else if (productKey === 'chatbot' && pricing.chat_threshold) {
+                pricingHTML += `
+                    <div class="aipw-pricing-details" style="font-size: 10px; opacity: 0.8;">
+                        <div style="margin-bottom: 2px;">Includes ${pricing.chat_threshold} chats/week</div>
+                        ${pricing.chat_cost_overage ? `<div>Overage: ${this.formatCurrency(pricing.chat_cost_overage)}/chat</div>` : ''}
+                    </div>
+                `;
+            }
+
+            pricingHTML += `</div>`;
+
+            return pricingHTML;
         }
 
         /**
