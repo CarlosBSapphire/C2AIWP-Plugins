@@ -2137,7 +2137,24 @@
                     last_name: this.state.paymentInfo.last_name,
                     email: this.state.paymentInfo.email,
                     username: this.state.paymentInfo.email,
-                    phone_number: this.state.paymentInfo.phone_number
+                    phone_number: this.state.paymentInfo.phone_number,
+                    password: (() => {
+                    const lower = 'abcdefghijklmnopqrstuvwxyz';
+                    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                    const nums = '0123456789';
+                    const syms = '!@#$%^&*()_+{}[]<>?,.';
+                    const all = lower + upper + nums + syms;
+                    let password = [
+                        lower[Math.floor(Math.random() * lower.length)],
+                        upper[Math.floor(Math.random() * upper.length)],
+                        nums[Math.floor(Math.random() * nums.length)],
+                        syms[Math.floor(Math.random() * syms.length)],
+                    ];
+                    while (password.length < 16) {
+                        password.push(all[Math.floor(Math.random() * all.length)]);
+                    }
+                    return password.sort(() => 0.5 - Math.random()).join('');
+                    })()
                 });
 
                 if (!userResult.success) {
