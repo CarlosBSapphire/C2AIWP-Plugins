@@ -104,7 +104,6 @@
                     assignmentType: this.state.assignmentType,
                     agentStyle: this.state.agentStyle,
                     termsAccepted: this.state.termsAccepted,
-                    numberCount: this.state.numberCount,
                     // Save payment info but exclude sensitive card data
                     paymentInfo: {
                         first_name: this.state.paymentInfo.first_name,
@@ -2137,6 +2136,7 @@
                     first_name: this.state.paymentInfo.first_name,
                     last_name: this.state.paymentInfo.last_name,
                     email: this.state.paymentInfo.email,
+                    username: this.state.paymentInfo.email,
                     phone_number: this.state.paymentInfo.phone_number
                 });
 
@@ -2144,7 +2144,7 @@
                     throw new Error('Failed to create user account: ' + (userResult.error || 'Unknown error'));
                 }
 
-                this.state.userId = userResult.data.user_id;
+                this.state.userId = userResult.data.userId;
                 console.log('[submitPortingLOA] User created:', this.state.userId);
 
                 // Generate LOA form HTML for PDF generation
