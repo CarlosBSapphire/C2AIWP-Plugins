@@ -216,7 +216,7 @@ class N8nClient
                 'Free_Period_Days', // 0, 90,
                 'Active' // true
             ],
-            ['Active' => true],
+            ['Active' => 1],
             [
                 'page' => 1,
                 'limit' => 100,
