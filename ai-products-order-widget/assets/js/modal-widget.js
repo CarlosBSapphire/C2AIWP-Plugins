@@ -98,6 +98,7 @@
                     assignmentType: this.state.assignmentType,
                     agentStyle: this.state.agentStyle,
                     termsAccepted: this.state.termsAccepted,
+                    numberCount: this.state.numberCount,
                     // Save payment info but exclude sensitive card data
                     paymentInfo: {
                         first_name: this.state.paymentInfo.first_name,
