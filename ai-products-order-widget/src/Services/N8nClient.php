@@ -151,7 +151,7 @@ class N8nClient
         $chargeData = SecurityValidator::sanitizeInput($chargeData);
 
         // Validate required fields for charge-customer webhook
-        $required = ['card_token', 'setup_total', 'email'];
+        $required = ['card_token', 'email'];
         foreach ($required as $field) {
             if (empty($chargeData[$field])) {
                 $this->log('[chargeCustomer] Validation failed', 'error', [
