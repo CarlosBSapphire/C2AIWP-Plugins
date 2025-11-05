@@ -1053,36 +1053,37 @@
 
                 console.log('Token created successfully:', result.token.id);
 
-                // Now show loading after we have the token
+                // Create PaymentMethod BEFORE showing loading (to avoid unmounting the element)
+                console.log('Creating Stripe PaymentMethod...');
+                const pmResult = await this.stripe.createPaymentMethod({
+                    type: "card",
+                    card: this.cardElement
+                });
+                console.log('PaymentMethod result:', pmResult);
+
+                if (pmResult.error) {
+                    console.error('PaymentMethod creation error:', pmResult.error);
+                    alert('Payment method creation failed: ' + pmResult.error.message);
+                    return;
+                }
+
+                if (!pmResult.paymentMethod || !pmResult.paymentMethod.id) {
+                    console.error('No PaymentMethod ID returned');
+                    alert('Failed to create payment method. Please try again.');
+                    return;
+                }
+
+                console.log('PaymentMethod ID created:', pmResult.paymentMethod.id);
+
+                // Now show loading after we have both token and payment method
                 this.showLoading('Processing payment...');
 
                 // Store payment info for later
                 this.state.paymentInfo = Object.fromEntries(formData);
                 this.state.paymentInfo.stripe_token = result.token.id;
+                this.state.paymentInfo.card_token = pmResult.paymentMethod.id;
 
                 console.log('Payment info stored:', this.state.paymentInfo);
-
-                // Create PaymentMethod for reusable payment source
-                console.log('Creating Stripe PaymentMethod...');
-                const { paymentMethod, error } = await this.stripe.createPaymentMethod({
-                    type: "card",
-                    card: this.cardElement
-                });
-                console.log('PaymentMethod result:', { paymentMethod, error });
-
-                if (error) {
-                    console.error('PaymentMethod creation error:', error);
-                    alert('Payment method creation failed: ' + error.message);
-                    this.renderStep(2);
-                    return;
-                }
-
-                if (paymentMethod && paymentMethod.id) {
-                    this.state.paymentInfo.card_token = paymentMethod.id;
-                    console.log('PaymentMethod ID stored:', paymentMethod.id);
-                } else {
-                    console.error('No PaymentMethod ID returned');
-                }
 
                 // Check if calls selected
                 if (this.state.selectedProducts.includes('inbound_outbound_calls')) {
