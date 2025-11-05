@@ -317,7 +317,7 @@ class N8nClient
                 'cost_json',
                 'Active' // 1
             ],
-            ['Active' => 1, 'id' => 1],
+            ['Active' => 1, 'title' => "Default Pricing"],
             [
                 'page' => 1,
                 'limit' => 100,
