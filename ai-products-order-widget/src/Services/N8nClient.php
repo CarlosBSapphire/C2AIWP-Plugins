@@ -24,6 +24,7 @@ class N8nClient
     public string $ENDPOINT_CREATE_USER;
     public string $ENDPOINT_CHARGE_CUSTOMER;
     public string $ENDPOINT_WEBSITE_PAYLOAD_PURCHASE;
+    public string $ENDPOINT_SUBMIT_PORTING_LOA;
     /**
      * HTTP client adapter
      *
@@ -64,6 +65,7 @@ class N8nClient
             ? 'https://n8n.workflows.organizedchaos.cc/webhook/charge-test'
             : 'https://n8n.workflows.organizedchaos.cc/webhook/charge-customer';
         $this->ENDPOINT_WEBSITE_PAYLOAD_PURCHASE = 'https://n8n.workflows.organizedchaos.cc/webhook/website-payload-purchase';
+        $this->ENDPOINT_SUBMIT_PORTING_LOA = 'https://n8n.workflows.organizedchaos.cc/webhook/submit-porting-loa';
     }
 
     /**
@@ -392,6 +394,45 @@ class N8nClient
             'success' => false,
             'data' => null,
             'error' => $response['error'] ?? 'Failed to submit order'
+        ];
+    }
+
+    /**
+     * Submit porting LOA form to database
+     *
+     * @param array $loaData LOA form data including user_id, base64 PDF, phone numbers
+     * @return array
+     */
+    public function submitPortingLOA($loaData)
+    {
+        $this->log('[submitPortingLOA] Starting LOA submission', 'info', [
+            'user_id' => $loaData['user_id'] ?? null,
+            'phone_count' => isset($loaData['phone_numbers']) ? count(json_decode($loaData['phone_numbers'], true)) : 0
+        ]);
+
+        $response = $this->request(
+            $this->ENDPOINT_SUBMIT_PORTING_LOA,
+            'POST',
+            $loaData
+        );
+
+        $this->log('[submitPortingLOA] Response received', 'info', [
+            'success' => $response['success'] ?? false,
+            'error' => $response['error'] ?? null
+        ]);
+
+        if (isset($response['success']) && $response['success']) {
+            return [
+                'success' => true,
+                'data' => $response['data'] ?? [],
+                'error' => null
+            ];
+        }
+
+        return [
+            'success' => false,
+            'data' => null,
+            'error' => $response['error'] ?? 'Failed to submit porting LOA'
         ];
     }
 

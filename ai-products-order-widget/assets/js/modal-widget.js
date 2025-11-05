@@ -29,7 +29,12 @@
                 assignmentType: null,
                 agentStyle: null,
                 paymentInfo: {},
-                termsAccepted: false
+                termsAccepted: false,
+                portingPhoneNumbers: [], // Array of {phone_number, service_provider}
+                loaFormData: {}, // LOA form data (business_name, signature, etc.)
+                userId: null, // User ID from create_user API
+                utilityBillBase64: null, // Base64 encoded utility bill
+                utilityBillFilename: null // Original filename
             };
 
             this.steps = [
@@ -37,7 +42,8 @@
                 { id: 2, name: 'Payment', handler: this.renderPaymentForm.bind(this) },
                 { id: 3, name: 'Setup', handler: this.renderCallSetup.bind(this) },
                 { id: 4, name: 'Configuration', handler: this.renderConfiguration.bind(this) },
-                { id: 5, name: 'Agent Style', handler: this.renderAgentStyle.bind(this) }
+                { id: 5, name: 'Agent Style', handler: this.renderAgentStyle.bind(this) },
+                { id: 6, name: 'Porting LOA', handler: this.renderPortingLOA.bind(this) }
             ];
 
             // Pricing - will be loaded from n8n API
@@ -1746,7 +1752,12 @@
             });
 
             document.getElementById('aipwCompleteBtn').addEventListener('click', () => {
-                this.completeOrder();
+                // Check if BYO porting is selected - if so, show LOA form first
+                if (this.state.setupType === 'byo') {
+                    this.renderStep(6); // Show LOA form
+                } else {
+                    this.completeOrder(); // Complete order directly
+                }
             });
 
             // Restore saved selection
@@ -1763,6 +1774,548 @@
                     card.classList.add('selected');
                     document.getElementById('aipwCompleteBtn').disabled = false;
                 }
+            }
+        }
+
+        /**
+         * Step 6: Porting LOA Form (BYO only)
+         */
+        renderPortingLOA() {
+            const header = document.getElementById('aipwModalHeader');
+            const body = document.getElementById('aipwModalBody');
+            const footer = document.getElementById('aipwModalFooter');
+
+            header.innerHTML = `
+                <h1 class="aipw-modal-title">Porting Letter of Authorization</h1>
+                <p class="aipw-modal-subtitle">Please complete and sign the form to authorize porting your phone number(s)</p>
+            `;
+
+            // Generate phone number input fields based on numberCount
+            let phoneNumberFields = '';
+            for (let i = 0; i < this.state.numberCount; i++) {
+                const rowNumber = i + 1;
+                phoneNumberFields += `
+                    <div class="aipw-phone-number-row">
+                        <div class="aipw-form-group">
+                            <label class="aipw-form-label">Phone Number ${rowNumber}*</label>
+                            <input type="tel" class="aipw-form-input" name="phone_number_${i}"
+                                   placeholder="5558889000" required
+                                   data-phone-index="${i}">
+                        </div>
+                        <div class="aipw-form-group">
+                            <label class="aipw-form-label">Service Provider*</label>
+                            <input type="text" class="aipw-form-input" name="service_provider_${i}"
+                                   placeholder="e.g., Verizon, AT&T" required
+                                   data-provider-index="${i}">
+                        </div>
+                    </div>
+                `;
+            }
+
+            body.innerHTML = `
+                <form class="aipw-loa-form" id="aipwLOAForm">
+                    <div class="aipw-form-section">
+                        <div class="aipw-form-section-title">1. Customer Name (as it appears on your telephone bill)</div>
+                    </div>
+
+                    <div class="aipw-form-group">
+                        <label class="aipw-form-label">First Name*</label>
+                        <input type="text" class="aipw-form-input" name="first_name"
+                               value="${this.state.paymentInfo.first_name || ''}" required readonly>
+                    </div>
+
+                    <div class="aipw-form-group">
+                        <label class="aipw-form-label">Last Name*</label>
+                        <input type="text" class="aipw-form-input" name="last_name"
+                               value="${this.state.paymentInfo.last_name || ''}" required readonly>
+                    </div>
+
+                    <div class="aipw-form-group full-width">
+                        <label class="aipw-form-label">Business Name (if service is in your company's name)</label>
+                        <input type="text" class="aipw-form-input" name="business_name"
+                               value="${this.state.loaFormData.business_name || ''}">
+                    </div>
+
+                    <div class="aipw-form-section">
+                        <div class="aipw-form-section-title">2. Service Address on file with your current carrier</div>
+                        <div class="aipw-form-help-text">(Must be a physical location, cannot be a PO Box)</div>
+                    </div>
+
+                    <div class="aipw-form-group full-width">
+                        <label class="aipw-form-label">Address*</label>
+                        <input type="text" class="aipw-form-input" name="address"
+                               value="${this.state.paymentInfo.shipping_address || ''}" required readonly>
+                    </div>
+
+                    <div class="aipw-form-group">
+                        <label class="aipw-form-label">City*</label>
+                        <input type="text" class="aipw-form-input" name="city"
+                               value="${this.state.paymentInfo.shipping_city || ''}" required readonly>
+                    </div>
+
+                    <div class="aipw-form-group">
+                        <label class="aipw-form-label">State*</label>
+                        <input type="text" class="aipw-form-input" name="state"
+                               value="${this.state.paymentInfo.shipping_state || ''}" required readonly>
+                    </div>
+
+                    <div class="aipw-form-group">
+                        <label class="aipw-form-label">ZIP/Postal Code*</label>
+                        <input type="text" class="aipw-form-input" name="zip"
+                               value="${this.state.paymentInfo.shipping_zip || ''}" required readonly>
+                    </div>
+
+                    <div class="aipw-form-section">
+                        <div class="aipw-form-section-title">3. List all Telephone Number(s) to be ported</div>
+                    </div>
+
+                    ${phoneNumberFields}
+
+                    <div class="aipw-form-section">
+                        <div class="aipw-form-section-title">Authorization</div>
+                    </div>
+
+                    <div class="aipw-authorization-text">
+                        <p>By signing below, I verify that I am, or represent (for a business), the above-named service customer,
+                        authorized to change the primary carrier(s) for the telephone number(s) listed, and am at least 18 years of age.
+                        The name and address I have provided is the name and address on record with my local telephone company
+                        for each telephone number listed. I authorize <strong>Customer2.AI</strong> (the "Company") or its
+                        designated agent to act on my behalf and notify my current carrier(s) to change my preferred carrier(s) for the
+                        listed number(s) and service(s), to obtain any information the Company deems necessary to make the carrier
+                        change(s), including, for example, an inventory of telephone lines billed to the telephone number(s), carrier or
+                        customer identifying information, billing addresses, and my credit history.</p>
+                    </div>
+
+                    <div class="aipw-form-group">
+                        <label class="aipw-form-label">Authorized Signature*</label>
+                        <div class="aipw-signature-pad-container">
+                            <canvas id="aipwSignaturePad" class="aipw-signature-pad"></canvas>
+                            <button type="button" class="aipw-btn aipw-btn-clear-signature" id="aipwClearSignature">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="aipw-form-group">
+                        <label class="aipw-form-label">Printed Name*</label>
+                        <input type="text" class="aipw-form-input" name="printed_name"
+                               value="${this.state.paymentInfo.first_name || ''} ${this.state.paymentInfo.last_name || ''}" required>
+                    </div>
+
+                    <div class="aipw-form-group">
+                        <label class="aipw-form-label">Date*</label>
+                        <input type="date" class="aipw-form-input" name="date"
+                               value="${new Date().toISOString().split('T')[0]}" required>
+                    </div>
+
+                    <div class="aipw-form-group">
+                        <label class="aipw-form-label">Utility Bill Upload*</label>
+                        <input type="file" class="aipw-form-input" id="aipwUtilityBillUpload"
+                               accept=".pdf,.jpg,.jpeg,.png" required>
+                        <small class="aipw-form-help">Please upload a recent utility bill (PDF or image). Max size: 5MB</small>
+                        <div id="aipwUtilityBillPreview" class="aipw-file-preview" style="display:none;">
+                            <span id="aipwUtilityBillName"></span>
+                            <button type="button" class="aipw-btn-remove-file" onclick="aipwWidget.clearUtilityBill()">Remove</button>
+                        </div>
+                    </div>
+
+                    <div class="aipw-form-note">
+                        <strong>Note:</strong> For toll free numbers, please change RespOrg to TWI01.
+                        Please do not end service on the number for 10 days after RespOrg change.
+                    </div>
+                </form>
+            `;
+
+            footer.innerHTML = `
+                <button class="aipw-btn" onclick="aipwWidget.renderStep(5)">Back</button>
+                <button class="aipw-btn aipw-btn-primary" id="aipwSubmitLOA">Submit LOA & Complete Order</button>
+            `;
+
+            // Initialize signature pad
+            this.initializeSignaturePad();
+
+            // Attach form handlers
+            this.attachLOAHandlers();
+
+            // Restore saved phone numbers if any
+            this.restorePortingPhoneNumbers();
+        }
+
+        /**
+         * Initialize signature pad for LOA form
+         */
+        initializeSignaturePad() {
+            const canvas = document.getElementById('aipwSignaturePad');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+
+            // Set canvas size
+            canvas.width = canvas.offsetWidth;
+            canvas.height = 150;
+
+            // Drawing state
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+
+            // Style
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            // Mouse events
+            canvas.addEventListener('mousedown', (e) => {
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                lastX = e.clientX - rect.left;
+                lastY = e.clientY - rect.top;
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isDrawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+
+                lastX = x;
+                lastY = y;
+            });
+
+            canvas.addEventListener('mouseup', () => {
+                isDrawing = false;
+            });
+
+            canvas.addEventListener('mouseleave', () => {
+                isDrawing = false;
+            });
+
+            // Touch events for mobile
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                lastX = touch.clientX - rect.left;
+                lastY = touch.clientY - rect.top;
+            });
+
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (!isDrawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+
+                lastX = x;
+                lastY = y;
+            });
+
+            canvas.addEventListener('touchend', () => {
+                isDrawing = false;
+            });
+
+            // Store canvas reference
+            this.signaturePad = canvas;
+        }
+
+        /**
+         * Attach LOA form handlers
+         */
+        attachLOAHandlers() {
+            // Clear signature button
+            document.getElementById('aipwClearSignature').addEventListener('click', () => {
+                const canvas = document.getElementById('aipwSignaturePad');
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            });
+
+            // Submit LOA button
+            document.getElementById('aipwSubmitLOA').addEventListener('click', () => {
+                this.submitPortingLOA();
+            });
+
+            // Save phone numbers on blur
+            const form = document.getElementById('aipwLOAForm');
+            form.addEventListener('change', () => {
+                this.capturePortingPhoneNumbers();
+                this.saveState();
+            });
+        }
+
+        /**
+         * Capture porting phone numbers from form
+         */
+        capturePortingPhoneNumbers() {
+            const phoneNumbers = [];
+            for (let i = 0; i < this.state.numberCount; i++) {
+                const phoneInput = document.querySelector(`input[data-phone-index="${i}"]`);
+                const providerInput = document.querySelector(`input[data-provider-index="${i}"]`);
+
+                if (phoneInput && providerInput) {
+                    phoneNumbers.push({
+                        phone_number: phoneInput.value,
+                        service_provider: providerInput.value
+                    });
+                }
+            }
+            this.state.portingPhoneNumbers = phoneNumbers;
+        }
+
+        /**
+         * Restore porting phone numbers to form
+         */
+        restorePortingPhoneNumbers() {
+            if (!this.state.portingPhoneNumbers || this.state.portingPhoneNumbers.length === 0) {
+                return;
+            }
+
+            this.state.portingPhoneNumbers.forEach((entry, i) => {
+                const phoneInput = document.querySelector(`input[data-phone-index="${i}"]`);
+                const providerInput = document.querySelector(`input[data-provider-index="${i}"]`);
+
+                if (phoneInput && providerInput) {
+                    phoneInput.value = entry.phone_number || '';
+                    providerInput.value = entry.service_provider || '';
+                }
+            });
+        }
+
+        /**
+         * Submit Porting LOA form
+         */
+        async submitPortingLOA() {
+            const form = document.getElementById('aipwLOAForm');
+            const canvas = document.getElementById('aipwSignaturePad');
+
+            // Validate form
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Check if signature is drawn
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const hasSignature = imageData.data.some(channel => channel !== 0);
+
+            if (!hasSignature) {
+                alert('Please provide your signature');
+                return;
+            }
+
+            this.showLoading('Processing your porting request...');
+
+            try {
+                // Capture phone numbers
+                this.capturePortingPhoneNumbers();
+
+                // Get signature as base64
+                const signatureBase64 = canvas.toDataURL('image/png');
+
+                // Get form data
+                const formData = new FormData(form);
+                this.state.loaFormData = {
+                    business_name: formData.get('business_name'),
+                    signature: signatureBase64,
+                    printed_name: formData.get('printed_name'),
+                    date: formData.get('date')
+                };
+
+                // Create user account first
+                console.log('[submitPortingLOA] Creating user account...');
+                const userResult = await this.apiCall('create_user', {
+                    first_name: this.state.paymentInfo.first_name,
+                    last_name: this.state.paymentInfo.last_name,
+                    email: this.state.paymentInfo.email,
+                    phone_number: this.state.paymentInfo.phone_number
+                });
+
+                if (!userResult.success) {
+                    throw new Error('Failed to create user account: ' + (userResult.error || 'Unknown error'));
+                }
+
+                this.state.userId = userResult.data.user_id;
+                console.log('[submitPortingLOA] User created:', this.state.userId);
+
+                // Generate LOA form HTML for PDF generation
+                const loaHTML = this.generateLOAHTML();
+
+                // Submit LOA to database via API
+                console.log('[submitPortingLOA] Submitting LOA form...');
+                const loaResult = await this.apiCall('submit_porting_loa', {
+                    user_id: this.state.userId,
+                    loa_html: loaHTML,
+                    phone_numbers: this.state.portingPhoneNumbers.map(p => p.phone_number)
+                });
+
+                if (!loaResult.success) {
+                    throw new Error('Failed to submit LOA form: ' + (loaResult.error || 'Unknown error'));
+                }
+
+                console.log('[submitPortingLOA] LOA submitted successfully');
+
+                // Send email with LOA
+                console.log('[submitPortingLOA] Sending LOA email...');
+                const emailResult = await this.sendLOAEmail(loaResult.data.loa_base64);
+
+                if (!emailResult.success) {
+                    console.warn('[submitPortingLOA] Email sending failed, but continuing...');
+                }
+
+                // Complete the order
+                await this.completeOrder();
+
+            } catch (error) {
+                console.error('[submitPortingLOA] Error:', error);
+                alert('Error processing porting request: ' + error.message);
+                this.renderStep(6); // Stay on LOA form
+            }
+        }
+
+        /**
+         * Generate LOA HTML for PDF generation (server-side)
+         */
+        generateLOAHTML() {
+            const phoneNumbersHTML = this.state.portingPhoneNumbers.map(p => {
+                return `<tr><td>${p.phone_number}</td><td>${p.service_provider}</td></tr>`;
+            }).join('');
+
+            return `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .section { margin-bottom: 20px; }
+        .section-title { font-weight: bold; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        table td { border: 1px solid #000; padding: 8px; }
+        .signature-img { max-width: 300px; height: auto; border: 1px solid #ccc; }
+        .authorization { font-size: 11px; line-height: 1.5; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>PORTING LETTER OF AUTHORIZATION (LOA)</h1>
+    </div>
+
+    <div class="section">
+        <div class="section-title">1. Customer Name (as it appears on your telephone bill):</div>
+        <p>First Name: ${this.state.paymentInfo.first_name}</p>
+        <p>Last Name: ${this.state.paymentInfo.last_name}</p>
+        <p>Business Name: ${this.state.loaFormData.business_name || 'N/A'}</p>
+    </div>
+
+    <div class="section">
+        <div class="section-title">2. Service Address on file with your current carrier:</div>
+        <p>${this.state.paymentInfo.shipping_address}</p>
+        <p>${this.state.paymentInfo.shipping_city}, ${this.state.paymentInfo.shipping_state} ${this.state.paymentInfo.shipping_zip}</p>
+    </div>
+
+    <div class="section">
+        <div class="section-title">3. List all Telephone Number(s) to be ported:</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Phone Number</th>
+                    <th>Service Provider</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${phoneNumbersHTML}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="authorization">
+        <p>By signing below, I verify that I am, or represent (for a business), the above-named service customer,
+        authorized to change the primary carrier(s) for the telephone number(s) listed, and am at least 18 years of age.
+        The name and address I have provided is the name and address on record with my local telephone company
+        for each telephone number listed. I authorize <strong>Customer2.AI</strong> (the "Company") or its
+        designated agent to act on my behalf and notify my current carrier(s) to change my preferred carrier(s) for the
+        listed number(s) and service(s), to obtain any information the Company deems necessary to make the carrier
+        change(s), including, for example, an inventory of telephone lines billed to the telephone number(s), carrier or
+        customer identifying information, billing addresses, and my credit history.</p>
+    </div>
+
+    <div class="section">
+        <p><strong>Authorized Signature:</strong></p>
+        <img src="${this.state.loaFormData.signature}" class="signature-img" alt="Signature">
+        <p><strong>Printed Name:</strong> ${this.state.loaFormData.printed_name}</p>
+        <p><strong>Date:</strong> ${this.state.loaFormData.date}</p>
+    </div>
+
+    <div class="section">
+        <p><small>For toll free numbers, please change RespOrg to TWI01. Please do not end service on the number for 10 days after RespOrg change.</small></p>
+    </div>
+</body>
+</html>
+            `;
+        }
+
+        /**
+         * Send LOA email via n8n
+         */
+        async sendLOAEmail(loaBase64) {
+            const emailEndpoint = 'https://n8n.workflows.organizedchaos.cc/webhook/59bc28f3-2fc6-42cd-8bc8-a8add1b5f6c4';
+
+            const emailBody = `
+Dear ${this.state.paymentInfo.first_name} ${this.state.paymentInfo.last_name},
+
+Thank you for choosing Customer2.AI for your phone number porting needs.
+
+Attached is your completed and signed Porting Letter of Authorization (LOA) form.
+
+This form has been submitted to our porting department and will be processed within 7-10 business days.
+
+Phone numbers to be ported:
+${this.state.portingPhoneNumbers.map(p => `- ${p.phone_number} (from ${p.service_provider})`).join('\n')}
+
+If you have any questions, please contact our support team.
+
+Best regards,
+Customer2.AI Team
+            `;
+
+            try {
+                const response = await fetch(emailEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sender_name: 'Customer2 AI System',
+                        recipient_email: this.state.paymentInfo.email,
+                        subject: 'Your Porting Letter of Authorization - Customer2.AI',
+                        messagebody: emailBody,
+                        attachment: loaBase64
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Email API returned ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log('[sendLOAEmail] Email sent successfully:', result);
+
+                return { success: true, data: result };
+            } catch (error) {
+                console.error('[sendLOAEmail] Error:', error);
+                return { success: false, error: error.message };
             }
         }
 

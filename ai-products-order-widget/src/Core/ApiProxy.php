@@ -41,7 +41,8 @@ class ApiProxy
         'send_porting_loa',
         'get_pricing',
         'create_user',
-        'validate_phone'
+        'validate_phone',
+        'submit_porting_loa'
     ];
 
     /**
@@ -404,6 +405,100 @@ class ApiProxy
             'data' => $result,
             'error' => $result['error']
         ];
+    }
+
+    /**
+     * Handle submit_porting_loa action
+     *
+     * @param array $data
+     * @return array
+     */
+    private function handleSubmitPortingLoa($data)
+    {
+        try {
+            // Validate required fields
+            if (empty($data['user_id'])) {
+                return [
+                    'success' => false,
+                    'error' => 'User ID is required',
+                    'error_code' => 'MISSING_USER_ID'
+                ];
+            }
+
+            if (empty($data['loa_html'])) {
+                return [
+                    'success' => false,
+                    'error' => 'LOA HTML is required',
+                    'error_code' => 'MISSING_LOA_HTML'
+                ];
+            }
+
+            if (empty($data['phone_numbers']) || !is_array($data['phone_numbers'])) {
+                return [
+                    'success' => false,
+                    'error' => 'Phone numbers array is required',
+                    'error_code' => 'MISSING_PHONE_NUMBERS'
+                ];
+            }
+
+            $this->log('info', '[handleSubmitPortingLoa] Generating PDF from HTML');
+
+            // Generate PDF from HTML using Dompdf
+            $dompdf = new \Dompdf\Dompdf();
+            $dompdf->loadHtml($data['loa_html']);
+            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->render();
+
+            // Get PDF content as base64
+            $pdfOutput = $dompdf->output();
+            $pdfBase64 = base64_encode($pdfOutput);
+
+            $this->log('info', '[handleSubmitPortingLoa] PDF generated, size: ' . strlen($pdfBase64) . ' bytes');
+
+            // Prepare payload for n8n database insertion
+            $dbPayload = [
+                'user_id' => $data['user_id'],
+                'signed_porting_loa_form_b64' => $pdfBase64,
+                'phone_numbers' => json_encode($data['phone_numbers']),
+                'submitted_at' => date('Y-m-d H:i:s')
+            ];
+
+            $this->log('info', '[handleSubmitPortingLoa] Submitting to database via n8n');
+
+            // Submit to n8n database webhook
+            $result = $this->n8nClient->submitPortingLOA($dbPayload);
+
+            if (!$result['success']) {
+                $this->log('error', '[handleSubmitPortingLoa] Database submission failed', [
+                    'error' => $result['error'] ?? 'Unknown error'
+                ]);
+                return $result;
+            }
+
+            $this->log('info', '[handleSubmitPortingLoa] LOA form submitted successfully');
+
+            return [
+                'success' => true,
+                'data' => [
+                    'loa_base64' => $pdfBase64,
+                    'phone_numbers' => $data['phone_numbers'],
+                    'message' => 'LOA form submitted successfully'
+                ],
+                'error' => null
+            ];
+
+        } catch (\Exception $e) {
+            $this->log('error', '[handleSubmitPortingLoa] Exception', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return [
+                'success' => false,
+                'error' => 'Failed to submit LOA: ' . $e->getMessage(),
+                'error_code' => 'LOA_SUBMIT_FAILED'
+            ];
+        }
     }
 
     /**
