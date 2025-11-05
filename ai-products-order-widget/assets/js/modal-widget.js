@@ -1489,7 +1489,6 @@
                     return;
                 }
 
-                console.log('PaymentMethod ID created:', pmResult.paymentMethod.id);
 
                 // Store payment info for later
                 this.state.paymentInfo = Object.fromEntries(formData);
@@ -2126,7 +2125,7 @@
                 // Get form data
                 const formData = new FormData(form);
                 this.state.loaFormData = {
-                    business_name: formData.get('business_name'),
+                    business_name: "",
                     signature: signatureBase64,
                     printed_name: formData.get('printed_name'),
                     date: formData.get('date')
