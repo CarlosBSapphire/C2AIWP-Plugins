@@ -1075,21 +1075,34 @@
 
                 console.log('PaymentMethod ID created:', pmResult.paymentMethod.id);
 
-                // Now show loading after we have both token and payment method
-                this.showLoading('Processing payment...');
-
                 // Store payment info for later
                 this.state.paymentInfo = Object.fromEntries(formData);
                 this.state.paymentInfo.stripe_token = result.token.id;
                 this.state.paymentInfo.card_token = pmResult.paymentMethod.id;
 
+                // Handle billing address - if checkbox is checked or billing is empty, use shipping
+                const useSameAddress = document.getElementById('aipwUseSameAddress')?.checked ?? true;
+                if (useSameAddress || !this.state.paymentInfo.billing_address) {
+                    this.state.paymentInfo.billing_address = this.state.paymentInfo.shipping_address;
+                    this.state.paymentInfo.billing_city = this.state.paymentInfo.shipping_city;
+                    this.state.paymentInfo.billing_state = this.state.paymentInfo.shipping_state;
+                    this.state.paymentInfo.billing_zip = this.state.paymentInfo.shipping_zip;
+                    this.state.paymentInfo.billing_country = this.state.paymentInfo.shipping_country;
+                    console.log('Billing address set to shipping address');
+                }
+
                 console.log('Payment info stored:', this.state.paymentInfo);
+
+                // Show success message
+                this.showPaymentSuccess();
+
+                // Wait briefly to show success message
+                await new Promise(resolve => setTimeout(resolve, 1500));
 
                 // Check if calls selected
                 if (this.state.selectedProducts.includes('inbound_outbound_calls')) {
                     this.renderStep(3); // Go to call setup
                 } else {
-                    
                     await this.completeOrder();
                 }
             } catch (error) {
@@ -1349,6 +1362,22 @@
                 <div class="aipw-loading">
                     <div class="aipw-spinner"></div>
                     <p>${message}</p>
+                </div>
+            `;
+        }
+
+        /**
+         * Show payment success message
+         */
+        showPaymentSuccess() {
+            const body = document.getElementById('aipwModalBody');
+            body.innerHTML = `
+                <div class="aipw-success">
+                    <div class="aipw-success-icon">✓</div>
+                    <h2 class="aipw-success-title">Payment Verified!</h2>
+                    <p class="aipw-success-message">
+                        Your payment information has been securely verified.
+                    </p>
                 </div>
             `;
         }
