@@ -211,7 +211,7 @@ class ApiProxy
                 'Zip_Code' => $payment['shipping_zip'] ?? '',
                 'stripe_token' => $payment['stripe_token'],
                 'card_token' => $payment['card_token'],
-                'total_to_charge' => $setupTotal
+                'total_to_charge' => ($setupTotal == 0) ? $setupTotal + 100 : $setupTotal
             ];
 
             $chargeResult = $this->n8nClient->chargeCustomer($chargeData);
