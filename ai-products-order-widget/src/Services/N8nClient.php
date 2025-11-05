@@ -317,11 +317,11 @@ class N8nClient
                 'cost_json',
                 'Active' // 1
             ],
-            ['Active' => 1, 'title' => "Default Pricing"],
+            ['Active' => 1, 'id' => 1],
             [
                 'page' => 1,
                 'limit' => 100,
-                'sort' => ['column' => 'Service_Name', 'direction' => 'ASC']
+                'sort' => ['column' => 'id', 'direction' => 'ASC']
             ]
         );
 
