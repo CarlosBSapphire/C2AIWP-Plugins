@@ -39,9 +39,12 @@
                 { id: 5, name: 'Agent Style', handler: this.renderAgentStyle.bind(this) }
             ];
 
+            // Pricing - will be loaded from n8n API
             this.pricing = {
-                setup: 99999,
-                weekly: 15000
+                setup: 0,
+                weekly: 0,
+                products: {},  // Product-specific pricing
+                addons: {}     // Addon-specific pricing
             };
 
             // Stripe elements
@@ -51,9 +54,12 @@
             this.init();
         }
 
-        init() {
+        async init() {
             this.createModal();
             this.attachEventListeners();
+            
+            // Load pricing data from n8n
+            await this.loadPricing();
         }
 
         /**
@@ -111,6 +117,179 @@
         closeModal() {
             this.modal.classList.remove('active');
             document.body.style.overflow = '';
+        }
+
+        /**
+         * Load pricing data from n8n API
+         */
+        async loadPricing() {
+            try {
+                console.log('[loadPricing] Fetching pricing from n8n...');
+                const response = await this.apiCall('get_pricing', {});
+
+                if (response.success && response.data) {
+                    console.log('[loadPricing] Pricing data received:', response.data);
+
+                    // Parse pricing data and organize by Service_Name and Package_Name
+                    response.data.forEach(item => {
+                        const serviceName = item.Service_Name;
+                        const packageName = item.Package_Name;
+
+                        // Parse rates - they come as dollar strings like "$99.00" or "$0.45"
+                        // Convert to cents (integer) for calculations
+                        const parseRate = (rateStr) => {
+                            if (!rateStr) return 0;
+                            const cleaned = String(rateStr).replace(/[$,]/g, '');
+                            const dollars = parseFloat(cleaned) || 0;
+                            return Math.round(dollars * 100); // Convert to cents
+                        };
+
+                        const minRate = parseRate(item.Min_Rate);
+                        const defaultRate = parseRate(item.Default_Rate);
+
+                        // Determine if this is a one-time setup fee or recurring
+                        const isOneTime = item.Frequency === 'One Time Fee';
+                        const isWeekly = item.Frequency === 'Week';
+                        const isMonthly = item.Frequency === 'Month';
+
+                        // Store pricing data
+                        const pricingData = {
+                            setup: isOneTime ? defaultRate : 0,
+                            weekly: isWeekly ? defaultRate : 0,
+                            monthly: isMonthly ? defaultRate : 0,
+                            minRate: minRate,
+                            defaultRate: defaultRate,
+                            frequency: item.Frequency || '',
+                            notes: item.Notes || '',
+                            definedAs: item.Defined_As || '',
+                            messageCap: parseInt(item.Message_Cap) || 0,
+                            freePeriodDays: parseInt(item.Free_Period_Days) || 0
+                        };
+
+                        // Store in products using both Service_Name and Package_Name as keys
+                        if (serviceName) {
+                            this.pricing.products[serviceName] = pricingData;
+                        }
+                        if (packageName) {
+                            this.pricing.products[packageName] = pricingData;
+                        }
+                    });
+
+                    // Create friendly key mappings for frontend product keys
+                    // Map n8n Service_Name to frontend data-product values
+                    this.mapPricingToProducts();
+
+                    console.log('[loadPricing] Parsed pricing:', {
+                        products: this.pricing.products,
+                        addons: this.pricing.addons
+                    });
+
+                    // Calculate initial totals based on default selections
+                    this.calculatePricing();
+                } else {
+                    console.error('[loadPricing] Failed to load pricing:', response);
+                    // Use fallback pricing
+                    this.useFallbackPricing();
+                }
+            } catch (error) {
+                console.error('[loadPricing] Error loading pricing:', error);
+                // Use fallback pricing
+                this.useFallbackPricing();
+            }
+        }
+
+        /**
+         * Use fallback pricing if API fails
+         */
+        useFallbackPricing() {
+            console.warn('[useFallbackPricing] Using fallback pricing values');
+            this.pricing.setup = 99999;
+            this.pricing.weekly = 15000;
+        }
+
+        /**
+         * Map n8n pricing data to frontend product keys
+         * This handles the mapping between Service_Name (from n8n) and data-product values (frontend)
+         */
+        mapPricingToProducts() {
+            // Mapping of frontend product keys to potential n8n Service_Name values
+            const productMappings = {
+                'inbound_outbound_calls': ['Inbound Calls', 'Outbound Calls', 'Calls', 'Inbound/Outbound Calls'],
+                'emails': ['Emails', 'Email', 'AI Emails'],
+                'chatbot': ['Chatbot', 'Chat', 'AI Chat']
+            };
+
+            // Mapping for addons (will check Service_Name or Package_Name)
+            const addonMappings = {
+                'Quality Assurance': ['Quality Assurance', 'QA'],
+                'AVS Match': ['AVS Match', 'AVS'],
+                'Custom Packages': ['Custom Packages', 'Custom Package'],
+                'Phone Numbers': ['Phone Numbers', 'Phone Number'],
+                'Lead Verification': ['Lead Verification', 'Lead Verify'],
+                'Transcriptions & Recordings': ['Transcriptions & Recordings', 'Transcriptions', 'Recordings']
+            };
+
+            // Map products to frontend keys
+            Object.entries(productMappings).forEach(([frontendKey, possibleNames]) => {
+                for (const name of possibleNames) {
+                    if (this.pricing.products[name]) {
+                        // Copy pricing data to frontend key if not already there
+                        if (!this.pricing.products[frontendKey]) {
+                            this.pricing.products[frontendKey] = this.pricing.products[name];
+                        }
+                        break;
+                    }
+                }
+            });
+
+            // Map addons
+            Object.entries(addonMappings).forEach(([addonKey, possibleNames]) => {
+                for (const name of possibleNames) {
+                    if (this.pricing.products[name]) {
+                        this.pricing.addons[addonKey] = this.pricing.products[name];
+                        break;
+                    }
+                }
+            });
+
+            console.log('[mapPricingToProducts] Mapped products:', this.pricing.products);
+            console.log('[mapPricingToProducts] Mapped addons:', this.pricing.addons);
+        }
+
+        /**
+         * Calculate pricing based on selected products and addons
+         */
+        calculatePricing() {
+            let setupTotal = 0;
+            let weeklyTotal = 0;
+
+            // Calculate product pricing
+            this.state.selectedProducts.forEach(productKey => {
+                if (this.pricing.products[productKey]) {
+                    setupTotal += this.pricing.products[productKey].setup;
+                    weeklyTotal += this.pricing.products[productKey].weekly;
+                }
+            });
+
+            // Calculate addon pricing
+            this.state.selectedAddons.forEach(addonKey => {
+                if (this.pricing.addons[addonKey]) {
+                    setupTotal += this.pricing.addons[addonKey].setup;
+                    weeklyTotal += this.pricing.addons[addonKey].weekly;
+                }
+            });
+
+            // Update pricing state
+            this.pricing.setup = setupTotal;
+            this.pricing.weekly = weeklyTotal;
+
+            console.log('[calculatePricing] Updated totals:', {
+                setup: setupTotal,
+                weekly: weeklyTotal
+            });
+
+            // Update summary display
+            this.updateSummary();
         }
 
         /**
@@ -183,11 +362,11 @@
                 <div class="aipw-summary-total">
                     <div class="aipw-summary-row">
                         <span>Setup Total</span>
-                        <span>$${this.pricing.setup.toFixed(2)}</span>
+                        <span>${this.formatCurrency(this.pricing.setup)}</span>
                     </div>
                     <div class="aipw-summary-row total">
                         <span>Weekly Cost</span>
-                        <span>$${this.pricing.weekly.toFixed(2)}</span>
+                        <span>${this.formatCurrency(this.pricing.weekly)}</span>
                     </div>
                 </div>
             `;
@@ -218,6 +397,7 @@
                             Automated Call Handling<br>
                             Inbound & Outbound calls
                         </div>
+                        ${this.getProductPricingHTML('inbound_outbound_calls')}
                         <div class="aipw-product-checkmark"></div>
                     </div>
 
@@ -229,6 +409,7 @@
                             Individual Responses<br>
                             AI That Replies
                         </div>
+                        ${this.getProductPricingHTML('emails')}
                         <div class="aipw-product-checkmark"></div>
                     </div>
 
@@ -240,6 +421,7 @@
                             24/7 Chat Support<br>
                             AI That Engages
                         </div>
+                        ${this.getProductPricingHTML('chatbot')}
                         <div class="aipw-product-checkmark"></div>
                     </div>
                 </div>
@@ -309,7 +491,8 @@
                         this.state.selectedProducts = this.state.selectedProducts.filter(p => p !== product);
                     }
 
-                    this.updateSummary();
+                    // Recalculate pricing based on selection
+                    this.calculatePricing();
                     this.checkPaymentButtonState();
                 });
             });
@@ -328,7 +511,8 @@
                         this.state.selectedAddons = this.state.selectedAddons.filter(a => a !== addon);
                     }
 
-                    this.updateSummary();
+                    // Recalculate pricing based on selection
+                    this.calculatePricing();
                 });
             });
 
@@ -1291,7 +1475,7 @@
 
             try {
                 // Prepare complete order payload
-                const orderData = {
+                let orderData = {
                     // Products and addons
                     products: this.state.selectedProducts,
                     addons: this.state.selectedAddons,
@@ -1458,6 +1642,38 @@
                 'chatbot': 'Chatbot'
             };
             return names[slug] || slug;
+        }
+
+        /**
+         * Get product pricing HTML for display in product card
+         */
+        getProductPricingHTML(productKey) {
+            const pricing = this.pricing.products[productKey];
+
+            if (!pricing) {
+                return '<div class="aipw-product-pricing">Pricing loading...</div>';
+            }
+
+            const setupFormatted = this.formatCurrency(pricing.setup);
+            const weeklyFormatted = this.formatCurrency(pricing.weekly);
+
+            return `
+                <div class="aipw-product-pricing">
+                    <div class="aipw-pricing-setup">Setup: ${setupFormatted}</div>
+                    <div class="aipw-pricing-weekly">${weeklyFormatted}/week</div>
+                </div>
+            `;
+        }
+
+        /**
+         * Format currency value
+         */
+        formatCurrency(cents) {
+            const dollars = cents / 100;
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(dollars);
         }
     }
 

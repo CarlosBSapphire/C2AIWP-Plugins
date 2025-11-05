@@ -206,21 +206,22 @@ class N8nClient
         $result = $this->select(
             'pricing',
             [
-                'service_type',
-                'package_name',
-                'tier',
-                'min_rate',
-                'default_rate',
-                'per_unit',
-                'notes',
-                'included_quantity',
-                'additional_rate'
+                'Service_Name', // Setup, Inbound Calls
+                'Package_Name', // 2 Services, Quick
+                'Min_Rate', //$99.00, $0.35
+                'Default_Rate', // $749.00, $0.45
+                'Frequency', // One Time Fee, Minute
+                'Notes', //  "", OSS
+                'Defined_As', // "", Individual Calls
+                'Message_Cap', // 250, 1000
+                'Free_Period_Days', // 0, 90,
+                'Active' // true
             ],
-            ['active' => true],
+            ['Active' => true],
             [
                 'page' => 1,
                 'limit' => 100,
-                'sort' => ['column' => 'service_type', 'direction' => 'ASC']
+                'sort' => ['column' => 'Service_Name', 'direction' => 'ASC']
             ]
         );
 

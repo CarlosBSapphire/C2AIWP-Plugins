@@ -80,8 +80,8 @@ class OrderProcessor
      * @var array
      */
     private $agent_levels = [
-        'essential' => 'Essential',
-        'responsive' => 'Responsive',
+        'essential' => 'Quick',
+        'responsive' => 'Advanced',
         'conversational' => 'Conversational'
     ];
 
