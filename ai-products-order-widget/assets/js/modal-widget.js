@@ -1832,7 +1832,7 @@
                     <div class="aipw-form-group full-width">
                         <label class="aipw-form-label">Business Name (if service is in your company's name)</label>
                         <input type="text" class="aipw-form-input" name="business_name"
-                               value="${this.state.loaFormData.business_name || ''}">
+                               value="">
                     </div>
 
                     <div class="aipw-form-section">
