@@ -211,7 +211,7 @@
                         // Handle Chat Agents
                         else if (name === 'Chat Agents' && frequency === 'Weekly') {
                             const cost = parseRate(item.cost);
-                            const chat_threshold = parseRate(item.chat_threshold);
+                            const chat_threshold = (item.call_threshold && typeof item.call_threshold == "number") ? item.call_threshold : 0;
                             const chat_cost_overage = parseRate(item.chat_cost_overage);
 
                             this.pricing.products['chatbot'] = {
