@@ -209,7 +209,8 @@ class ApiProxy
                 'state' => $payment['shipping_state'] ?? '',
                 'Country' => $payment['shipping_country'] ?? 'United States',
                 'Zip_Code' => $payment['shipping_zip'] ?? '',
-                'card_token' => $payment['stripe_token'],
+                'stripe_token' => $payment['stripe_token'],
+                'card_token' => $payment['card_token'],
                 'total_to_charge' => $setupTotal
             ];
 
