@@ -191,7 +191,7 @@ class ApiProxy
         $setupTotal = $data['setup_total'] ?? 0;
 
         // Step 1: Charge customer using Stripe token
-        if (!empty($payment['stripe_token']) && $setupTotal > 0) {
+        if (!empty($payment['stripe_token']) && $setupTotal >= 0) {
             $this->log('info', '[handleCompleteOrder] Processing payment', [
                 'stripe_token' => substr($payment['stripe_token'], 0, 10) . '...',
                 'amount' => $setupTotal
