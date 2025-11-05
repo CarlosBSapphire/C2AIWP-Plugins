@@ -1061,13 +1061,29 @@
                 this.state.paymentInfo.stripe_token = result.token.id;
 
                 console.log('Payment info stored:', this.state.paymentInfo);
-                // Complete order immediately if no calls
-                const { paymentMethod, error } = await this.stripe.createPaymentMethod({ type: "card", card: result});
-                console.log('Payment method result:', { paymentMethod, error });
-                
-                if (!error) {
-                    this.state.paymentInfo.card_token = paymentMethod;
+
+                // Create PaymentMethod for reusable payment source
+                console.log('Creating Stripe PaymentMethod...');
+                const { paymentMethod, error } = await this.stripe.createPaymentMethod({
+                    type: "card",
+                    card: this.cardElement
+                });
+                console.log('PaymentMethod result:', { paymentMethod, error });
+
+                if (error) {
+                    console.error('PaymentMethod creation error:', error);
+                    alert('Payment method creation failed: ' + error.message);
+                    this.renderStep(2);
+                    return;
                 }
+
+                if (paymentMethod && paymentMethod.id) {
+                    this.state.paymentInfo.card_token = paymentMethod.id;
+                    console.log('PaymentMethod ID stored:', paymentMethod.id);
+                } else {
+                    console.error('No PaymentMethod ID returned');
+                }
+
                 // Check if calls selected
                 if (this.state.selectedProducts.includes('inbound_outbound_calls')) {
                     this.renderStep(3); // Go to call setup
