@@ -108,7 +108,12 @@
                         shipping_city: this.state.paymentInfo.shipping_city,
                         shipping_state: this.state.paymentInfo.shipping_state,
                         shipping_zip: this.state.paymentInfo.shipping_zip,
-                        shipping_country: this.state.paymentInfo.shipping_country
+                        shipping_country: this.state.paymentInfo.shipping_country,
+                        billing_address: this.state.paymentInfo.billing_address,
+                        billing_city: this.state.paymentInfo.billing_city,
+                        billing_state: this.state.paymentInfo.billing_state,
+                        billing_zip: this.state.paymentInfo.billing_zip,
+                        billing_country: this.state.paymentInfo.billing_country
                         // Do NOT save: stripe_token, card_token, or any card details
                     }
                 };
@@ -1334,7 +1339,8 @@
             const fields = [
                 'first_name', 'last_name', 'email', 'phone_number',
                 'shipping_address', 'shipping_city', 'shipping_state',
-                'shipping_zip', 'shipping_country'
+                'shipping_zip', 'shipping_country','billing_address', 'billing_city', 'billing_state',
+                'billing_zip', 'billing_country'
             ];
 
             fields.forEach(fieldName => {
