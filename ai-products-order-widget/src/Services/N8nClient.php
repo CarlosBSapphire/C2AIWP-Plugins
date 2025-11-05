@@ -201,22 +201,123 @@ class N8nClient
             }
         }
 
+        /*default json example:
+        [
+            {
+                "type": "1 Service",
+                "name": "One Time Charge",
+                "cost": 499.00,
+                "frequency": "One Time",
+                "one_time_processed": 1
+            },
+            {
+                "type": "2 Services",
+                "name": "One Time Charge",
+                "cost": 799.00,
+                "frequency": "One Time",
+                "one_time_processed": 1
+            },
+            {
+                "type": "3+ Services",
+                "name": "One Time Charge",
+                "cost": 999.00,
+                "frequency": "One Time",
+                "one_time_processed": 1
+            },
+            {
+                "type": "Quick",
+                "name": "Inbound Calls",
+                "frequency": "Weekly",
+                "phone_per_minute": 0.45,
+                "phone_per_minute_overage": 0.00,
+                "call_threshold": 0
+            },
+            {
+                "type": "Advanced",
+                "name": "Inbound Calls",
+                "frequency": "Weekly",
+                "phone_per_minute": 0.55,
+                "phone_per_minute_overage": 0.00,
+                "call_threshold": 0
+            },
+            {
+                "type": "Conversational",
+                "name": "Inbound Calls",
+                "frequency": "Weekly",
+                "phone_per_minute": 0.65,
+                "phone_per_minute_overage": 0.00,
+                "call_threshold": 0
+            },
+            {
+                "type": "Quick",
+                "name": "Outbound Calls",
+                "frequency": "Weekly",
+                "phone_per_minute": 0.45,
+                "phone_per_minute_overage": 0.00,
+                "call_threshold": 0
+            },
+            {
+                "type": "Advanced",
+                "name": "Outbound Calls",
+                "frequency": "Weekly",
+                "phone_per_minute": 0.55,
+                "phone_per_minute_overage": 0.00,
+                "call_threshold": 0
+            },
+            {
+                "type": "Conversational",
+                "name": "Outbound Calls",
+                "frequency": "Weekly",
+                "phone_per_minute": 0.65,
+                "phone_per_minute_overage": 0.00,
+                "call_threshold": 0
+            },
+            {
+                "type": "Basic",
+                "name": "Email Agents",
+                "frequency": "Weekly",
+                "cost": 25.00,
+                "email_threshold": 250,
+                "email_cost_overage": 0.10
+            },
+            {
+                "type": "Basic",
+                "name": "Chat Agents",
+                "frequency": "Weekly",
+                "cost": 25.00,
+                "chat_threshold": 200,
+                "chat_cost_overage": 0.10
+            },
+            {
+                "type": "Addons",
+                "name": "Transcription & Call Recordings",
+                "frequency": "Weekly",
+                "cost": 125.00
+            },
+            {
+                "type": "Basic",
+                "name": "QA",
+                "frequency": "Weekly",
+                "cost": 0.00,
+                "cost_per_lead": "0.00"
+            },
+            {
+                "type": "Advanced",
+                "name": "QA",
+                "frequency": "Weekly",
+                "cost": 0.00,
+                "cost_per_lead": "0.00"
+            }
+        ]*/
+            
         // Fetch from API
-        $result = $this->select(
-            'Pricing_Details',
+            $result = $this->select(
+            'Website_Pricing',
             [
-                'Service_Name', // Setup, Inbound Calls
-                'Package_Name', // 2 Services, Quick
-                'Min_Rate', //$99.00, $0.35
-                'Default_Rate', // $749.00, $0.45
-                'Frequency', // One Time Fee, Minute
-                'Notes', //  "", OSS
-                'Defined_As', // "", Individual Calls
-                'Message_Cap', // 250, 1000
-                'Free_Period_Days', // 0, 90,
+                'cost_json',
                 'Active' // 1
             ],
-            ['Active' => 1],
+            ['Active' => 1, 'id' => 1],
             [
                 'page' => 1,
                 'limit' => 100,

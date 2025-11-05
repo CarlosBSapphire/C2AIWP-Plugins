@@ -44,7 +44,9 @@
                 setup: 0,
                 weekly: 0,
                 products: {},  // Product-specific pricing
-                addons: {}     // Addon-specific pricing
+                addons: {},     // Addon-specific pricing
+                setupFees: {}, // Setup fees by service count (1, 2, 3+)
+                agentStyles: {} // Agent style pricing by type (Quick, Advanced, Conversational)
             };
 
             // Stripe elements
@@ -57,7 +59,7 @@
         async init() {
             this.createModal();
             this.attachEventListeners();
-            
+
             // Load pricing data from n8n
             await this.loadPricing();
         }
@@ -127,59 +129,142 @@
                 console.log('[loadPricing] Fetching pricing from n8n...');
                 const response = await this.apiCall('get_pricing', {});
 
-                if (response.success && response.data) {
+                if (response.success && response.data.cost_json) {
                     console.log('[loadPricing] Pricing data received:', response.data);
 
-                    // Parse pricing data and organize by Service_Name and Package_Name
-                    response.data.forEach(item => {
-                        const serviceName = item.Service_Name;
-                        const packageName = item.Package_Name;
+                    // Parse rates - they come as numbers or dollar strings like "$99.00" or "$0.45"
+                    // Convert to cents (integer) for calculations
+                    const parseRate = (rateStr) => {
+                        if (!rateStr) return 0;
+                        if(typeof rateStr === 'number') return Math.round(rateStr * 100);
+                        const cleaned = String(rateStr).replace(/[$,]/g, '');
+                        const dollars = parseFloat(cleaned) || 0;
+                        return Math.round(dollars * 100); // Convert to cents
+                    };
 
-                        // Parse rates - they come as dollar strings like "$99.00" or "$0.45"
-                        // Convert to cents (integer) for calculations
-                        const parseRate = (rateStr) => {
-                            if (!rateStr) return 0;
-                            const cleaned = String(rateStr).replace(/[$,]/g, '');
-                            const dollars = parseFloat(cleaned) || 0;
-                            return Math.round(dollars * 100); // Convert to cents
-                        };
+                    // Process each pricing item
+                    response.data.cost_json.forEach(item => {
+                        const type = item.type;
+                        const name = item.name;
+                        const frequency = item.frequency;
 
-                        const minRate = parseRate(item.Min_Rate);
-                        const defaultRate = parseRate(item.Default_Rate);
+                        // Handle One Time Charges (setup fees based on service count)
+                        if (name === 'One Time Charge' && frequency === 'One Time') {
+                            const cost = parseRate(item.cost);
 
-                        // Determine if this is a one-time setup fee or recurring
-                        const isOneTime = item.Frequency === 'One Time Fee';
-                        const isWeekly = item.Frequency === 'Week';
-                        const isMonthly = item.Frequency === 'Month';
+                            if (type === '1 Service') {
+                                this.pricing.setupFees['1'] = cost;
+                            } else if (type === '2 Services') {
+                                this.pricing.setupFees['2'] = cost;
+                            } else if (type === '3+ Services') {
+                                this.pricing.setupFees['3+'] = cost;
+                            }
 
-                        // Store pricing data
-                        const pricingData = {
-                            setup: isOneTime ? defaultRate : 0,
-                            weekly: isWeekly ? defaultRate : 0,
-                            monthly: isMonthly ? defaultRate : 0,
-                            minRate: minRate,
-                            defaultRate: defaultRate,
-                            frequency: item.Frequency || '',
-                            notes: item.Notes || '',
-                            definedAs: item.Defined_As || '',
-                            messageCap: parseInt(item.Message_Cap) || 0,
-                            freePeriodDays: parseInt(item.Free_Period_Days) || 0
-                        };
-
-                        // Store in products using both Service_Name and Package_Name as keys
-                        if (serviceName) {
-                            this.pricing.products[serviceName] = pricingData;
+                            console.log(`[loadPricing] Setup fee for ${type}: ${cost} cents`);
                         }
-                        if (packageName) {
-                            this.pricing.products[packageName] = pricingData;
+
+                        // Handle Inbound/Outbound Calls (agent style pricing)
+                        else if ((name === 'Inbound Calls' || name === 'Outbound Calls') && frequency === 'Weekly') {
+                            const phone_per_minute = parseRate(item.phone_per_minute);
+                            const phone_per_minute_overage = parseRate(item.phone_per_minute_overage);
+                            const call_threshold = parseRate(item.call_threshold);
+
+                            // Store by agent style type (Quick, Advanced, Conversational)
+                            const styleKey = type; // "Quick", "Advanced", or "Conversational"
+
+                            if (!this.pricing.agentStyles[styleKey]) {
+                                this.pricing.agentStyles[styleKey] = {
+                                    phone_per_minute: 0,
+                                    phone_per_minute_overage: 0,
+                                    call_threshold: 0
+                                };
+                            }
+
+                            // Combine Inbound and Outbound (they should have same rates)
+                            this.pricing.agentStyles[styleKey].phone_per_minute = phone_per_minute;
+                            this.pricing.agentStyles[styleKey].phone_per_minute_overage = phone_per_minute_overage;
+                            this.pricing.agentStyles[styleKey].call_threshold = call_threshold;
+
+                            console.log(`[loadPricing] ${styleKey} calls: ${phone_per_minute} cents/min`);
+                        }
+
+                        // Handle Email Agents
+                        else if (name === 'Email Agents' && frequency === 'Weekly') {
+                            const cost = parseRate(item.cost);
+                            const email_threshold = parseRate(item.email_threshold);
+                            const email_cost_overage = parseRate(item.email_cost_overage);
+
+                            this.pricing.products['emails'] = {
+                                weekly: cost,
+                                email_threshold: email_threshold,
+                                email_cost_overage: email_cost_overage,
+                                type: type, // "Basic"
+                                frequency: frequency
+                            };
+
+                            console.log(`[loadPricing] Email Agents (${type}): ${cost} cents/week`);
+                        }
+
+                        // Handle Chat Agents
+                        else if (name === 'Chat Agents' && frequency === 'Weekly') {
+                            const cost = parseRate(item.cost);
+                            const chat_threshold = parseRate(item.chat_threshold);
+                            const chat_cost_overage = parseRate(item.chat_cost_overage);
+
+                            this.pricing.products['chatbot'] = {
+                                weekly: cost,
+                                chat_threshold: chat_threshold,
+                                chat_cost_overage: chat_cost_overage,
+                                type: type, // "Basic"
+                                frequency: frequency
+                            };
+
+                            console.log(`[loadPricing] Chat Agents (${type}): ${cost} cents/week`);
+                        }
+
+                        // Handle Addons
+                        else if (type === 'Addons') {
+                            const cost = parseRate(item.cost);
+
+                            // Map addon names to frontend keys
+                            const addonMapping = {
+                                'Transcription & Call Recordings': 'Transcriptions & Recordings',
+                                'QA': 'Quality Assurance'
+                            };
+
+                            const addonKey = addonMapping[name] || name;
+
+                            this.pricing.addons[addonKey] = {
+                                weekly: cost,
+                                frequency: frequency,
+                                type: type
+                            };
+
+                            console.log(`[loadPricing] Addon ${addonKey}: ${cost} cents/week`);
+                        }
+
+                        // Handle QA (Quality Assurance) - separate from Addons type
+                        else if (name === 'QA') {
+                            const cost = parseRate(item.cost);
+                            const cost_per_lead = parseRate(item.cost_per_lead);
+
+                            // Store QA pricing by type (Basic, Advanced)
+                            const qaKey = `Quality Assurance (${type})`;
+
+                            this.pricing.addons[qaKey] = {
+                                weekly: cost,
+                                cost_per_lead: cost_per_lead,
+                                frequency: frequency,
+                                type: type
+                            };
+
+                            console.log(`[loadPricing] ${qaKey}: ${cost} cents/week, ${cost_per_lead} cents/lead`);
                         }
                     });
 
-                    // Create friendly key mappings for frontend product keys
-                    // Map n8n Service_Name to frontend data-product values
-                    this.mapPricingToProducts();
-
                     console.log('[loadPricing] Parsed pricing:', {
+                        setupFees: this.pricing.setupFees,
+                        agentStyles: this.pricing.agentStyles,
                         products: this.pricing.products,
                         addons: this.pricing.addons
                     });
@@ -208,74 +293,61 @@
         }
 
         /**
-         * Map n8n pricing data to frontend product keys
-         * This handles the mapping between Service_Name (from n8n) and data-product values (frontend)
-         */
-        mapPricingToProducts() {
-            // Mapping of frontend product keys to potential n8n Service_Name values
-            const productMappings = {
-                'inbound_outbound_calls': ['Inbound Calls', 'Outbound Calls', 'Calls', 'Inbound/Outbound Calls'],
-                'emails': ['Emails', 'Email', 'AI Emails'],
-                'chatbot': ['Chatbot', 'Chat', 'AI Chat']
-            };
-
-            // Mapping for addons (will check Service_Name or Package_Name)
-            const addonMappings = {
-                'Quality Assurance': ['Quality Assurance', 'QA'],
-                'AVS Match': ['AVS Match', 'AVS'],
-                'Custom Packages': ['Custom Packages', 'Custom Package'],
-                'Phone Numbers': ['Phone Numbers', 'Phone Number'],
-                'Lead Verification': ['Lead Verification', 'Lead Verify'],
-                'Transcriptions & Recordings': ['Transcriptions & Recordings', 'Transcriptions', 'Recordings']
-            };
-
-            // Map products to frontend keys
-            Object.entries(productMappings).forEach(([frontendKey, possibleNames]) => {
-                for (const name of possibleNames) {
-                    if (this.pricing.products[name]) {
-                        // Copy pricing data to frontend key if not already there
-                        if (!this.pricing.products[frontendKey]) {
-                            this.pricing.products[frontendKey] = this.pricing.products[name];
-                        }
-                        break;
-                    }
-                }
-            });
-
-            // Map addons
-            Object.entries(addonMappings).forEach(([addonKey, possibleNames]) => {
-                for (const name of possibleNames) {
-                    if (this.pricing.products[name]) {
-                        this.pricing.addons[addonKey] = this.pricing.products[name];
-                        break;
-                    }
-                }
-            });
-
-            console.log('[mapPricingToProducts] Mapped products:', this.pricing.products);
-            console.log('[mapPricingToProducts] Mapped addons:', this.pricing.addons);
-        }
-
-        /**
-         * Calculate pricing based on selected products and addons
+         * Calculate pricing based on selected products, addons, and agent style
          */
         calculatePricing() {
             let setupTotal = 0;
             let weeklyTotal = 0;
 
-            // Calculate product pricing
+            console.log('[calculatePricing] Starting calculation with:', {
+                selectedProducts: this.state.selectedProducts,
+                selectedAddons: this.state.selectedAddons,
+                agentStyle: this.state.agentStyle
+            });
+
+            // Step 1: Calculate setup fee based on number of selected services
+            const serviceCount = this.state.selectedProducts.length;
+
+            if (serviceCount === 1) {
+                setupTotal = this.pricing.setupFees['1'] || 0;
+            } else if (serviceCount === 2) {
+                setupTotal = this.pricing.setupFees['2'] || 0;
+            } else if (serviceCount >= 3) {
+                setupTotal = this.pricing.setupFees['3+'] || 0;
+            }
+
+            console.log(`[calculatePricing] Setup fee for ${serviceCount} service(s): ${setupTotal} cents`);
+
+            // Step 2: Calculate weekly costs for selected products
             this.state.selectedProducts.forEach(productKey => {
-                if (this.pricing.products[productKey]) {
-                    setupTotal += this.pricing.products[productKey].setup;
-                    weeklyTotal += this.pricing.products[productKey].weekly;
+                if (productKey === 'inbound_outbound_calls') {
+                    // Call pricing depends on agent style (selected in step 5)
+                    // We'll just note that calls are selected; actual per-minute rate comes from agentStyle
+                    console.log('[calculatePricing] Calls selected (pricing depends on agent style)');
+                    // No weekly base fee for calls - it's all usage-based
+                }
+                else if (productKey === 'emails') {
+                    const emailPricing = this.pricing.products['emails'];
+                    if (emailPricing) {
+                        weeklyTotal += emailPricing.weekly || 0;
+                        console.log(`[calculatePricing] Email weekly: ${emailPricing.weekly} cents`);
+                    }
+                }
+                else if (productKey === 'chatbot') {
+                    const chatPricing = this.pricing.products['chatbot'];
+                    if (chatPricing) {
+                        weeklyTotal += chatPricing.weekly || 0;
+                        console.log(`[calculatePricing] Chat weekly: ${chatPricing.weekly} cents`);
+                    }
                 }
             });
 
-            // Calculate addon pricing
+            // Step 3: Calculate weekly costs for addons
             this.state.selectedAddons.forEach(addonKey => {
-                if (this.pricing.addons[addonKey]) {
-                    setupTotal += this.pricing.addons[addonKey].setup;
-                    weeklyTotal += this.pricing.addons[addonKey].weekly;
+                const addon = this.pricing.addons[addonKey];
+                if (addon) {
+                    weeklyTotal += addon.weekly || 0;
+                    console.log(`[calculatePricing] Addon '${addonKey}' weekly: ${addon.weekly} cents`);
                 }
             });
 
@@ -283,9 +355,11 @@
             this.pricing.setup = setupTotal;
             this.pricing.weekly = weeklyTotal;
 
-            console.log('[calculatePricing] Updated totals:', {
+            console.log('[calculatePricing] Final totals:', {
                 setup: setupTotal,
-                weekly: weeklyTotal
+                weekly: weeklyTotal,
+                setupDollars: (setupTotal / 100).toFixed(2),
+                weeklyDollars: (weeklyTotal / 100).toFixed(2)
             });
 
             // Update summary display
@@ -1423,24 +1497,32 @@
                 <p class="aipw-modal-subtitle">Which level of AI support best fits where your business is today?</p>
             `;
 
+            // Get pricing for each agent style
+            const quickPricing = this.pricing.agentStyles['Quick'] || {};
+            const advancedPricing = this.pricing.agentStyles['Advanced'] || {};
+            const conversationalPricing = this.pricing.agentStyles['Conversational'] || {};
+
             body.innerHTML = `
                 <div class="aipw-agent-styles">
                     <div class="aipw-agent-card" data-agent="quick">
                         <div class="aipw-config-radio"></div>
                         <div class="aipw-agent-name">Quick</div>
                         <div class="aipw-agent-description">Streamlines common requests and workflows</div>
+                        <div class="aipw-agent-pricing">${this.formatCurrency(quickPricing.phone_per_minute || 0)}/min</div>
                     </div>
 
                     <div class="aipw-agent-card" data-agent="advanced">
                         <div class="aipw-config-radio"></div>
                         <div class="aipw-agent-name">Advanced</div>
                         <div class="aipw-agent-description">Adapts across channels with richer context</div>
+                        <div class="aipw-agent-pricing">${this.formatCurrency(advancedPricing.phone_per_minute || 0)}/min</div>
                     </div>
 
                     <div class="aipw-agent-card" data-agent="conversational">
                         <div class="aipw-config-radio"></div>
                         <div class="aipw-agent-name">Conversational</div>
                         <div class="aipw-agent-description">Manages complex cases with full customer awareness</div>
+                        <div class="aipw-agent-pricing">${this.formatCurrency(conversationalPricing.phone_per_minute || 0)}/min</div>
                     </div>
                 </div>
             `;
@@ -1474,6 +1556,14 @@
             this.showLoading('Completing your order...');
 
             try {
+                // Get agent style pricing if calls were selected
+                let agentStylePricing = null;
+                if (this.state.selectedProducts.includes('inbound_outbound_calls') && this.state.agentStyle) {
+                    // Capitalize first letter to match pricing key (Quick, Advanced, Conversational)
+                    const styleKey = this.state.agentStyle.charAt(0).toUpperCase() + this.state.agentStyle.slice(1);
+                    agentStylePricing = this.pricing.agentStyles[styleKey] || null;
+                }
+
                 // Prepare complete order payload
                 let orderData = {
                     // Products and addons
@@ -1492,7 +1582,8 @@
                         setup_type: this.state.setupType,
                         number_count: this.state.numberCount,
                         assignment_type: this.state.assignmentType,
-                        agent_style: this.state.agentStyle
+                        agent_style: this.state.agentStyle,
+                        agent_style_pricing: agentStylePricing // Include pricing details for backend
                     } : null
                 };
 
@@ -1648,18 +1739,26 @@
          * Get product pricing HTML for display in product card
          */
         getProductPricingHTML(productKey) {
+            if (productKey === 'inbound_outbound_calls') {
+                // Call pricing is usage-based and depends on agent style
+                return `
+                    <div class="aipw-product-pricing">
+                        <div class="aipw-pricing-weekly">Usage-based pricing</div>
+                        <div class="aipw-pricing-note" style="font-size: 11px; opacity: 0.8;">Rate depends on agent style</div>
+                    </div>
+                `;
+            }
+
             const pricing = this.pricing.products[productKey];
 
             if (!pricing) {
                 return '<div class="aipw-product-pricing">Pricing loading...</div>';
             }
 
-            const setupFormatted = this.formatCurrency(pricing.setup);
-            const weeklyFormatted = this.formatCurrency(pricing.weekly);
+            const weeklyFormatted = this.formatCurrency(pricing.weekly || 0);
 
             return `
                 <div class="aipw-product-pricing">
-                    <div class="aipw-pricing-setup">Setup: ${setupFormatted}</div>
                     <div class="aipw-pricing-weekly">${weeklyFormatted}/week</div>
                 </div>
             `;
