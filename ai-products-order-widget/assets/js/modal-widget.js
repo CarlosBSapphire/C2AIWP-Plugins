@@ -170,7 +170,7 @@
                         else if ((name === 'Inbound Calls' || name === 'Outbound Calls') && frequency === 'Weekly') {
                             const phone_per_minute = parseRate(item.phone_per_minute);
                             const phone_per_minute_overage = parseRate(item.phone_per_minute_overage);
-                            const call_threshold = parseRate(item.call_threshold);
+                            const call_threshold = item.call_threshold ? parseInt(item.call_threshold) : 0;
 
                             // Store by agent style type (Quick, Advanced, Conversational)
                             const styleKey = type; // "Quick", "Advanced", or "Conversational"
@@ -194,7 +194,7 @@
                         // Handle Email Agents
                         else if (name === 'Email Agents' && frequency === 'Weekly') {
                             const cost = parseRate(item.cost);
-                            const email_threshold = parseRate(item.email_threshold);
+                            const email_threshold = item.email_threshold ? parseRate(item.email_threshold) : 0;
                             const email_cost_overage = parseRate(item.email_cost_overage);
 
                             this.pricing.products['emails'] = {
