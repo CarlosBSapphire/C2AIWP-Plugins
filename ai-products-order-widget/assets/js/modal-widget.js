@@ -129,8 +129,11 @@
                 console.log('[loadPricing] Fetching pricing from n8n...');
                 const response = await this.apiCall('get_pricing', {});
 
-                if (response.success && response.data.cost_json) {
-                    console.log('[loadPricing] Pricing data received:', response.data);
+                // Handle the response structure: response.data is an array with cost_json inside
+                const costData = response.success && response.data && response.data[0] && response.data[0].cost_json;
+
+                if (costData) {
+                    console.log('[loadPricing] Pricing data received:', response.data[0]);
 
                     // Parse rates - they come as numbers or dollar strings like "$99.00" or "$0.45"
                     // Convert to cents (integer) for calculations
@@ -143,7 +146,7 @@
                     };
 
                     // Process each pricing item
-                    response.data.cost_json.forEach(item => {
+                    costData.forEach(item => {
                         const type = item.type;
                         const name = item.name;
                         const frequency = item.frequency;
