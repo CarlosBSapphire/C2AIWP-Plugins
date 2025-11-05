@@ -204,7 +204,7 @@ class N8nClient
 
         // Fetch from API
         $result = $this->select(
-            'pricing',
+            'Pricing_Details',
             [
                 'Service_Name', // Setup, Inbound Calls
                 'Package_Name', // 2 Services, Quick
