@@ -97,7 +97,7 @@ class N8nClient
         }
 
         // Build payload
-        $payload = [
+        $payload = 
             [
                 'table_name' => $table_name,
                 'columns' => $columns,
@@ -105,8 +105,7 @@ class N8nClient
                 'page' => $options['page'] ?? 1,
                 'limit' => $options['limit'] ?? 50,
                 'sort' => $options['sort'] ?? []
-            ]
-        ];
+            ];
 
         // Execute request
         return $this->request($this->ENDPOINT_SELECT, 'POST', $payload);
