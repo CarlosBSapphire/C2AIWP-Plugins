@@ -1516,6 +1516,8 @@
                 // Wait briefly to show success message
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
+                console.log("Selected products: ", this.state.selectedProducts)
+
                 // Check if calls selected
                 if (this.state.selectedProducts.includes('inbound_outbound_calls')) {
                     this.renderStep(3); // Go to call setup
@@ -2161,7 +2163,7 @@
                     throw new Error('Failed to create user account: ' + (userResult.error || 'Unknown error'));
                 }
 
-                this.state.userId = userResult.data.userId;
+                this.state.userId = userResult.data.data.userId;
                 console.log('[submitPortingLOA] User created:', this.state.userId);
 
                 // Generate LOA form HTML for PDF generation
@@ -2603,6 +2605,22 @@ Customer2.AI Team
             }).format(dollars);
         }
     }
+
+    window.addEventListener('load', function () {
+        // Detect if the page was loaded via a hard reload
+        const navEntries = performance.getEntriesByType('navigation');
+        const navType = navEntries.length > 0 ? navEntries[0].type : performance.navigation.type;
+
+        if (navType === 'reload') {
+            // Page was hard-refreshed (Ctrl+R, F5, etc.)
+            console.log('Page was hard reloaded, clearing widget state');
+            if (typeof this.clearState === 'function') {
+                this.clearState();
+            } else {
+                console.log('clearState not found on this context');
+            }
+        }
+    });
 
     // Initialize widget when DOM is ready
     if (document.readyState === 'loading') {
