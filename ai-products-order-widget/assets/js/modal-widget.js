@@ -19,7 +19,8 @@
                 ...config
             };
 
-            this.state = {
+            // Load saved state from localStorage or use defaults
+            this.state = this.loadState() || {
                 currentStep: 1,
                 selectedProducts: [],
                 selectedAddons: [],
@@ -62,6 +63,73 @@
 
             // Load pricing data from n8n
             await this.loadPricing();
+        }
+
+        /**
+         * Load state from localStorage
+         * @returns {Object|null} Saved state or null if not found
+         */
+        loadState() {
+            try {
+                const savedState = localStorage.getItem('aipw_widget_state');
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    console.log('[loadState] Restored state from localStorage:', parsed);
+                    return parsed;
+                }
+            } catch (error) {
+                console.error('[loadState] Error loading state from localStorage:', error);
+            }
+            return null;
+        }
+
+        /**
+         * Save current state to localStorage
+         */
+        saveState() {
+            try {
+                // Create a clean copy of state without sensitive payment info
+                const stateToSave = {
+                    currentStep: this.state.currentStep,
+                    selectedProducts: this.state.selectedProducts,
+                    selectedAddons: this.state.selectedAddons,
+                    setupType: this.state.setupType,
+                    numberCount: this.state.numberCount,
+                    assignmentType: this.state.assignmentType,
+                    agentStyle: this.state.agentStyle,
+                    termsAccepted: this.state.termsAccepted,
+                    // Save payment info but exclude sensitive card data
+                    paymentInfo: {
+                        first_name: this.state.paymentInfo.first_name,
+                        last_name: this.state.paymentInfo.last_name,
+                        email: this.state.paymentInfo.email,
+                        phone_number: this.state.paymentInfo.phone_number,
+                        shipping_address: this.state.paymentInfo.shipping_address,
+                        shipping_city: this.state.paymentInfo.shipping_city,
+                        shipping_state: this.state.paymentInfo.shipping_state,
+                        shipping_zip: this.state.paymentInfo.shipping_zip,
+                        shipping_country: this.state.paymentInfo.shipping_country
+                        // Do NOT save: stripe_token, card_token, or any card details
+                    }
+                };
+
+                localStorage.setItem('aipw_widget_state', JSON.stringify(stateToSave));
+                console.log('[saveState] State saved to localStorage');
+            } catch (error) {
+                console.error('[saveState] Error saving state to localStorage:', error);
+            }
+        }
+
+        /**
+         * Clear saved state from localStorage
+         */
+        clearState() {
+            try {
+                localStorage.removeItem('aipw_widget_state');
+                console.log('[clearState] State cleared from localStorage');
+            } catch (error) {
+                console.error('[clearState] Error clearing state from localStorage:', error);
+            }
         }
 
         /**
@@ -110,7 +178,10 @@
         openModal() {
             this.modal.classList.add('active');
             document.body.style.overflow = 'hidden';
-            this.renderStep(1);
+
+            // Render the saved step (or step 1 if no saved state)
+            const stepToRender = this.state.currentStep || 1;
+            this.renderStep(stepToRender);
         }
 
         /**
@@ -380,6 +451,9 @@
                 this.updateProgress();
                 step.handler();
                 this.updateSummary();
+
+                // Save state to localStorage when navigating between steps
+                this.saveState();
             }
         }
 
@@ -548,6 +622,39 @@
 
             // Attach product selection handlers
             this.attachProductHandlers();
+
+            // Restore UI state from saved selections
+            this.restoreProductSelectionState();
+        }
+
+        /**
+         * Restore product selection UI state from saved data
+         */
+        restoreProductSelectionState() {
+            // Restore selected products
+            this.state.selectedProducts.forEach(productKey => {
+                const card = document.querySelector(`.aipw-product-card[data-product="${productKey}"]`);
+                if (card) {
+                    card.classList.add('selected');
+                }
+            });
+
+            // Restore selected addons
+            this.state.selectedAddons.forEach(addonKey => {
+                const item = document.querySelector(`.aipw-addon-item[data-addon="${addonKey}"]`);
+                if (item) {
+                    item.classList.add('selected');
+                }
+            });
+
+            // Restore terms checkbox
+            const termsCheckbox = document.getElementById('aipwTermsCheckbox');
+            if (termsCheckbox) {
+                termsCheckbox.checked = this.state.termsAccepted || false;
+            }
+
+            // Update button state
+            this.checkPaymentButtonState();
         }
 
         /**
@@ -571,6 +678,9 @@
                     // Recalculate pricing based on selection
                     this.calculatePricing();
                     this.checkPaymentButtonState();
+
+                    // Save state to localStorage
+                    this.saveState();
                 });
             });
 
@@ -590,6 +700,9 @@
 
                     // Recalculate pricing based on selection
                     this.calculatePricing();
+
+                    // Save state to localStorage
+                    this.saveState();
                 });
             });
 
@@ -597,6 +710,9 @@
             document.getElementById('aipwTermsCheckbox').addEventListener('change', (e) => {
                 this.state.termsAccepted = e.target.checked;
                 this.checkPaymentButtonState();
+
+                // Save state to localStorage
+                this.saveState();
             });
 
             // Payment button
@@ -1203,6 +1319,32 @@
 
             // Initialize Stripe Elements
             this.initializeStripe();
+
+            // Restore form data from saved state
+            this.restorePaymentFormState();
+        }
+
+        /**
+         * Restore payment form state from saved data
+         */
+        restorePaymentFormState() {
+            const form = document.getElementById('aipwPaymentForm');
+            if (!form || !this.state.paymentInfo) return;
+
+            const fields = [
+                'first_name', 'last_name', 'email', 'phone_number',
+                'shipping_address', 'shipping_city', 'shipping_state',
+                'shipping_zip', 'shipping_country'
+            ];
+
+            fields.forEach(fieldName => {
+                const input = form.querySelector(`[name="${fieldName}"]`);
+                if (input && this.state.paymentInfo[fieldName]) {
+                    input.value = this.state.paymentInfo[fieldName];
+                }
+            });
+
+            console.log('[restorePaymentFormState] Payment form restored from localStorage');
         }
 
         /**
@@ -1354,6 +1496,9 @@
 
                 console.log('Payment info stored:', this.state.paymentInfo);
 
+                // Save state to localStorage (payment info without sensitive card data)
+                this.saveState();
+
                 // Show success message
                 this.showPaymentSuccess();
 
@@ -1420,12 +1565,31 @@
                     card.classList.add('selected');
                     this.state.setupType = card.dataset.setup;
                     document.getElementById('aipwSetupNextBtn').disabled = false;
+
+                    // Save state to localStorage
+                    this.saveState();
                 });
             });
 
             document.getElementById('aipwSetupNextBtn').addEventListener('click', () => {
                 this.renderStep(4);
             });
+
+            // Restore saved selection
+            this.restoreCallSetupState();
+        }
+
+        /**
+         * Restore call setup state from saved data
+         */
+        restoreCallSetupState() {
+            if (this.state.setupType) {
+                const card = document.querySelector(`.aipw-config-card[data-setup="${this.state.setupType}"]`);
+                if (card) {
+                    card.classList.add('selected');
+                    document.getElementById('aipwSetupNextBtn').disabled = false;
+                }
+            }
         }
 
         /**
@@ -1479,12 +1643,38 @@
                     this.state.assignmentType = card.dataset.assignment;
                     this.state.numberCount = parseInt(document.getElementById('aipwNumberCount').value);
                     document.getElementById('aipwConfigNextBtn').disabled = false;
+
+                    // Save state to localStorage
+                    this.saveState();
                 });
             });
 
             document.getElementById('aipwConfigNextBtn').addEventListener('click', () => {
                 this.renderStep(5);
             });
+
+            // Restore saved selection
+            this.restoreConfigurationState();
+        }
+
+        /**
+         * Restore configuration state from saved data
+         */
+        restoreConfigurationState() {
+            if (this.state.assignmentType) {
+                const card = document.querySelector(`.aipw-assignment-options .aipw-config-card[data-assignment="${this.state.assignmentType}"]`);
+                if (card) {
+                    card.classList.add('selected');
+                    document.getElementById('aipwConfigNextBtn').disabled = false;
+                }
+            }
+
+            if (this.state.numberCount) {
+                const input = document.getElementById('aipwNumberCount');
+                if (input) {
+                    input.value = this.state.numberCount;
+                }
+            }
         }
 
         /**
@@ -1542,12 +1732,31 @@
                     card.classList.add('selected');
                     this.state.agentStyle = card.dataset.agent;
                     document.getElementById('aipwCompleteBtn').disabled = false;
+
+                    // Save state to localStorage
+                    this.saveState();
                 });
             });
 
             document.getElementById('aipwCompleteBtn').addEventListener('click', () => {
                 this.completeOrder();
             });
+
+            // Restore saved selection
+            this.restoreAgentStyleState();
+        }
+
+        /**
+         * Restore agent style state from saved data
+         */
+        restoreAgentStyleState() {
+            if (this.state.agentStyle) {
+                const card = document.querySelector(`.aipw-agent-card[data-agent="${this.state.agentStyle}"]`);
+                if (card) {
+                    card.classList.add('selected');
+                    document.getElementById('aipwCompleteBtn').disabled = false;
+                }
+            }
         }
 
         /**
@@ -1600,6 +1809,10 @@
 
                 if (response.success) {
                     console.log('Order completed successfully!');
+
+                    // Clear cached state on successful order completion
+                    this.clearState();
+
                     this.showSuccess();
 
                     // If BYO/Porting, send LOA via email
