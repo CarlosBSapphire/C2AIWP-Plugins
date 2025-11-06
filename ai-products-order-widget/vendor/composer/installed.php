@@ -3,7 +3,7 @@
         'name' => 'organizedchaos/ai-products-order-widget',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '38688487e2eef8188ac0e1a431c170fbde8ad921',
+        'reference' => '2ca61c54e3eb818c2c3434c859eda2e7ff9647d9',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -73,7 +73,7 @@
         'organizedchaos/ai-products-order-widget' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '38688487e2eef8188ac0e1a431c170fbde8ad921',
+            'reference' => '2ca61c54e3eb818c2c3434c859eda2e7ff9647d9',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
