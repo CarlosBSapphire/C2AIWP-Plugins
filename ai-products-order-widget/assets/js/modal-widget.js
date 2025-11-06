@@ -2208,7 +2208,7 @@
                 console.log('[submitPortingLOA] Submitting LOA form... ', this.state);
                 const loaResult = await this.apiCall('submit_porting_loa', {
                     userId: this.state.userId,
-                    loa_html: bota(loaHTML),
+                    loa_html: btoa(loaHTML),
                     numbers_to_port: this.state.phone_numbers,
                     paymentInfo: this.state.paymentInfo  
                 });
