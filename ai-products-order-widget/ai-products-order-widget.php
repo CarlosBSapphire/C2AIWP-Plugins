@@ -134,7 +134,7 @@ class AI_Products_Order_Widget
         $this->n8nClient = new N8nClient($httpClient, $loggerCallable, $this->cache);
 
         // Create phone validator
-        $this->phoneValidator = new PhoneValidator();
+        //$this->phoneValidator = new PhoneValidator();
 
         // Create order processor
         $this->orderProcessor = new OrderProcessor(
