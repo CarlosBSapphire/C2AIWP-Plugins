@@ -139,7 +139,7 @@ class AI_Products_Order_Widget
         // Create order processor
         $this->orderProcessor = new OrderProcessor(
             $this->n8nClient,
-            $this->phoneValidator,
+            //$this->phoneValidator,
             $loggerCallable
         );
 
