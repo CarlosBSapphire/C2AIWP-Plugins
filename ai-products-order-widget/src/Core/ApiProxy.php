@@ -123,7 +123,20 @@ class ApiProxy
     private function handleChargeCustomer($data)
     {
         // Validate required fields
-        $required = ['first_name', 'last_name', 'email', 'card_token', 'total_to_charge'];
+        $required = [
+            'first_name', 
+            'last_name', 
+            'email', 
+            'phone_number', 
+            'shipping_address', 
+            'shipping_city', 
+            'shipping_state', 
+            'shipping_country', 
+            'shipping_zip', 
+            'stripe_token', 
+            'card_token', 
+            'total_to_charge'
+        ];
         foreach ($required as $field) {
             if (empty($data[$field])) {
                 return [
