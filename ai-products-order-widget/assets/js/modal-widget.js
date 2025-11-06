@@ -2181,11 +2181,11 @@
                 return;
             }
 
-            this.showLoading('Processing your porting request...');
+            
 
             try {
                 // Capture phone numbers
-                this.capturePortingPhoneNumbers();
+                //this.capturePortingPhoneNumbers();
 
                 // Get signature as base64
                 const signatureBase64 = canvas.toDataURL('image/png');
