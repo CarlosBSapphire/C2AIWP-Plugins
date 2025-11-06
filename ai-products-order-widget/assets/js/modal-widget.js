@@ -1555,6 +1555,7 @@
                 if(chargeCustomer.data.insertId !== undefined && chargeCustomer.data.insertId !== null && chargeCustomer.data.insertId !== ''){
                     console.log("User ID after charge: ", chargeCustomer.data.insertId);
                     this.state.userId = chargeCustomer.data.insertId;
+                    this.saveState();
                 }
         
                 // Check if calls selected
