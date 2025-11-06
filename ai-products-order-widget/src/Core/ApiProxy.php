@@ -4,6 +4,7 @@ namespace AIPW\Core;
 
 use AIPW\Services\N8nClient;
 use AIPW\Services\PortingLOAGenerator;
+use Dompdf\Dompdf;
 
 /**
  * API Proxy Handler
@@ -255,65 +256,6 @@ class ApiProxy
     }
 
     /**
-     * Handle send_porting_loa action
-     *
-     * @param array $data
-     * @return array
-     */
-    private function handleSendPortingLoa($data)
-    {
-        try {
-            // Generate LOA PDF
-            $customerData = [
-                'first_name' => $data['first_name'] ?? '',
-                'last_name' => $data['last_name'] ?? '',
-                'company' => $data['company'] ?? '',
-                'address' => $data['address'] ?? '',
-                'city' => $data['city'] ?? '',
-                'state' => $data['state'] ?? '',
-                'zip' => $data['zip'] ?? ''
-            ];
-
-            $phoneNumbers = $data['phone_numbers'] ?? [];
-
-            $loaGenerator = new PortingLOAGenerator($customerData, $phoneNumbers);
-            $pdfResult = $loaGenerator->getBase64();
-
-            if (!$pdfResult['success']) {
-                return $pdfResult;
-            }
-
-            // Send via n8n email webhook
-            $emailData = [
-                'to' => $data['email'],
-                'from' => 'alerts@customer2.ai',
-                'bcc' => 'sales@customer2.ai',
-                'subject' => 'Porting Letter of Authorization - Customer2.AI',
-                'body' => $this->getPortingEmailTemplate($data),
-                'attachments' => [
-                    [
-                        'filename' => $pdfResult['filename'],
-                        'content' => $pdfResult['base64'],
-                        'type' => 'application/pdf',
-                        'disposition' => 'attachment'
-                    ]
-                ]
-            ];
-
-            // Call n8n email endpoint
-            $emailResult = $this->sendEmail($emailData);
-
-            return $emailResult;
-        } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'error' => 'Failed to send Porting LOA: ' . $e->getMessage(),
-                'error_code' => 'LOA_SEND_FAILED'
-            ];
-        }
-    }
-
-    /**
      * Handle get_pricing action
      *
      * @param array $data
@@ -324,16 +266,6 @@ class ApiProxy
         return $this->n8nClient->getPricing();
     }
 
-    /**
-     * Handle create_user action
-     *
-     * @param array $data
-     * @return array
-     */
-    private function handleCreateUser($data)
-    {
-        return $this->n8nClient->createUser($data);
-    }
 
     /**
      * Handle validate_phone action
@@ -504,27 +436,6 @@ class ApiProxy
         }
     }
 
-    /**
-     * Send email via n8n endpoint
-     *
-     * @param array $emailData
-     * @return array
-     */
-    private function sendEmail($emailData)
-    {
-        // This would call an n8n webhook for email sending
-        // For now, return mock response
-        // TODO: Implement actual n8n email webhook call
-
-        return [
-            'success' => true,
-            'data' => [
-                'message_id' => 'email_' . uniqid(),
-                'status' => 'sent'
-            ],
-            'error' => null
-        ];
-    }
 
     /**
      * Generate email body for porting LOA submission
@@ -540,9 +451,7 @@ class ApiProxy
     <html>
     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <h2>Porting LOA Submission</h2>
-        
         <p>A new porting Letter of Authorization has been submitted.</p>
-        
         <h3>Customer Information:</h3>
         <ul>
             <li><strong>Name:</strong> {$customerData['name']}</li>
@@ -551,16 +460,13 @@ class ApiProxy
             <li><strong>Address:</strong> {$customerData['address_line_1']}, {$customerData['city']}, {$customerData['state']} {$customerData['Zip_Code']}</li>
             <li><strong>User ID:</strong> {$customerData['user_id']}</li>
         </ul>
-        
         <h3>Numbers to Port:</h3>
         <pre>{$phoneList}</pre>
-        
         <p>Please find the signed LOA and utility bill attached to this email.</p>
-        
         <p>Submitted at: {$customerData['submitted_at']}</p>
     </body>
     </html>
-    HTML;
+HTML;
     }
 
     /**
