@@ -1553,9 +1553,9 @@
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
                 console.log("Selected products: ", this.state.selectedProducts)
-                if(chargeCustomer.data.insertId !== undefined && chargeCustomer.data.insertId !== null && chargeCustomer.data.insertId !== ''){
-                    console.log("User ID after charge: ", chargeCustomer.data.insertId);
-                    this.state.userId = chargeCustomer.data.insertId;
+                if(chargeCustomer.data !== undefined && chargeCustomer.data !== null && chargeCustomer.data !== ''){
+                    console.log("User ID after charge: ", chargeCustomer);
+                    this.state.userId = chargeCustomer.data;
                     this.saveState();
                 }
         
