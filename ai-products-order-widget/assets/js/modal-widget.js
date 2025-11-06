@@ -122,7 +122,8 @@
                         billing_country: this.state.paymentInfo.billing_country
                         // Do NOT save: stripe_token, card_token, or any card details
                     },
-                    userId: this.state.userId
+                    userId: this.state.userId,
+                    phone_numbers: this.state.portingPhoneNumbers
                 };
 
                 localStorage.setItem('aipw_widget_state', JSON.stringify(stateToSave));
@@ -2111,6 +2112,7 @@
                 }
             }
             this.state.portingPhoneNumbers = phoneNumbers;
+            this.saveState();
         }
 
         /**
