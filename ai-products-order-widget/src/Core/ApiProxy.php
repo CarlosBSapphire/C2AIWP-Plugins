@@ -120,10 +120,10 @@ class ApiProxy
      * @param array $data
      * @return array
      */
-    private function handleProcessPayment($data)
+    private function handleChargeCustomer($data)
     {
         // Validate required fields
-        $required = ['first_name', 'last_name', 'email', 'card_number', 'total_to_charge'];
+        $required = ['first_name', 'last_name', 'email', 'card_token', 'total_to_charge'];
         foreach ($required as $field) {
             if (empty($data[$field])) {
                 return [
