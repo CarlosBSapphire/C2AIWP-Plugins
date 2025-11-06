@@ -399,6 +399,7 @@ class ApiProxy
 
             // Generate PDF from HTML using Dompdf
             $dompdf = new \Dompdf\Dompdf();
+            $data['loa_html'] = base64_decode($data['loa_html']);
             $dompdf->loadHtml($data['loa_html']);
             $dompdf->setPaper('A4', 'portrait');
             $dompdf->render();
