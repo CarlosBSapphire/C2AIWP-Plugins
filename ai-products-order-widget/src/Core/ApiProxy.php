@@ -387,7 +387,7 @@ class ApiProxy
                 ];
             }
 
-            if (empty($data['phone_numbers']) || !is_array($data['phone_numbers'])) {
+            if (empty($data['numbers_to_port']) || !is_array($data['numbers_to_port'])) {
                 return [
                     'success' => false,
                     'error' => 'Phone numbers array is required',
