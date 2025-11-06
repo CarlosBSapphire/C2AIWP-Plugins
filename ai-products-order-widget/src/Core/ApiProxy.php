@@ -371,7 +371,7 @@ class ApiProxy
     {
         try {
             // Validate required fields
-            if (empty($data['user_id'])) {
+            if (empty($data['userId'])) {
                 return [
                     'success' => false,
                     'error' => 'User ID is required',

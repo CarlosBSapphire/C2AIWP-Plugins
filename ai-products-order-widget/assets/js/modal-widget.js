@@ -121,7 +121,8 @@
                         billing_zip: this.state.paymentInfo.billing_zip,
                         billing_country: this.state.paymentInfo.billing_country
                         // Do NOT save: stripe_token, card_token, or any card details
-                    }
+                    },
+                    userId: this.state.userId
                 };
 
                 localStorage.setItem('aipw_widget_state', JSON.stringify(stateToSave));
@@ -2179,7 +2180,7 @@
                 // Submit LOA to database via API
                 console.log('[submitPortingLOA] Submitting LOA form... ', this.state);
                 const loaResult = await this.apiCall('submit_porting_loa', {
-                    user_id: this.state.userId,
+                    userId: this.state.userId,
                     loa_html: loaHTML,
                     phone_numbers: this.state.portingPhoneNumbers.map(p => p.phone_number)
                 });
