@@ -1553,11 +1553,11 @@
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
                 console.log("Selected products: ", this.state.selectedProducts)
-                if(chargeCustomer.data !== undefined && chargeCustomer.data !== null && chargeCustomer.data !== ''){
-                    console.log("User ID after charge: ", chargeCustomer);
-                    this.state.userId = chargeCustomer.data;
-                    this.saveState();
-                }
+                
+                console.log("User ID after charge: ", chargeCustomer);
+                this.state.userId = chargeCustomer.data;
+                this.saveState();
+                
         
                 // Check if calls selected
                 if (this.state.selectedProducts.includes('inbound_outbound_calls')) {
