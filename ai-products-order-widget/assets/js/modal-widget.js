@@ -1696,12 +1696,16 @@
                     document.querySelectorAll('.aipw-assignment-options .aipw-config-card').forEach(c => c.classList.remove('selected'));
                     card.classList.add('selected');
                     this.state.assignmentType = card.dataset.assignment;
-                    this.state.numberCount = parseInt(document.getElementById('aipwNumberCount').value);
                     document.getElementById('aipwConfigNextBtn').disabled = false;
 
                     // Save state to localStorage
                     this.saveState();
                 });
+            });
+            document.getElementById('aipwNumberCount').addEventListener('change', (e) => {
+                this.state.numberCount = parseInt(e.target.value);
+                this.saveState();
+                console.log('numberCount updated:', this.state.numberCount);
             });
 
             document.getElementById('aipwConfigNextBtn').addEventListener('click', () => {
