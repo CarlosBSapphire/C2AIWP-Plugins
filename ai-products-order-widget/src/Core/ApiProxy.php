@@ -330,7 +330,7 @@ class ApiProxy
             $this->log('info', '[handleSubmitPortingLoa] Generating PDF from HTML');
 
             // Generate PDF from HTML using Dompdf
-            $dompdf = new \Dompdf\Dompdf();
+            $dompdf = new Dompdf();
             $data['loa_html'] = base64_decode($data['loa_html']);
             $dompdf->loadHtml($data['loa_html']);
             $dompdf->setPaper('A4', 'portrait');
