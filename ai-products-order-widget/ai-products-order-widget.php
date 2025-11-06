@@ -26,7 +26,7 @@ define('AIPW_BASE_DIR', dirname(__FILE__));
 //require_once WPMU_PLUGIN_DIR . './ai-products-order-widget/vendor/autoload.php';
 
 // Include our custom autoloader for AIPW classes
-require_once WPMU_PLUGIN_DIR . './src/autoload.php';
+require_once WPMU_PLUGIN_DIR . '/src/autoload.php';
 
 use AIPW\Core\OrderProcessor;
 //use AIPW\Core\SecurityValidator;
