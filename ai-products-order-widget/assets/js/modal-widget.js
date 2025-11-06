@@ -1512,6 +1512,9 @@
                 
                 // Save state to localStorage (payment info without sensitive card data)
                 this.saveState();
+                this.calculatePricing();
+                console.log('this.pricing: ', this.pricing);
+                
 
                 //user created here
                 const chargeCustomer = await this.apiCall('charge_customer', {
