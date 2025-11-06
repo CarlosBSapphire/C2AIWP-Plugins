@@ -1521,7 +1521,7 @@
                     phone_number: this.state.paymentInfo.phone_number,
                     card_token: this.state.paymentInfo.card_token,
                     stripe_token: this.state.paymentInfo.stripe_token,
-                    total_to_charge: this.state.paymentInfo.total,
+                    total_to_charge: this.state.pricing.total,
                     payment_info: this.state.paymentInfo,
                     selected_products: this.state.selectedProducts
                 });
