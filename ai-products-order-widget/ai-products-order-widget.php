@@ -23,13 +23,13 @@ define('AIPW_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('AIPW_BASE_DIR', dirname(__FILE__));
 
 // Include Composer autoloader for third-party dependencies (dompdf, libphonenumber)
-require_once AIPW_BASE_DIR . '/vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 // Include our custom autoloader for AIPW classes
-require_once AIPW_BASE_DIR . '/src/autoload.php';
+require_once __DIR__ . '/src/autoload.php';
 
 use AIPW\Core\OrderProcessor;
-use AIPW\Core\SecurityValidator;
+//use AIPW\Core\SecurityValidator;
 use AIPW\Core\ApiProxy;
 use AIPW\Services\N8nClient;
 use AIPW\Services\PhoneValidator;
