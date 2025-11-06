@@ -36,7 +36,7 @@ class ApiProxy
      * @var array
      */
     private $allowedActions = [
-        'process_payment',
+        'charge_customer',
         'complete_order',
         'send_porting_loa',
         'get_pricing',
