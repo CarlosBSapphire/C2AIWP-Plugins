@@ -195,55 +195,6 @@ class ApiProxy
         $payment = $data['payment'] ?? [];
         $setupTotal = $data['setup_total'] ?? 0;
 
-        // Step 1: Charge customer using Stripe token
-        if (!empty($payment['stripe_token']) && $setupTotal >= 0) {
-            $this->log('info', '[handleCompleteOrder] Processing payment', [
-                'stripe_token' => substr($payment['stripe_token'], 0, 10) . '...',
-                'amount' => $setupTotal
-            ]);
-            // Format data to match n8n charge-customer webhook expectations
-            $chargeData = [
-                'name' => trim(($payment['first_name'] ?? '') . ' ' . ($payment['last_name'] ?? '')),
-                'first_name' => $payment['first_name'] ?? '',
-                'last_name' => $payment['last_name'] ?? '',
-                'email' => $payment['email'] ?? '',
-                'phone_number' => $payment['phone_number'] ?? '',
-                'address_line_1' => $payment['shipping_address'] ?? '',
-                'address_line_2' => '',
-                'city' => $payment['shipping_city'] ?? '',
-                'state' => $payment['shipping_state'] ?? '',
-                'Country' => $payment['shipping_country'] ?? 'United States',
-                'Zip_Code' => $payment['shipping_zip'] ?? '',
-                'stripe_token' => $payment['stripe_token'],
-                'card_token' => $payment['card_token'],
-                'total_to_charge' => ($setupTotal == 0) ? $setupTotal + 100 : $setupTotal
-            ];
-
-            
-            $this->log('info', '[handleCompleteOrder] Charge result', [
-                'success' => $chargeResult['success'],
-                'error' => $chargeResult['error'] ?? null,
-                'charge_id' => $chargeResult['data']['charge_id'] ?? null
-            ]);
-
-            if (!$chargeResult['success']) {
-                $this->log('error', '[handleCompleteOrder] Payment failed', [
-                    'error' => $chargeResult['error'] ?? 'Unknown error',
-                    'full_result' => $chargeResult
-                ]);
-                return [
-                    'success' => false,
-                    'error' => 'Payment failed: ' . ($chargeResult['error'] ?? 'Unknown error'),
-                    'error_code' => 'PAYMENT_FAILED'
-                ];
-            }
-
-            // Store charge ID in payment info
-            $payment['charge_id'] = $chargeResult['data']['charge_id'] ?? null;
-            $this->log('info', '[handleCompleteOrder] Payment successful', [
-                'charge_id' => $payment['charge_id']
-            ]);
-        }
 
         // Step 2: Prepare complete order payload for n8n webhook
         $orderPayload = [
