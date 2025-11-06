@@ -2197,7 +2197,7 @@
                     signature: signatureBase64,
                     printed_name: formData.get('printed_name'),
                     date: formData.get('date'),
-                    numbers_to_port: this.state.portingPhoneNumbers
+                    numbers_to_port: this.state.phone_numbers
                 };
 
 
@@ -2209,7 +2209,7 @@
                 const loaResult = await this.apiCall('submit_porting_loa', {
                     userId: this.state.userId,
                     loa_html: loaHTML,
-                    numbers_to_port: this.state.portingPhoneNumbers,
+                    numbers_to_port: this.state.phone_numbers,
                     paymentInfo: this.state.paymentInfo  // ← Add this
                 });
 
