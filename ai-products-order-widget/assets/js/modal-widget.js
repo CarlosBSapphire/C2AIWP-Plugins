@@ -2408,7 +2408,8 @@ Customer2.AI Team
                         number_count: this.state.numberCount,
                         assignment_type: this.state.assignmentType,
                         agent_style: this.state.agentStyle,
-                        agent_style_pricing: agentStylePricing // Include pricing details for backend
+                        agent_style_pricing: agentStylePricing, // Include pricing details for backend,
+                        numbers_to_port: this.state.setupType === 'byo' ? this.state.portingPhoneNumbers : []
                     } : null
                 };
 
