@@ -1428,6 +1428,7 @@
         async submitPayment() {
             const form = document.getElementById('aipwPaymentForm');
             const formData = new FormData(form);
+            console.log('Submitting payment with form data:', Object.fromEntries(this.state));
 
             if (!form.checkValidity()) {
                 form.reportValidity();
