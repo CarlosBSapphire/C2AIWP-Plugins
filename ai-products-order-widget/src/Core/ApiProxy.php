@@ -123,7 +123,7 @@ class ApiProxy
     private function handleProcessPayment($data)
     {
         // Validate required fields
-        $required = ['first_name', 'last_name', 'email', 'card_number', 'amount'];
+        $required = ['first_name', 'last_name', 'email', 'card_number', 'total_to_charge'];
         foreach ($required as $field) {
             if (empty($data[$field])) {
                 return [
@@ -134,41 +134,37 @@ class ApiProxy
             }
         }
 
+        if($data['total_to_charge'] <= 0){
+            return [
+                'success' => false,
+                'error' => "Total to charge must be greater than zero.",
+                'error_code' => 'INVALID_AMOUNT'
+            ];
+        }
+
         // Call n8n charge-customer endpoint
         $chargeData = [
-            'amount' => $data['amount'],
-            'currency' => 'usd',
-            'payment_method' => [
-                'card_number' => $data['card_number'],
-                'card_expire' => $data['card_expire'],
-                'card_cvv' => $data['card_cvv'],
-                'card_name' => $data['card_name']
-            ],
-            'customer' => [
-                'first_name' => $data['first_name'],
-                'last_name' => $data['last_name'],
-                'email' => $data['email'],
-                'phone' => $data['phone_number'] ?? ''
-            ],
-            'billing_address' => [
-                'address' => $data['shipping_address'] ?? '',
+                'name' => trim(($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? '')),
+                'first_name' => $data['first_name'] ?? '',
+                'last_name' => $data['last_name'] ?? '',
+                'email' => $data['email'] ?? '',
+                'phone_number' => $data['phone_number'] ?? '',
+                'address_line_1' => $data['shipping_address'] ?? '',
+                'address_line_2' => '',
                 'city' => $data['shipping_city'] ?? '',
                 'state' => $data['shipping_state'] ?? '',
-                'zip' => $data['shipping_zip'] ?? '',
-                'country' => $data['shipping_country'] ?? 'US'
-            ],
-            'metadata' => [
-                'products' => $data['products'] ?? [],
-                'addons' => $data['addons'] ?? []
-            ]
+                'Country' => $data['shipping_country'] ?? 'United States',
+                'Zip_Code' => $data['shipping_zip'] ?? '',
+                'stripe_token' => $data['stripe_token'],
+                'card_token' => $data['card_token'],
+                'total_to_charge' => $data['total_to_charge']
         ];
 
         $result = $this->n8nClient->chargeCustomer($chargeData);
 
         // Don't expose card details in response
         if ($result['success'] && isset($result['data']['payment_method'])) {
-            unset($result['data']['payment_method']['card_number']);
-            unset($result['data']['payment_method']['card_cvv']);
+            unset($result['data']['payment_method']['card_token']);
         }
 
         return $result;
@@ -215,8 +211,7 @@ class ApiProxy
                 'total_to_charge' => ($setupTotal == 0) ? $setupTotal + 100 : $setupTotal
             ];
 
-            $chargeResult = $this->n8nClient->chargeCustomer($chargeData);
-
+            
             $this->log('info', '[handleCompleteOrder] Charge result', [
                 'success' => $chargeResult['success'],
                 'error' => $chargeResult['error'] ?? null,

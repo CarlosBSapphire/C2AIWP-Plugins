@@ -21,10 +21,10 @@ class N8nClient
     private bool $isTest = true;
 
     public string $ENDPOINT_SELECT;
-    public string $ENDPOINT_CREATE_USER;
     public string $ENDPOINT_CHARGE_CUSTOMER;
     public string $ENDPOINT_WEBSITE_PAYLOAD_PURCHASE;
     public string $ENDPOINT_SUBMIT_PORTING_LOA;
+    public string $TICKET_GENERATOR_EMAIL_ADDRESS;
     /**
      * HTTP client adapter
      *
@@ -59,13 +59,38 @@ class N8nClient
         $this->logger = $logger;
         $this->cache = $cache;
 
+        /* Dynamic Select Endpoint for selecting table data */
         $this->ENDPOINT_SELECT = 'https://n8n.workflows.organizedchaos.cc/webhook/da176ae9-496c-4f08-baf5-6a78a6a42adb';
-        $this->ENDPOINT_CREATE_USER = 'https://n8n.workflows.organizedchaos.cc/webhook/users/create';
+
+        /* Payment Charge Endpoint - Test or Live */
         $this->ENDPOINT_CHARGE_CUSTOMER = $this->isTest
             ? 'https://n8n.workflows.organizedchaos.cc/webhook/charge-test'
             : 'https://n8n.workflows.organizedchaos.cc/webhook/charge-customer';
+
+         /**
+         * Data object is orderComplete payload
+         * To Do: give example here
+         */
         $this->ENDPOINT_WEBSITE_PAYLOAD_PURCHASE = 'https://n8n.workflows.organizedchaos.cc/webhook/website-payload-purchase';
-        $this->ENDPOINT_SUBMIT_PORTING_LOA = 'https://n8n.workflows.organizedchaos.cc/webhook/submit-porting-loa';
+
+        /**
+         * Data object example:
+         * {
+         *   "sender_name": 
+         *   "Customer2 AI System",
+         *   "recipient_email": 
+         *   "dev@sapphiremediallc.com",
+         *   "subject": 
+         *   "Daily Cost Calculation Report",
+         *   "messagebody":"",
+         *   "attachment":""
+         *  }
+         */
+        $this->ENDPOINT_SUBMIT_PORTING_LOA = 'https://n8n.workflows.organizedchaos.cc/webhook/59bc28f3-2fc6-42cd-8bc8-a8add1b5f6c4';
+
+
+        /* Trello Ticket Generator Email Address */
+        $this->TICKET_GENERATOR_EMAIL_ADDRESS = 'dev@sapphiremediallc.com';
     }
 
     /**
@@ -113,28 +138,6 @@ class N8nClient
         return $this->request($this->ENDPOINT_SELECT, 'POST', $payload);
     }
 
-    /**
-     * Create a new user
-     *
-     * @param array $userData
-     * @return array
-     */
-    public function createUser($userData)
-    {
-        // Sanitize input
-        $userData = SecurityValidator::sanitizeInput($userData);
-
-        // Validate required fields
-        if (empty($userData['email']) || !SecurityValidator::isValidEmail($userData['email'])) {
-            return [
-                'success' => false,
-                'data' => null,
-                'error' => 'Valid email address is required'
-            ];
-        }
-
-        return $this->request($this->ENDPOINT_CREATE_USER, 'POST', $userData);
-    }
 
     /**
      * Charge customer via Stripe
@@ -149,11 +152,8 @@ class N8nClient
             'email' => $chargeData['email'] ?? null
         ]);
 
-        // Sanitize input
-        $chargeData = SecurityValidator::sanitizeInput($chargeData);
-
         // Validate required fields for charge-customer webhook
-        $required = ['card_token', 'email'];
+        $required = ['card_token', 'email', 'first_name', 'last_name', 'total_to_charge'];
         foreach ($required as $field) {
             if (empty($chargeData[$field])) {
                 $this->log('[chargeCustomer] Validation failed', 'error', [
@@ -166,6 +166,50 @@ class N8nClient
                 ];
             }
         }
+
+        // Sanitize input
+        foreach ($chargeData as $key => $value) {
+            if (is_string($value) && ($key == 'email' || $key == 'first_name' || $key == 'last_name' || $key == 'card_token' || $key == 'stripe_token' || $key == 'address_line1' || $key == 'address_line2' || $key == 'city' || $key == 'state' || $key == 'country' || $key == 'zip_code')) {
+                $validateData = $this->validateDataObjects([[
+                    'data_type' => 'string',
+                    'value' => $value,
+                    'key' => $key
+                ]]);
+
+                if(!$validateData){
+                    $this->log('[chargeCustomer] Validation failed', 'error', [
+                        'field' => $key,
+                        'value' => $value
+                    ]);
+                    return [
+                        'success' => false,
+                        'data' => null,
+                        'error' => "Invalid data for field: {$key}"
+                    ];
+                }
+            }
+
+            if (is_numeric($value) && ($key == 'total_to_charge')) {
+                $validateData = $this->validateDataObjects([[
+                    'data_type' => 'number',
+                    'value' => $value,
+                    'key' => $key
+                ]]);
+
+                if(!$validateData){
+                    $this->log('[chargeCustomer] Validation failed', 'error', [
+                        'field' => $key,
+                        'value' => $value
+                    ]);
+                    return [
+                        'success' => false,
+                        'data' => null,
+                        'error' => "Invalid data for field: {$key}"
+                    ];
+                }
+            }
+        }
+
 
         $this->log('[chargeCustomer] Sending request to charge-customer webhook', 'info', [
             'endpoint' => $this->ENDPOINT_CHARGE_CUSTOMER
@@ -493,5 +537,148 @@ class N8nClient
         if ($this->logger) {
             call_user_func($this->logger, $message, $level, $context);
         }
+    }
+
+    /**
+     * Validates an array of objects with data_type, value, and key properties
+     * 
+     * @param array $items Array of objects to validate
+     * @return array Returns ['valid' => bool, 'errors' => array, 'sanitized' => array]
+     */
+    public function validateDataObjects(array $items): array
+    {
+        $errors = [];
+        $sanitized = [];
+        
+        // Valid data types
+        $validDataTypes = ['string', 'number', 'integer', 'float', 'boolean', 'email', 'url'];
+        
+        foreach ($items as $index => $item) {
+            $itemErrors = [];
+            
+            // Check if item is an array/object
+            if (!is_array($item)) {
+                $errors[] = "Item at index $index is not an array/object";
+                continue;
+            }
+            
+            // Check required fields exist
+            if (!isset($item['data_type']) || !isset($item['value']) || !isset($item['key'])) {
+                $errors[] = "Item at index $index is missing required fields (data_type, value, key)";
+                continue;
+            }
+            
+            // Validate and sanitize key
+            $key = $item['key'];
+            if (!is_string($key)) {
+                $itemErrors[] = "Key must be a string";
+            } elseif (empty(trim($key))) {
+                $itemErrors[] = "Key cannot be empty";
+            } elseif (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $key)) {
+                $itemErrors[] = "Key contains invalid characters. Only alphanumeric and underscores allowed, must start with letter or underscore";
+            } elseif (strlen($key) > 64) {
+                $itemErrors[] = "Key exceeds maximum length of 64 characters";
+            }
+            $sanitizedKey = htmlspecialchars(trim($key), ENT_QUOTES, 'UTF-8');
+            
+            // Validate data_type
+            $dataType = strtolower(trim($item['data_type']));
+            if (!in_array($dataType, $validDataTypes, true)) {
+                $itemErrors[] = "Invalid data_type. Allowed: " . implode(', ', $validDataTypes);
+            }
+            
+            // Validate value based on data_type
+            $value = $item['value'];
+            $sanitizedValue = null;
+            
+            switch ($dataType) {
+                case 'string':
+                    if (!is_string($value)) {
+                        $itemErrors[] = "Value must be a string";
+                    } else {
+                        // Sanitize string - remove potential XSS
+                        $sanitizedValue = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+                        // Optional: limit string length
+                        if (strlen($sanitizedValue) > 10000) {
+                            $itemErrors[] = "String value exceeds maximum length of 10000 characters";
+                        }
+                    }
+                    break;
+                    
+                case 'number':
+                case 'integer':
+                    if (!is_numeric($value)) {
+                        $itemErrors[] = "Value must be numeric";
+                    } else {
+                        $sanitizedValue = filter_var($value, FILTER_VALIDATE_INT);
+                        if ($sanitizedValue === false) {
+                            $sanitizedValue = (int)$value;
+                        }
+                    }
+                    break;
+                    
+                case 'float':
+                    if (!is_numeric($value)) {
+                        $itemErrors[] = "Value must be a float";
+                    } else {
+                        $sanitizedValue = filter_var($value, FILTER_VALIDATE_FLOAT);
+                        if ($sanitizedValue === false) {
+                            $sanitizedValue = (float)$value;
+                        }
+                    }
+                    break;
+                    
+                case 'boolean':
+                    if (!is_bool($value) && !in_array($value, [0, 1, '0', '1', 'true', 'false'], true)) {
+                        $itemErrors[] = "Value must be boolean or boolean-like (0, 1, 'true', 'false')";
+                    } else {
+                        $sanitizedValue = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                        if ($sanitizedValue === null) {
+                            $itemErrors[] = "Could not convert value to boolean";
+                        }
+                    }
+                    break;
+                    
+                case 'email':
+                    if (!is_string($value)) {
+                        $itemErrors[] = "Email value must be a string";
+                    } else {
+                        $sanitizedValue = filter_var($value, FILTER_VALIDATE_EMAIL);
+                        if ($sanitizedValue === false) {
+                            $itemErrors[] = "Invalid email format";
+                        }
+                    }
+                    break;
+                    
+                case 'url':
+                    if (!is_string($value)) {
+                        $itemErrors[] = "URL value must be a string";
+                    } else {
+                        $sanitizedValue = filter_var($value, FILTER_VALIDATE_URL);
+                        if ($sanitizedValue === false) {
+                            $itemErrors[] = "Invalid URL format";
+                        }
+                    }
+                    break;
+            }
+            
+            // Add errors for this item
+            if (!empty($itemErrors)) {
+                $errors[] = "Item at index $index (key: '$key'): " . implode('; ', $itemErrors);
+            } else {
+                // Add sanitized item
+                $sanitized[] = [
+                    'data_type' => $dataType,
+                    'value' => $sanitizedValue,
+                    'key' => $sanitizedKey
+                ];
+            }
+        }
+        
+        return [
+            'valid' => empty($errors),
+            'errors' => $errors,
+            'sanitized' => $sanitized
+        ];
     }
 }

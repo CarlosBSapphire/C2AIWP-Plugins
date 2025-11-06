@@ -1507,8 +1507,20 @@
 
                 console.log('Payment info stored:', this.state.paymentInfo);
 
+                
                 // Save state to localStorage (payment info without sensitive card data)
                 this.saveState();
+
+                //user created here
+                const chargeCustomer = await this.apiCall('charge_customer', {
+                    payment_info: this.state.paymentInfo,
+                    selected_products: this.state.selectedProducts
+                });
+                if(chargeCustomer.success === false){
+                    throw new Error(chargeCustomer.message || 'Payment failed');
+                }else{
+                    console.log('Customer charged successfully:', chargeCustomer);
+                }
 
                 // Show success message
                 this.showPaymentSuccess();
@@ -1517,7 +1529,11 @@
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
                 console.log("Selected products: ", this.state.selectedProducts)
-
+                if(chargeCustomer.userId !== undefined && chargeCustomer.userId !== null && chargeCustomer.userId !== ''){
+                    console.log("User ID after charge: ", chargeCustomer.userId);
+                    this.state.userId = chargeCustomer.userId;
+                }
+        
                 // Check if calls selected
                 if (this.state.selectedProducts.includes('inbound_outbound_calls')) {
                     this.renderStep(3); // Go to call setup
@@ -2132,39 +2148,6 @@
                     date: formData.get('date')
                 };
 
-                // Create user account first
-                console.log('[submitPortingLOA] Creating user account...');
-                const userResult = await this.apiCall('create_user', {
-                    first_name: this.state.paymentInfo.first_name,
-                    last_name: this.state.paymentInfo.last_name,
-                    email: this.state.paymentInfo.email,
-                    username: this.state.paymentInfo.email,
-                    phone_number: this.state.paymentInfo.phone_number,
-                    password: (() => {
-                    const lower = 'abcdefghijklmnopqrstuvwxyz';
-                    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                    const nums = '0123456789';
-                    const syms = '!@#$%^&*()_+{}[]<>?,.';
-                    const all = lower + upper + nums + syms;
-                    let password = [
-                        lower[Math.floor(Math.random() * lower.length)],
-                        upper[Math.floor(Math.random() * upper.length)],
-                        nums[Math.floor(Math.random() * nums.length)],
-                        syms[Math.floor(Math.random() * syms.length)],
-                    ];
-                    while (password.length < 16) {
-                        password.push(all[Math.floor(Math.random() * all.length)]);
-                    }
-                    return password.sort(() => 0.5 - Math.random()).join('');
-                    })()
-                });
-
-                if (!userResult.success) {
-                    throw new Error('Failed to create user account: ' + (userResult.error || 'Unknown error'));
-                }
-
-                this.state.userId = userResult.data.data.userId;
-                console.log('[submitPortingLOA] User created:', this.state.userId);
 
                 // Generate LOA form HTML for PDF generation
                 const loaHTML = this.generateLOAHTML();
