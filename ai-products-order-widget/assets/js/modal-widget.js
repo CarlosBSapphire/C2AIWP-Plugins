@@ -1514,6 +1514,12 @@
 
                 //user created here
                 const chargeCustomer = await this.apiCall('charge_customer', {
+                    first_name: this.state.paymentInfo.first_name,
+                    last_name: this.state.paymentInfo.last_name,
+                    email: this.state.paymentInfo.email,
+                    phone_number: this.state.paymentInfo.phone_number,
+                    card_token: this.state.paymentInfo.card_token,
+                    stripe_token: this.state.paymentInfo.stripe_token,
                     payment_info: this.state.paymentInfo,
                     selected_products: this.state.selectedProducts
                 });
