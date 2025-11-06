@@ -2,7 +2,7 @@
 
 namespace AIPW\Services;
 
-require_once WPMU_PLUGIN_DIR . '/ai-products-order-widget/vendor/autoload.php';
+require_once '/home/customer2/htdocs/customer2.ai/wp-content/mu-plugins/ai-products-order-widget/vendor/autoload.php';
 use libphonenumber\PhoneNumberUtil;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\NumberParseException;
