@@ -2176,7 +2176,7 @@
                 const loaHTML = this.generateLOAHTML();
 
                 // Submit LOA to database via API
-                console.log('[submitPortingLOA] Submitting LOA form...');
+                console.log('[submitPortingLOA] Submitting LOA form... ', this.state);
                 const loaResult = await this.apiCall('submit_porting_loa', {
                     user_id: this.state.userId,
                     loa_html: loaHTML,
@@ -2400,16 +2400,6 @@ Customer2.AI Team
 
                     this.showSuccess();
 
-                    // If BYO/Porting, send LOA via email
-                    if (this.state.setupType === 'byo') {
-                        console.log('Setup type is BYO, sending porting LOA...');
-                        await this.apiCall('send_porting_loa', {
-                            email: this.state.paymentInfo.email,
-                            customer_name: `${this.state.paymentInfo.first_name} ${this.state.paymentInfo.last_name}`,
-                            number_count: this.state.numberCount
-                        });
-                        console.log('Porting LOA sent');
-                    }
                 } else {
                     console.error('Order completion failed:', response);
                     console.error('Error details:', {
