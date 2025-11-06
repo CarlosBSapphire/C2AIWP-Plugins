@@ -439,6 +439,7 @@
             // Update pricing state
             this.pricing.setup = setupTotal;
             this.pricing.weekly = weeklyTotal;
+            this.pricing.total = setupTotal + weeklyTotal;
 
             console.log('[calculatePricing] Final totals:', {
                 setup: setupTotal,
@@ -2354,6 +2355,7 @@ Customer2.AI Team
                     // Pricing
                     setup_total: this.pricing.setup,
                     weekly_cost: this.pricing.weekly,
+                    total_to_charge: this.pricing.total,
 
                     // Payment info
                     payment: this.state.paymentInfo,
