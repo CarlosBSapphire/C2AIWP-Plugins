@@ -409,21 +409,70 @@ class ApiProxy
 
             $this->log('info', '[handleSubmitPortingLoa] PDF generated, size: ' . strlen($pdfBase64) . ' bytes');
 
-            // Prepare payload for n8n database insertion
-            $dbPayload = [
-                'user_id' => $data['user_id'],
-                'signed_porting_loa_form_b64' => $pdfBase64,
-                'phone_numbers' => json_encode($data['phone_numbers']),
+            // Extract payment info
+            $paymentInfo = $data['paymentInfo'] ?? [];
+            
+            // Prepare customer body data
+            $customerBody = [
+                'name' => trim(($paymentInfo['first_name'] ?? '') . ' ' . ($paymentInfo['last_name'] ?? '')),
+                'first_name' => $paymentInfo['first_name'] ?? '',
+                'last_name' => $paymentInfo['last_name'] ?? '',
+                'email' => $paymentInfo['email'] ?? '',
+                'phone_number' => $paymentInfo['phone_number'] ?? '',
+                'address_line_1' => $paymentInfo['shipping_address'] ?? '',
+                'address_line_2' => '',
+                'city' => $paymentInfo['shipping_city'] ?? '',
+                'state' => $paymentInfo['shipping_state'] ?? '',
+                'Country' => $paymentInfo['shipping_country'] ?? 'US',
+                'Zip_Code' => $paymentInfo['shipping_zip'] ?? '',
+                'user_id' => $data['userId'],
+                'numbers_to_port' => $data['numbers_to_port'],
                 'submitted_at' => date('Y-m-d H:i:s')
             ];
 
-            $this->log('info', '[handleSubmitPortingLoa] Submitting to database via n8n');
+            // Prepare attachments array
+            $attachments = [
+                [
+                    'filename' => 'porting_loa_' . $data['userId'] . '_' . date('Ymd') . '.pdf',
+                    'content' => $pdfBase64,
+                    'encoding' => 'base64',
+                    'type' => 'application/pdf'
+                ]
+            ];
 
-            // Submit to n8n database webhook
-            $result = $this->n8nClient->submitPortingLOA($dbPayload);
+            // Add utility bill if provided
+            if (!empty($data['utility_bill_base64'])) {
+                $attachments[] = [
+                    'filename' => 'utility_bill_' . $data['userId'] . '.' . ($data['utility_bill_extension'] ?? 'pdf'),
+                    'content' => $data['utility_bill_base64'],
+                    'encoding' => 'base64',
+                    'type' => $data['utility_bill_mime_type'] ?? 'application/pdf'
+                ];
+            }
+
+            // Prepare email message body
+            $messageBody = $this->generatePortingEmailBody($customerBody, $data['numbers_to_port']);
+
+            // Prepare payload for n8n email endpoint
+            $emailPayload = [
+                'sender_name' => 'Customer2 AI System',
+                'recipient_email' => $paymentInfo['email'] ?? 'sales@customer2.ai',
+                'subject' => 'Porting LOA Submission - ' . ($paymentInfo['first_name'] ?? '') . ' ' . ($paymentInfo['last_name'] ?? ''),
+                'messagebody' => $messageBody,
+                'attachment' => $attachments,
+                'body' => $customerBody
+            ];
+
+            $this->log('info', '[handleSubmitPortingLoa] Submitting to n8n', [
+                'recipient' => $emailPayload['recipient_email'],
+                'attachment_count' => count($attachments)
+            ]);
+
+            // Submit to n8n webhook
+            $result = $this->n8nClient->submitPortingLOA($emailPayload);
 
             if (!$result['success']) {
-                $this->log('error', '[handleSubmitPortingLoa] Database submission failed', [
+                $this->log('error', '[handleSubmitPortingLoa] Submission failed', [
                     'error' => $result['error'] ?? 'Unknown error'
                 ]);
                 return $result;
@@ -434,12 +483,11 @@ class ApiProxy
             return [
                 'success' => true,
                 'data' => [
-                    'loa_base64' => $pdfBase64,
-                    'phone_numbers' => $data['phone_numbers'],
                     'message' => 'LOA form submitted successfully'
                 ],
                 'error' => null
             ];
+
 
         } catch (\Exception $e) {
             $this->log('error', '[handleSubmitPortingLoa] Exception', [
@@ -478,51 +526,40 @@ class ApiProxy
     }
 
     /**
-     * Get porting email template
-     *
-     * @param array $data
-     * @return string
+     * Generate email body for porting LOA submission
      */
-    private function getPortingEmailTemplate($data)
+    private function generatePortingEmailBody($customerData, $numbersToPort)
     {
-        $customerName = ($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? '');
+        $phoneList = '';
+        foreach ($numbersToPort as $entry) {
+            $phoneList .= '- ' . ($entry['phone_number'] ?? 'N/A') . ' (Provider: ' . ($entry['service_provider'] ?? 'N/A') . ')' . "\n";
+        }
 
         return <<<HTML
-<html>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <h2>Porting Letter of Authorization</h2>
-
-    <p>Dear {$customerName},</p>
-
-    <p>Thank you for choosing Customer2.AI! Attached to this email is your <strong>Porting Letter of Authorization (LOA)</strong>.</p>
-
-    <h3>Next Steps:</h3>
-    <ol>
-        <li><strong>Print</strong> the attached LOA document</li>
-        <li><strong>Sign</strong> the document where indicated</li>
-        <li><strong>Scan or photograph</strong> the signed document</li>
-        <li><strong>Reply to this email</strong> with the signed LOA attached</li>
-        <li><strong>Include a copy of your utility bill</strong> for Twilio porting verification</li>
-    </ol>
-
-    <h3>Required Documents:</h3>
-    <ul>
-        <li>✅ Signed Porting LOA (attached to this email)</li>
-        <li>✅ Recent utility bill showing the service address on file with your current carrier</li>
-    </ul>
-
-    <p><strong>Important:</strong> The utility bill is required by Twilio for verification purposes. It must show the same service address that appears on your phone bill.</p>
-
-    <p>Once we receive both documents, we will begin the porting process immediately. This typically takes 7-10 business days.</p>
-
-    <p>If you have any questions, please don't hesitate to reach out to our support team.</p>
-
-    <p>Best regards,<br>
-    <strong>Customer2.AI Team</strong><br>
-    <a href="mailto:support@customer2.ai">support@customer2.ai</a></p>
-</body>
-</html>
-HTML;
+    <html>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h2>Porting LOA Submission</h2>
+        
+        <p>A new porting Letter of Authorization has been submitted.</p>
+        
+        <h3>Customer Information:</h3>
+        <ul>
+            <li><strong>Name:</strong> {$customerData['name']}</li>
+            <li><strong>Email:</strong> {$customerData['email']}</li>
+            <li><strong>Phone:</strong> {$customerData['phone_number']}</li>
+            <li><strong>Address:</strong> {$customerData['address_line_1']}, {$customerData['city']}, {$customerData['state']} {$customerData['Zip_Code']}</li>
+            <li><strong>User ID:</strong> {$customerData['user_id']}</li>
+        </ul>
+        
+        <h3>Numbers to Port:</h3>
+        <pre>{$phoneList}</pre>
+        
+        <p>Please find the signed LOA and utility bill attached to this email.</p>
+        
+        <p>Submitted at: {$customerData['submitted_at']}</p>
+    </body>
+    </html>
+    HTML;
     }
 
     /**

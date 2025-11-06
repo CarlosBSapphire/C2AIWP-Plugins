@@ -2209,7 +2209,8 @@
                 const loaResult = await this.apiCall('submit_porting_loa', {
                     userId: this.state.userId,
                     loa_html: loaHTML,
-                    numbers_to_port: phone_numbers
+                    numbers_to_port: this.state.portingPhoneNumbers,
+                    paymentInfo: this.state.paymentInfo  // ← Add this
                 });
 
                 if (!loaResult.success) {
@@ -2218,13 +2219,7 @@
 
                 console.log('[submitPortingLOA] LOA submitted successfully');
 
-                // Send email with LOA
-                console.log('[submitPortingLOA] Sending LOA email...');
-                const emailResult = await this.sendLOAEmail(loaResult.data.loa_base64);
-
-                if (!emailResult.success) {
-                    console.warn('[submitPortingLOA] Email sending failed, but continuing...');
-                }
+        
 
                 // Complete the order
                 await this.completeOrder();
@@ -2319,58 +2314,6 @@
             `;
         }
 
-        /**
-         * Send LOA email via n8n
-         */
-        async sendLOAEmail(loaBase64) {
-            const emailEndpoint = 'https://n8n.workflows.organizedchaos.cc/webhook/59bc28f3-2fc6-42cd-8bc8-a8add1b5f6c4';
-
-            const emailBody = `
-Dear ${this.state.paymentInfo.first_name} ${this.state.paymentInfo.last_name},
-
-Thank you for choosing Customer2.AI for your phone number porting needs.
-
-Attached is your completed and signed Porting Letter of Authorization (LOA) form.
-
-This form has been submitted to our porting department and will be processed within 7-10 business days.
-
-Phone numbers to be ported:
-${this.state.portingPhoneNumbers.map(p => `- ${p.phone_number} (from ${p.service_provider})`).join('\n')}
-
-If you have any questions, please contact our support team.
-
-Best regards,
-Customer2.AI Team
-            `;
-
-            try {
-                const response = await fetch(emailEndpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        sender_name: 'Customer2 AI System',
-                        recipient_email: this.state.paymentInfo.email,
-                        subject: 'Your Porting Letter of Authorization - Customer2.AI',
-                        messagebody: emailBody,
-                        attachment: loaBase64
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Email API returned ${response.status}`);
-                }
-
-                const result = await response.json();
-                console.log('[sendLOAEmail] Email sent successfully:', result);
-
-                return { success: true, data: result };
-            } catch (error) {
-                console.error('[sendLOAEmail] Error:', error);
-                return { success: false, error: error.message };
-            }
-        }
 
         /**
          * Complete the order
