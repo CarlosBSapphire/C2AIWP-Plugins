@@ -2196,7 +2196,8 @@
                     business_name: "",
                     signature: signatureBase64,
                     printed_name: formData.get('printed_name'),
-                    date: formData.get('date')
+                    date: formData.get('date'),
+                    numbers_to_port: this.state.portingPhoneNumbers
                 };
 
 
