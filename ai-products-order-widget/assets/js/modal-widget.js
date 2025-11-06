@@ -1521,7 +1521,7 @@
                     phone_number: this.state.paymentInfo.phone_number,
                     card_token: this.state.paymentInfo.card_token,
                     stripe_token: this.state.paymentInfo.stripe_token,
-                    total_to_charge: this.pricing.total,
+                    total_to_charge: this.pricing.setupTotal,
                     payment_info: this.state.paymentInfo,
                     selected_products: this.state.selectedProducts
                 });
@@ -2607,11 +2607,8 @@ Customer2.AI Team
         if (navType === 'reload') {
             // Page was hard-refreshed (Ctrl+R, F5, etc.)
             console.log('Page was hard reloaded, clearing widget state');
-            if (typeof this.clearState === 'function') {
-                this.clearState();
-            } else {
-                console.log('clearState not found on this context');
-            }
+            localStorage.removeItem('aipw_widget_state');
+            console.log('Widget state cleared from localStorage');
         }
     });
 

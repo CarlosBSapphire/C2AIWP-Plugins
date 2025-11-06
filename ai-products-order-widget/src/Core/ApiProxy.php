@@ -153,7 +153,7 @@ class ApiProxy
                 'address_line_2' => '',
                 'city' => $data['shipping_city'] ?? '',
                 'state' => $data['shipping_state'] ?? '',
-                'Country' => $data['shipping_country'] ?? 'United States',
+                'Country' => $data['shipping_country'] ?? 'US',
                 'Zip_Code' => $data['shipping_zip'] ?? '',
                 'stripe_token' => $data['stripe_token'],
                 'card_token' => $data['card_token'],
