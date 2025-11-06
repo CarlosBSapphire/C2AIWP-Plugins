@@ -128,11 +128,6 @@ class ApiProxy
             'last_name', 
             'email', 
             'phone_number', 
-            'shipping_address', 
-            'shipping_city', 
-            'shipping_state', 
-            'shipping_country', 
-            'shipping_zip', 
             'stripe_token', 
             'card_token', 
             'total_to_charge'

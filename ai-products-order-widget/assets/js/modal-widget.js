@@ -1536,6 +1536,7 @@
                     selected_products: this.state.selectedProducts
                 });
                 if(chargeCustomer.success === false){
+                    console.log('Charge customer failed:', chargeCustomer);
                     throw new Error(chargeCustomer.message || 'Payment failed');
                 }else{
                     console.log('Customer charged successfully:', chargeCustomer);
@@ -1548,9 +1549,9 @@
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
                 console.log("Selected products: ", this.state.selectedProducts)
-                if(chargeCustomer.userId !== undefined && chargeCustomer.userId !== null && chargeCustomer.userId !== ''){
-                    console.log("User ID after charge: ", chargeCustomer.userId);
-                    this.state.userId = chargeCustomer.userId;
+                if(chargeCustomer.data.insertId !== undefined && chargeCustomer.data.insertId !== null && chargeCustomer.data.insertId !== ''){
+                    console.log("User ID after charge: ", chargeCustomer.data.insertId);
+                    this.state.userId = chargeCustomer.data.insertId;
                 }
         
                 // Check if calls selected
