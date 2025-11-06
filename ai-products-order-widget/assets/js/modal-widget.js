@@ -2209,7 +2209,7 @@
                 const loaResult = await this.apiCall('submit_porting_loa', {
                     userId: this.state.userId,
                     loa_html: loaHTML,
-                    phone_numbers: this.state.portingPhoneNumbers.map(p => p.phone_number)
+                    numbers_to_port: this.state.portingPhoneNumbers.map(p => p.phone_number)
                 });
 
                 if (!loaResult.success) {
