@@ -2090,6 +2090,7 @@
             document.getElementById('aipwSubmitLOA').addEventListener('click', () => {
                 this.submitPortingLOA();
             });
+            
 
             // Save phone numbers on blur
             const form = document.getElementById('aipwLOAForm');
@@ -2097,6 +2098,25 @@
                 this.capturePortingPhoneNumbers();
                 this.saveState();
             });
+
+            // Attach listeners to phone number and provider inputs
+            for (let i = 0; i < this.state.numberCount; i++) {
+                const phoneInput = document.querySelector(`input[data-phone-index="${i}"]`);
+                const providerInput = document.querySelector(`input[data-provider-index="${i}"]`);
+
+                if (phoneInput) {
+                    phoneInput.addEventListener('input', () => {
+                        this.capturePortingPhoneNumbers();
+                    });
+                }
+
+                if (providerInput) {
+                    providerInput.addEventListener('input', () => {
+                        this.capturePortingPhoneNumbers();
+                    });
+                }
+            }
+            
         }
 
         /**
