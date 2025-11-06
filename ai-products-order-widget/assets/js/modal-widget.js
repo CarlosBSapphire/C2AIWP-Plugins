@@ -2210,7 +2210,7 @@
                     userId: this.state.userId,
                     loa_html: loaHTML,
                     numbers_to_port: this.state.phone_numbers,
-                    paymentInfo: this.state.paymentInfo  // ← Add this
+                    paymentInfo: this.state.paymentInfo  
                 });
 
                 if (!loaResult.success) {
@@ -2235,7 +2235,7 @@
          * Generate LOA HTML for PDF generation (server-side)
          */
         generateLOAHTML() {
-            const phoneNumbersHTML = this.state.portingPhoneNumbers.map(p => {
+            const phoneNumbersHTML = this.state.phone_numbers.map(p => {
                 return `<tr><td>${p.phone_number}</td><td>${p.service_provider}</td></tr>`;
             }).join('');
 
