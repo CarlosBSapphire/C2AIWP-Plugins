@@ -23,10 +23,10 @@ define('AIPW_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('AIPW_BASE_DIR', dirname(__FILE__));
 
 // Include Composer autoloader for third-party dependencies (dompdf, libphonenumber)
-require_once __DIR__ . '/vendor/autoload.php';
+require_once WPMU_PLUGIN_DIR . '/ai-products-order-widget/vendor/autoload.php';
 
 // Include our custom autoloader for AIPW classes
-require_once __DIR__ . '/src/autoload.php';
+require_once WPMU_PLUGIN_DIR . '/ai-products-order-widget/src/autoload.php';
 
 use AIPW\Core\OrderProcessor;
 //use AIPW\Core\SecurityValidator;
