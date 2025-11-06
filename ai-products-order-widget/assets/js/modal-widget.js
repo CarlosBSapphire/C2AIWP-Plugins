@@ -1531,7 +1531,7 @@
                     billing_state: this.state.paymentInfo.billing_state,
                     billing_zip: this.state.paymentInfo.billing_zip,
                     billing_country: this.state.paymentInfo.billing_country,
-                    total_to_charge: this.pricing.setupTotal,
+                    total_to_charge: this.pricing.setup,
                     payment_info: this.state.paymentInfo,
                     selected_products: this.state.selectedProducts
                 });
