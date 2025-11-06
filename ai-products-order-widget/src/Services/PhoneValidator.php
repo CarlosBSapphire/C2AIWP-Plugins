@@ -2,6 +2,8 @@
 
 namespace AIPW\Services;
 
+require_once WP_CONTENT_DIR . '/mu-plugins/ai-products-order-widget/src/autoload.php';
+
 use libphonenumber\PhoneNumberUtil;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\NumberParseException;
