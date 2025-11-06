@@ -126,7 +126,7 @@
                 };
 
                 localStorage.setItem('aipw_widget_state', JSON.stringify(stateToSave));
-                console.log('[saveState] State saved to localStorage');
+                console.log('[saveState] State saved to localStorage ', stateToSave);
             } catch (error) {
                 console.error('[saveState] Error saving state to localStorage:', error);
             }
