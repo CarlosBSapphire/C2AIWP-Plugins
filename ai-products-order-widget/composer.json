@@ -5,7 +5,9 @@
     "require": {
         "php": ">=7.4",
         "dompdf/dompdf": "^3.1",
-        "giggsey/libphonenumber-for-php": "^9.0"
+        "giggsey/libphonenumber-for-php": "^9.0",
+        "masterminds/html5": "^2.10",
+        "symfony/polyfill-mbstring": "^1.33"
     },
     "autoload": {
         "psr-4": {
