@@ -450,7 +450,7 @@ class N8nClient
     public function submitPortingLOA($loaData)
     {
         $this->log('[submitPortingLOA] Starting LOA submission', 'info', [
-            'user_id' => $loaData['user_id'] ?? null,
+            'user_id' => $loaData['userId'] ?? null,
             'phone_count' => isset($loaData['phone_numbers']) ? count(json_decode($loaData['phone_numbers'], true)) : 0
         ]);
 
