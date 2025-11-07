@@ -83,6 +83,10 @@
                 if (savedState) {
                     const parsed = JSON.parse(savedState);
                     console.log('[loadState] Restored state from localStorage:', parsed);
+                    // Normalize phone_numbers to portingPhoneNumbers for backward compatibility
+                    if (parsed.phone_numbers && !parsed.portingPhoneNumbers) {
+                        parsed.portingPhoneNumbers = parsed.phone_numbers;
+                    }
                     return parsed;
                 }
             } catch (error) {
@@ -1988,6 +1992,21 @@
 
             // Restore utility bill preview if any
             this.restoreUtilityBillPreview();
+        }
+
+        /**
+         * Restore utility bill preview from state
+         */
+        restoreUtilityBillPreview() {
+            if (this.state.utilityBillFilename) {
+                const preview = document.getElementById('aipwUtilityBillPreview');
+                const nameSpan = document.getElementById('aipwUtilityBillName');
+                
+                if (preview && nameSpan) {
+                    nameSpan.textContent = this.state.utilityBillFilename;
+                    preview.style.display = 'block';
+                }
+            }
         }
 
         /**
