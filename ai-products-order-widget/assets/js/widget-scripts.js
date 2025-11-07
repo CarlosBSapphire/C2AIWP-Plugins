@@ -313,28 +313,3 @@
     }
     
 })(jQuery);
-
-/**
- * Vanilla JS version (if you don't want jQuery dependency)
- */
-
-/*
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // Your vanilla JS code here
-    console.log('AI Products Widget vanilla JS loaded');
-    
-    // Example: Toggle classes
-    document.querySelectorAll('.aipw-product-checkbox').forEach(function(checkbox) {
-        checkbox.addEventListener('change', function() {
-            var parent = this.closest('.aipw-product-option');
-            if (this.checked) {
-                parent.classList.add('selected');
-            } else {
-                parent.classList.remove('selected');
-            }
-        });
-    });
-    
-});
-*/

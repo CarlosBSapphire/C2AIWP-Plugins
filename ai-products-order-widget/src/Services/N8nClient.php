@@ -90,7 +90,7 @@ class N8nClient
 
 
         /* Trello Ticket Generator Email Address */
-        $this->TICKET_GENERATOR_EMAIL_ADDRESS = 'dev@sapphiremediallc.com';
+        $this->TICKET_GENERATOR_EMAIL_ADDRESS = $isTest ? 'ianf@sapphiremediallc.com':'dev@sapphiremediallc.com';
     }
 
     /**

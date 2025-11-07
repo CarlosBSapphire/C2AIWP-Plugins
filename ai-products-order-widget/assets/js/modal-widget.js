@@ -33,8 +33,10 @@
                 portingPhoneNumbers: [], // Array of {phone_number, service_provider}
                 loaFormData: {}, // LOA form data (business_name, signature, etc.)
                 userId: null, // User ID from create_user API
-                utilityBillBase64: null, // Base64 encoded utility bill
-                utilityBillFilename: null // Original filename
+                utilityBillBase64: null,
+                utilityBillFilename: null,
+                utilityBillMimeType: null, 
+                utilityBillExtension: null  
             };
 
             this.steps = [
@@ -1983,6 +1985,9 @@
 
             // Restore saved phone numbers if any
             this.restorePortingPhoneNumbers();
+
+            // Restore utility bill preview if any
+            this.restoreUtilityBillPreview();
         }
 
         /**
@@ -2117,7 +2122,106 @@
                 }
             }
             
+                this.handleUtilityBillUpload();
+
+            
         }
+
+        /**
+         * Handle utility bill file upload
+         */
+        handleUtilityBillUpload() {
+            const fileInput = document.getElementById('aipwUtilityBillUpload');
+            
+            if (!fileInput) return;
+            
+            fileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                
+                if (!file) return;
+                
+                // Validate file size (5MB max)
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                if (file.size > maxSize) {
+                    alert('File size exceeds 5MB limit. Please choose a smaller file.');
+                    fileInput.value = '';
+                    return;
+                }
+                
+                // Validate file type
+                const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Invalid file type. Please upload a PDF or image file.');
+                    fileInput.value = '';
+                    return;
+                }
+                
+                try {
+                    // Convert to base64
+                    const base64 = await this.fileToBase64(file);
+                    
+                    // Store in state (remove data URI prefix)
+                    this.state.utilityBillBase64 = base64.split(',')[1];
+                    this.state.utilityBillFilename = file.name;
+                    this.state.utilityBillMimeType = file.type;
+                    this.state.utilityBillExtension = file.name.split('.').pop();
+                    
+                    // Show preview
+                    this.showUtilityBillPreview(file.name);
+                    
+                    // Save state
+                    this.saveState();
+                    
+                } catch (error) {
+                    console.error('[handleUtilityBillUpload] Error:', error);
+                    alert('Error reading file. Please try again.');
+                    fileInput.value = '';
+                }
+            });
+        }
+
+            /**
+             * Convert file to base64
+             */
+            fileToBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            /**
+             * Show utility bill preview
+             */
+            showUtilityBillPreview(filename) {
+                const preview = document.getElementById('aipwUtilityBillPreview');
+                const nameSpan = document.getElementById('aipwUtilityBillName');
+                
+                if (preview && nameSpan) {
+                    nameSpan.textContent = filename;
+                    preview.style.display = 'block';
+                }
+            }
+
+            /**
+             * Clear utility bill upload
+             */
+            clearUtilityBill() {
+                const fileInput = document.getElementById('aipwUtilityBillUpload');
+                const preview = document.getElementById('aipwUtilityBillPreview');
+                
+                if (fileInput) fileInput.value = '';
+                if (preview) preview.style.display = 'none';
+                
+                this.state.utilityBillBase64 = null;
+                this.state.utilityBillFilename = null;
+                this.state.utilityBillMimeType = null;
+                this.state.utilityBillExtension = null;
+                
+                this.saveState();
+            }
 
         /**
          * Capture porting phone numbers from form
@@ -2210,7 +2314,11 @@
                     userId: this.state.userId,
                     loa_html: btoa(loaHTML),
                     numbers_to_port: this.state.phone_numbers,
-                    paymentInfo: this.state.paymentInfo  
+                    paymentInfo: this.state.paymentInfo,
+                    utility_bill_base64: this.state.utilityBillBase64,
+                    utility_bill_filename: this.state.utilityBillFilename,
+                    utility_bill_mime_type: this.state.utilityBillMimeType,
+                    utility_bill_extension: this.state.utilityBillExtension
                 });
 
                 if (!loaResult.success) {
