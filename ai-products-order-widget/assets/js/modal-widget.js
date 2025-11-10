@@ -58,7 +58,8 @@
                 addons: {},     // Addon-specific pricing
                 setupFees: {}, // Setup fees by service count (1, 2, 3+)
                 agentStyles: {}, // Agent style pricing by type (Quick, Advanced, Conversational)
-                pricingPerNumber: 0 // Cost per phone number setup (default $2)
+                phoneNumberWeeklyCost: 0, // Cost per phone number setup (default $2)
+                phoneCountPricingTotal: 0
             };
 
             // Stripe elements
@@ -357,7 +358,7 @@
                             console.log(`[loadPricing] ${qaKey}: ${cost} cents/week, ${cost_per_lead} cents/lead`);
                         }
                         // Handle Phone Number pricing
-                        else if (name === 'Phone Number' && frequency === 'Weekly') {
+                        else if (type === 'Price Per Number' && frequency === 'Weekly') {
                             const cost_per_number = parseRate(item.cost_per_number);
 
                             this.pricing.phoneNumberWeeklyCost = cost_per_number;
@@ -1671,7 +1672,6 @@
             const header = document.getElementById('aipwModalHeader');
             const body = document.getElementById('aipwModalBody');
             const footer = document.getElementById('aipwModalFooter');
-            const pricingPerNumber = this.pricing.number_setup_cost || 0;
 
             const setupTypeText = {
                 'purchase': 'Purchase Number',
@@ -1746,11 +1746,11 @@
 
             document.getElementById('aipwNumberCount').addEventListener('change', (e) => {
                 this.state.numberCount = parseInt(e.target.value);
-                this.state.pricing.pricingPerNumber = pricingPerNumber * this.state.numberCount;
+                this.pricing.phoneCountPricingTotal = phoneNumberWeeklyCost * this.state.numberCount;
 
                 this.saveState();
                 console.log('numberCount updated:', this.state.numberCount);
-                console.log('numberCount updated:', this.state.pricing.pricingPerNumber);
+                console.log('numberCount updated:', this.pricing.phoneNumberWeeklyCost);
             });
 
             document.getElementById('aipwConfigNextBtn').addEventListener('click', () => {
