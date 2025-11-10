@@ -409,7 +409,7 @@
                 selectedProducts: this.state.selectedProducts,
                 selectedAddons: this.state.selectedAddons,
                 agentStyle: this.state.agentStyle,
-                phoneCountPricingTotal: this.state.phoneCountPricingTotal
+                phoneCountPricingTotal: this.state.numberCount * this.pricing.phoneNumberWeeklyCost || 0
             });
 
             // Step 1: Calculate setup fee based on number of selected services
