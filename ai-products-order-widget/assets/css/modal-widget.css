@@ -166,10 +166,6 @@
 /* Modal Overlay */
 .aipw-modal-overlay {
     position: fixed;
-    top: 10px;
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
     background: var(--bg);
     z-index: 999999;
     display: none;
@@ -715,7 +711,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0;
 }
 
 .aipw-terms-checkbox input[type="checkbox"] {
