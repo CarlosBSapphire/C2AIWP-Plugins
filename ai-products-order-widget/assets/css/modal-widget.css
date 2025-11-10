@@ -483,7 +483,8 @@
     padding: 15px 40px;
     font-size: 16px;
     font-weight: bold;
-    border: 2px solid #000;
+    border-style: none;
+    border-radius: 16px;
     background: #fff;
     color: #000;
     cursor: pointer;
@@ -491,18 +492,20 @@
 }
 
 .aipw-btn:hover {
-    background:  #00356f;
+    background: #00356f;
     color: #fff;
 }
 
 .aipw-btn-primary {
-    background:  #00356f;
+    background: #00356f;
     color: #fff;
+    border-style: none;
+    border-radius: 16px;
 }
 
 .aipw-btn-primary:hover {
-    background: #00356f;
-    color: #000;
+    background: #0467d2;
+    color: #fff;
 }
 
 .aipw-btn:disabled {
