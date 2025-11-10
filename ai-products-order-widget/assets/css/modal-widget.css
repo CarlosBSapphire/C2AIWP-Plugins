@@ -2,33 +2,174 @@
 /* Version: 3.0.0 - Root level styling */
 
 :root {
-    /* Modal shadows */
-    --modal-footer-shadow: 0rem 0rem 1rem rgba(0, 53, 111, 0.8);
-    --modal-header-shadow: 0rem 0rem 1rem rgba(0, 53, 111, 0.8);
+    /* SECTION Light Colors */
+    
+  /* Backgrounds */
+  --bg: #ffffff;
+  /* main background */
+  --bg-plugin-gradient: linear-gradient(to bottom, #ffffff, #f5f5f5);
+  /*panel gradient background */
+  --bg-c2ai-border-gradient: linear-gradient(to bottom right, #46c2c6, 70%, #2563eb);
+  --panel-shadow: 0rem 0.2rem 0.2rem rgba(0, 0, 0, 0.07);
+  /* subtle soft shadow for light mode */
+  --modal-footer-shadow: 0rem 0rem 1rem rgba(0, 0, 0, 0.2);
+  --modal-header-shadow: 0rem 0rem 1rem rgba(0, 0, 0, 0.2);
 
-    /* Borders */
-    --input-active-border: #0467d2;
+  /* Text */
+  --text: #2a3142;
+  /* primary text */
+  --text-muted: #6b7280;
+  /* secondary text */
+  --text-placeholders: #9ca3af;
+  /* input hints, placeholders */
+  --warning-text: #b45309;
+  /* warning text */
+  --menu-text: #ffffff;
+  /* menu text */
 
-    /* Dropdown */
-    --dropdown-hover: #545a82;
+  /* Borders / Dividers */
+  --border: #d1d5db;
 
-    /* Text colors */
-    --text: #ffffff;
-    --text-muted: #9ca3af;
-    --text-placeholders: #545a82;
-    --pending-text: #ffb70b;
-    --menu-text: #ffffff;
+  /* Primary Accent */
+  --primary: #00356f;
+  /* keep same brand accent */
+
+  /* Secondary Accent */
+  --secondary: #008387;
+  /* keep same brand accent */
+
+  /* Nav Button Highlights */
+  --nav-active-background: #e5ecf9;
+  /* subtle light highlight */
+  --nav-active-left-trim: #0467d2;
+  /* keep brand blue trim */
+  /* Status Colors (Light Theme) */
+  --success: #008387;
+  /* keep same brand teal for continuity */
+  --failed: #dc2626;
+  /* slightly brighter red for light bg */
+  --info: #2563eb;
+  /* deeper blue for readability */
+  --active: #00356f;
+  /* same brand navy, contrasts well on white */
+  --inactive: #e5e7eb;
+  /* light gray to look disabled on white */
+  --pending: #f59e0b;
+  /* brighter amber for visibility */
+
+  /* Buttons & Inputs */
+  --primary-btn-bg: #00356f;
+  --primary-btn-onhover: #008387;
+  --secondary-btn-bg: #f3f4f6;
+  --secondary-btn-onhover-border: #0467d2;
+  --input-bg: #ffffff;
+  --input-active-bg: #f9fafb;
+  --input-active-border: #0467d2;
+  --active-box-shadow: 0 0 0 0.2rem #0467d280;
+
+  /* Chart Colors */
+  --grid-color: #d1d5db;
+
+  /* SVG Icon Filters */
+  --svg-icon-filter: brightness(0) saturate(100%) invert(15%) sepia(18%) saturate(1126%) hue-rotate(185deg) brightness(92%) contrast(86%);
+  --svg-icon-menu-filter: brightness(0) saturate(100%) invert(92%) sepia(100%) saturate(2%) hue-rotate(111deg) brightness(106%) contrast(100%);
+  --svg-icon-secondary-hover-filter: brightness(0) saturate(100%) invert(26%) sepia(47%) saturate(4084%) hue-rotate(165deg) brightness(95%) contrast(106%);
 }
+/* !SECTION */
+
+/* SECTION DARK Mode */
+@media (prefers-color-scheme: dark){
+    :root {
+         /* Backgrounds */
+        --bg: #141421;
+        /* panel gradient background */
+        --bg-plugin-gradient: linear-gradient(to bottom, #1a1a2e, #141421);
+        /* panels / cards */
+        --bg-c2ai-border-gradient: linear-gradient(to bottom right, #008387, 70%, #00124a);
+        /* c2ai border; requires a ::before and absolute postioning with a zindex of -1 at 0 top, left, bottom, right and content:'';  */
+        --panel-shadow: 0rem 0.2rem 0.2rem rgba(0, 0, 0, 0.3);
+        --modal-footer-shadow: 0rem 0rem 1rem rgba(0, 53, 111, 0.8);
+        --modal-header-shadow: 0rem 0rem 1rem rgba(0, 53, 111, 0.8);
+
+        /* Text */
+        --text: #ffffff;
+        /* primary text */
+        --text-muted: #9ca3af;
+        /* secondary text */
+        --text-placeholders: #545a82;
+        /* input hints, placeholders */
+        --pending-text: #ffb70b;
+        /* warning text */
+        --menu-text: #ffffff;
+        /* menu text */
+
+        /* Borders / Dividers */
+        --border: #2e3045;
+
+        /* Primary Accent */
+        --primary: #00356f;
+        /* main CTA (blue button) */
+
+        /* Secondary Accent */
+        --secondary: #008387;
+
+        /* Secondary Accent */
+        --offset: #f15722;
+
+        /* Nav Button Highlights */
+        --nav-active-background: #0a1330;
+        /* active nav item highlight main */
+        --nav-active-left-trim: #0467d2;
+        /* active nav item highlight left border trim */
+
+        /* Status Colors */
+        --success: #008387;
+        /* success */
+        --failed: #dc3545;
+        /* failed */
+        --info: #3b82f6;
+        /* links / highlights */
+        --active: #00356f;
+        /* active elements */
+        --inactive: #2e3045;
+        /* inactive elements */
+        --pending: #008387;
+        /* pending */
+
+        /* Buttons & Inputs */
+        --primary-btn-bg: #00356f;
+        --primary-btn-onhover: #008387;
+        --secondary-btn-bg: #0a1330;
+        --secondary-btn-onhover-border: #0467d2;
+        --input-bg: #2e3045;
+        --input-active-bg: #0a1330;
+        --input-active-border: #0467d2;
+        --active-box-shadow: 0 0 0 0.2rem #0467d280;
+        --dropdown-item-hover: #545a82;
+
+        /* Chart Colors */
+        --grid-color: #2e3045;
+
+        /* SVG Icon Filters */
+        --svg-icon-filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(128deg) brightness(102%) contrast(101%);
+        --svg-icon-menu-filter: brightness(0) saturate(100%) invert(92%) sepia(100%) saturate(2%) hue-rotate(111deg) brightness(106%) contrast(100%);
+        --svg-icon-secondary-hover-filter: brightness(0) saturate(100%) invert(26%) sepia(47%) saturate(4084%) hue-rotate(165deg) brightness(95%) contrast(106%);
+    }
+}
+/* !SECTION */
+
+/* ========================================
+   MODAL SYSTEM CLASSES
+   ======================================== */
 
 /* Modal Overlay */
-
 .aipw-modal-overlay {
     position: fixed;
     top: 10px;
     left: 10px;
     right: 10px;
     bottom: 10px;
-    background: #141421;
+    background: var(--bg);
     z-index: 999999;
     display: none;
     overflow-y: auto;
@@ -45,11 +186,11 @@
 
 /* Modal Container */
 .aipw-modal {
-    background: #0a1330;
-    color: #ffffff;
+    background: var(--nav-active-background);
+    color: var(--text);
     padding: 40px;
     position: relative;
-    border: 2px solid #000;
+    border: 2px solid var(--border);
     height: 100%;
     width: 100%;
     max-width: 1200px;
@@ -60,19 +201,19 @@
 .aipw-progress {
     margin-bottom: 30px;
     padding-bottom: 20px;
-    border-bottom: 2px solid  #ffffff;
+    border-bottom: 2px solid var(--border);
 }
 
 .aipw-progress-bar {
     width: 100%;
     height: 4px;
-    background: #ffffff;
+    background: var(--border);
     position: relative;
 }
 
 .aipw-progress-fill {
     height: 100%;
-    background: #efffff;
+    background: var(--secondary);
     transition: width 0.3s ease;
 }
 
@@ -84,16 +225,16 @@
 
 .aipw-progress-step {
     font-size: 12px;
-    color: #ffffff;
+    color: var(--text-muted);
 }
 
 .aipw-progress-step.active {
-    color: #666;
+    color: var(--text);
     font-weight: bold;
 }
 
 .aipw-progress-step.completed {
-    color: #666;
+    color: var(--success);
 }
 
 /* Modal Header */
@@ -107,15 +248,14 @@
     font-size: 32px;
     font-weight: bold;
     margin: 0 0 10px 0;
+    color: var(--text);
 }
 
 .aipw-modal-subtitle {
     font-size: 16px;
-    color:  #ffffff;
+    color: var(--text-muted);
     margin: 0;
 }
-
-
 
 /* Product Selection Grid */
 .aipw-products-grid {
@@ -132,17 +272,17 @@
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: #00356f;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: var(--primary-btn-bg);
+    box-shadow: var(--panel-shadow);
 }
 
 .aipw-product-card:hover {
-    background: #0467d2;
+    background: var(--input-active-border);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .aipw-product-card.selected {
-    background: #008387;
+    background: var(--secondary);
     box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
 }
 
@@ -155,11 +295,12 @@
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 10px;
+    color: var(--menu-text);
 }
 
 .aipw-product-description {
     font-size: 14px;
-    color: #ffffff;
+    color: var(--menu-text);
     line-height: 1.6;
     margin-bottom: 15px;
 }
@@ -173,14 +314,14 @@
 
 .aipw-pricing-setup {
     font-size: 14px;
-    color: #ffffff;
+    color: var(--menu-text);
     margin-bottom: 5px;
 }
 
 .aipw-pricing-weekly {
     font-size: 18px;
     font-weight: bold;
-    color: rgb(204, 248, 248);
+    color: var(--secondary);
 }
 
 .aipw-product-checkbox {
@@ -192,7 +333,7 @@
     display: inline-block;
     width: 24px;
     height: 24px;
-    border: 2px solid #fff;
+    border: 2px solid var(--menu-text);
     margin-top: 10px;
     position: relative;
 }
@@ -205,13 +346,14 @@
     transform: translate(-50%, -50%);
     font-size: 18px;
     font-weight: bold;
+    color: var(--menu-text);
 }
 
 /* Addons Section */
 .aipw-addons-section {
     margin-top: 40px;
     padding-top: 40px;
-    border-top: 2px solid #000;
+    border-top: 2px solid var(--border);
 }
 
 .aipw-addons-grid {
@@ -228,24 +370,24 @@
     align-items: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: #00356f;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: var(--primary-btn-bg);
+    box-shadow: var(--panel-shadow);
 }
 
 .aipw-addon-item:hover {
-    background: #0467d2;
+    background: var(--input-active-border);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .aipw-addon-item.selected {
-    background: #008387;
+    background: var(--secondary);
     box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
 }
 
 .aipw-addon-checkbox {
     width: 20px;
     height: 20px;
-    border: 2px solid #fff;
+    border: 2px solid var(--menu-text);
     margin-right: 15px;
     flex-shrink: 0;
     border-radius: 4px;
@@ -257,10 +399,12 @@
     text-align: center;
     line-height: 16px;
     font-weight: bold;
+    color: var(--menu-text);
 }
 
 .aipw-addon-name {
     font-weight: bold;
+    color: var(--menu-text);
 }
 
 /* Summary Sidebar */
@@ -270,8 +414,8 @@
     right: 0;
     width: 300px;
     height: 100vh;
-    background: #fff;
-    border-left: 2px solid #000;
+    background: var(--bg);
+    border-left: 2px solid var(--border);
     padding: 20px;
     overflow-y: auto;
 }
@@ -281,7 +425,8 @@
     font-weight: bold;
     margin-bottom: 20px;
     padding-bottom: 10px;
-    border-bottom: 2px solid #000;
+    border-bottom: 2px solid var(--border);
+    color: var(--text);
 }
 
 .aipw-summary-section {
@@ -291,18 +436,20 @@
 .aipw-summary-section-title {
     font-weight: bold;
     margin-bottom: 10px;
+    color: var(--text);
 }
 
 .aipw-summary-item {
     padding: 5px 0;
     font-size: 14px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
 }
 
 .aipw-summary-total {
     padding-top: 20px;
     margin-top: 20px;
-    border-top: 2px solid #000;
+    border-top: 2px solid var(--border);
 }
 
 .aipw-summary-row {
@@ -310,6 +457,7 @@
     justify-content: space-between;
     margin-bottom: 10px;
     font-size: 14px;
+    color: var(--text);
 }
 
 .aipw-summary-row.total {
@@ -334,7 +482,8 @@
     font-weight: bold;
     margin-bottom: 15px;
     padding-bottom: 10px;
-    border-bottom: 2px solid #000;
+    border-bottom: 2px solid var(--border);
+    color: var(--text);
 }
 
 .aipw-form-group {
@@ -350,32 +499,34 @@
     margin-bottom: 5px;
     font-weight: bold;
     font-size: 14px;
+    color: var(--text);
 }
 
 .aipw-form-input,
 .aipw-form-select {
     width: 100%;
     padding: 12px;
-    border: 2px solid #0467d2;
+    border: 2px solid var(--border);
     font-size: 14px;
-    background: #2e3045;
-    color: #fff;
+    background: var(--input-bg);
+    color: var(--text);
 }
 
 .aipw-form-input:focus,
 .aipw-form-select:focus {
     outline: none;
-    border-color: #0467d2;
-    background: #0a1330;
+    border-color: var(--input-active-border);
+    background: var(--input-active-bg);
+    box-shadow: var(--active-box-shadow);
 }
 
 .aipw-form-select option {
-    background: #2e3045;
-    color: #fff;
+    background: var(--input-bg);
+    color: var(--text);
 }
 
 .aipw-form-select option:hover {
-    background: #545a82;
+    background: var(--dropdown-item-hover);
 }
 
 .aipw-form-checkbox-group {
@@ -399,21 +550,22 @@
 }
 
 .aipw-config-card {
-    border: 2px solid #ccc;
+    border: 2px solid var(--border);
     padding: 30px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
+    background: var(--input-bg);
 }
 
 .aipw-config-card:hover {
-    border-color:  #00356f;
+    border-color: var(--primary);
 }
 
 .aipw-config-card.selected {
-    border-color: #eff;
-    background: #008387;
+    border-color: var(--secondary);
+    background: var(--secondary);
 }
 
 .aipw-config-radio {
@@ -422,7 +574,7 @@
     right: 15px;
     width: 20px;
     height: 20px;
-    border: 2px solid #000;
+    border: 2px solid var(--border);
     border-radius: 50%;
 }
 
@@ -434,7 +586,7 @@
     transform: translate(-50%, -50%);
     width: 10px;
     height: 10px;
-    background: #000;
+    background: var(--menu-text);
     border-radius: 50%;
 }
 
@@ -442,11 +594,12 @@
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 10px;
+    color: var(--text);
 }
 
 .aipw-config-description {
     font-size: 14px;
-    color: #666;
+    color: var(--text-muted);
 }
 
 /* Agent Style Cards */
@@ -458,38 +611,40 @@
 }
 
 .aipw-agent-card {
-    border: 2px solid #ccc;
+    border: 2px solid var(--border);
     padding: 20px;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
+    background: var(--input-bg);
 }
 
 .aipw-agent-card:hover {
-    border-color: #00356f;
+    border-color: var(--primary);
 }
 
 .aipw-agent-card.selected {
-    border-color: #000;
-    background: #f0f0f0;
+    border-color: var(--secondary);
+    background: var(--nav-active-background);
 }
 
 .aipw-agent-name {
     font-size: 16px;
     font-weight: bold;
     margin-bottom: 5px;
+    color: var(--text);
 }
 
 .aipw-agent-description {
     font-size: 12px;
-    color: #666;
+    color: var(--text-muted);
 }
 
 /* Buttons */
 .aipw-modal-footer {
     margin-top: 40px;
     padding-top: 20px;
-    border-top: 2px solid #000;
+    border-top: 2px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -502,27 +657,28 @@
     font-weight: bold;
     border-style: none;
     border-radius: 16px;
-    background: #fff;
-    color: #000;
+    background: var(--secondary-btn-bg);
+    color: var(--text);
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .aipw-btn:hover {
-    background: #00356f;
-    color: #fff;
+    background: var(--primary);
+    color: var(--menu-text);
+    border: 2px solid var(--secondary-btn-onhover-border);
 }
 
 .aipw-btn-primary {
-    background: #00356f;
-    color: #fff;
+    background: var(--primary-btn-bg);
+    color: var(--menu-text);
     border-style: none;
     border-radius: 16px;
 }
 
 .aipw-btn-primary:hover {
-    background: #0467d2;
-    color: #fff;
+    background: var(--primary-btn-onhover);
+    color: var(--menu-text);
 }
 
 .aipw-btn:disabled {
@@ -535,27 +691,23 @@
     text-align: center;
     margin: 20px 0;
     padding: 20px;
-    background: #00356f;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: var(--primary-btn-bg);
+    box-shadow: var(--panel-shadow);
     border-style: none;
     border-radius: 16px;
-    color: #fff;
+    color: var(--menu-text);
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .aipw-terms-agreement:hover {
-    background: #0467d2;
+    background: var(--input-active-border);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    border-style: none;
-    border-radius: 16px;
-    color: #fff;
 }
 
 .aipw-terms-agreement.selected {
-    background: #008387;
+    background: var(--secondary);
     box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
-    border-style: none;
-    border-radius: 16px;
-    color: #fff;
 }
 
 .aipw-terms-checkbox {
@@ -563,14 +715,12 @@
     align-items: center;
     justify-content: center;
     opacity: 0;
-    color: #fff;
 }
 
 .aipw-terms-checkbox input[type="checkbox"] {
     width: 20px;
     height: 20px;
     margin-right: 10px;
-    color: #fff;
 }
 
 /* Number Input Group */
@@ -619,8 +769,8 @@
 }
 
 .aipw-spinner {
-    border: 4px solid #ddd;
-    border-top: 4px solid #000;
+    border: 4px solid var(--border);
+    border-top: 4px solid var(--primary);
     border-radius: 50%;
     width: 50px;
     height: 50px;
@@ -641,7 +791,7 @@
 
 .aipw-success-icon {
     font-size: 80px;
-    color: #000;
+    color: var(--success);
     margin-bottom: 20px;
 }
 
@@ -649,39 +799,34 @@
     font-size: 32px;
     font-weight: bold;
     margin-bottom: 10px;
+    color: var(--text);
 }
 
 .aipw-success-message {
     font-size: 16px;
-    color: #666;
+    color: var(--text-muted);
 }
 
 /* Stripe Element Styles */
 .aipw-stripe-element {
     padding: 12px;
-    border: 2px solid #0467d2;
+    border: 2px solid var(--border);
     border-radius: 4px;
-    background: #0a1330;
+    background: var(--input-bg);
     transition: border-color 0.3s ease;
     min-height: 44px;
-    color: #fff
+    color: var(--text);
 }
-/*
-.aipw-stripe-element iframe {
-    height: 100% !important;
-    width: 100% !important;
-}
-    */
 
 .aipw-stripe-element:focus-within {
-    border-color: #0467d2;
+    border-color: var(--input-active-border);
     outline: none;
-    box-shadow: 0 0 0 1px #0467d2;
-    background: #0a1330;
+    box-shadow: var(--active-box-shadow);
+    background: var(--input-active-bg);
 }
 
 .aipw-stripe-errors {
-    color: #fa755a;
+    color: var(--failed);
     font-size: 14px;
     margin-top: 8px;
     min-height: 20px;
@@ -705,18 +850,19 @@
 
 .aipw-form-help-text {
     font-size: 12px;
-    color: #666;
+    color: var(--text-muted);
     margin-top: 5px;
     font-style: italic;
 }
 
 .aipw-authorization-text {
-    background: #f5f5f5;
-    border: 1px solid #ddd;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
     padding: 20px;
     margin: 20px 0;
     font-size: 13px;
     line-height: 1.6;
+    color: var(--text);
 }
 
 .aipw-authorization-text p {
@@ -731,8 +877,8 @@
 .aipw-signature-pad {
     width: 100%;
     height: 150px;
-    border: 2px solid #000;
-    background: #fff;
+    border: 2px solid var(--border);
+    background: var(--bg);
     cursor: crosshair;
     touch-action: none;
 }
@@ -743,26 +889,30 @@
     right: 5px;
     padding: 5px 10px;
     font-size: 12px;
-    background: #fff;
-    border: 1px solid #000;
+    background: var(--secondary-btn-bg);
+    border: 1px solid var(--border);
     cursor: pointer;
+    color: var(--text);
 }
 
 .aipw-btn-clear-signature:hover {
-    background: #008387;
+    background: var(--secondary);
+    color: var(--menu-text);
 }
 
 .aipw-form-note {
-    background: #fffbe5;
-    border: 1px solid #e6d85c;
+    background: var(--input-bg);
+    border: 1px solid var(--warning-text);
     padding: 15px;
     margin-top: 20px;
     font-size: 13px;
     line-height: 1.5;
+    color: var(--text);
 }
 
 .aipw-form-note strong {
     font-weight: 600;
+    color: var(--warning-text);
 }
 
 /* Responsive LOA Form */
