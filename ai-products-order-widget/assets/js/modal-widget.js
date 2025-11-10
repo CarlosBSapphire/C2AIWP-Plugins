@@ -1779,9 +1779,9 @@
             }
 
             if (this.state.phoneNumberType) {
-                const card = document.querySelector(`.aipw-assignment-options .aipw-config-card[data-assignment="${this.state.phoneNumberType}"]`);
-                if (card) {
-                    card.classList.add('selected');
+                const card_phone = document.querySelector(`.aipw-assignment-options .aipw-config-card[data-assignment="${this.state.phoneNumberType}"]`);
+                if (card_phone) {
+                    card_phone.classList.add('selected');
                     document.getElementById('aipwConfigNextBtn').disabled = false;
                 }
             }
