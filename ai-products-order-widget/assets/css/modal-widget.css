@@ -538,6 +538,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border-style: none;
     border-radius: 16px;
+    color: #fff;
 }
 
 .aipw-terms-agreement:hover {
@@ -545,6 +546,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     border-style: none;
     border-radius: 16px;
+    color: #fff;
 }
 
 .aipw-terms-agreement.selected {
@@ -552,6 +554,7 @@
     box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
     border-style: none;
     border-radius: 16px;
+    color: #fff;
 }
 
 .aipw-terms-checkbox {
@@ -559,12 +562,14 @@
     align-items: center;
     justify-content: center;
     opacity: 0;
+    color: #fff;
 }
 
 .aipw-terms-checkbox input[type="checkbox"] {
     width: 20px;
     height: 20px;
     margin-right: 10px;
+    color: #fff;
 }
 
 /* Number Input Group */

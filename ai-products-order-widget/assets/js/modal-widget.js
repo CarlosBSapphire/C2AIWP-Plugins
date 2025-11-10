@@ -1321,8 +1321,8 @@
 
                     <div class="aipw-form-group full-width">
                         <label class="aipw-form-label">Card Information</label>
-                        <div id="card-element" class="aipw-stripe-element"></div>
-                        <div id="card-errors" class="aipw-stripe-errors" role="alert"></div>
+                        <div id="aipw-card-element" class="aipw-stripe-element"></div>
+                        <div id="aipw-card-errors" class="aipw-stripe-errors" role="alert"></div>
                     </div>
                 </form>
             `;
@@ -1403,14 +1403,14 @@
                 });
 
                 // Mount card element
-                const mountResult = this.cardElement.mount('#card-element');
+                const mountResult = this.cardElement.mount('#aipw-card-element');
 
                 // Log mount result for debugging
                 console.log('Stripe Element mounted:', mountResult);
 
                 // Handle real-time validation errors
                 this.cardElement.on('change', (event) => {
-                    const displayError = document.getElementById('card-errors');
+                    const displayError = document.getElementById('aipw-card-errors');
                     if (displayError) {
                         if (event.error) {
                             displayError.textContent = event.error.message;
