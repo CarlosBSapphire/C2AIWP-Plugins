@@ -6,8 +6,6 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
     background: #141421;
     z-index: 999999;
     display: none;
@@ -25,8 +23,6 @@
 .aipw-modal {
     background:#141421;
     color: #ffffff;
-    max-width: 1200px;
-    width: 100%;
     padding: 40px;
     position: relative;
     border: 2px solid #000;
@@ -44,13 +40,13 @@
 .aipw-progress-bar {
     width: 100%;
     height: 4px;
-    background: #ddd;
+    background: #ffffff;
     position: relative;
 }
 
 .aipw-progress-fill {
     height: 100%;
-    background: #000;
+    background: #efffff;
     transition: width 0.3s ease;
 }
 
