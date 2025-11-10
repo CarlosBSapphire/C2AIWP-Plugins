@@ -408,7 +408,8 @@
             console.log('[calculatePricing] Starting calculation with:', {
                 selectedProducts: this.state.selectedProducts,
                 selectedAddons: this.state.selectedAddons,
-                agentStyle: this.state.agentStyle
+                agentStyle: this.state.agentStyle,
+                phoneCountPricingTotal: this.pricing.phoneCountPricingTotal
             });
 
             // Step 1: Calculate setup fee based on number of selected services
@@ -456,6 +457,8 @@
                     console.log(`[calculatePricing] Addon '${addonKey}' weekly: ${addon.weekly} cents`);
                 }
             });
+
+            weeklyTotal += this.pricing.phoneCountPricingTotal || 0;
 
             // Update pricing state
             this.pricing.setup = setupTotal;
