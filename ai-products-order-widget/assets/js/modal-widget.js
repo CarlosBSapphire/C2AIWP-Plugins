@@ -458,7 +458,7 @@
                 }
             });
 
-            weeklyTotal += this.state.phoneCountPricingTotal || 0;
+            weeklyTotal += this.state.numberCount * this.pricing.phoneNumberWeeklyCost || 0;
 
             // Update pricing state
             this.pricing.setup = setupTotal;
