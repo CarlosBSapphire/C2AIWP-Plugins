@@ -528,16 +528,22 @@
     padding: 20px;
     background: #00356f;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-style: none;
+    border-radius: 16px;
 }
 
 .aipw-terms-agreement:hover {
     background: #0467d2;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-style: none;
+    border-radius: 16px;
 }
 
 .aipw-terms-agreement.selected {
     background: #008387;
     box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
+    border-style: none;
+    border-radius: 16px;
 }
 
 .aipw-terms-checkbox {
