@@ -643,13 +643,11 @@
 
 /* Buttons */
 .aipw-modal-footer {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 2px solid var(--border);
+    margin-top: 0px;
+    padding-top: 0px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: var(--modal-footer-shadow);
 }
 
 .aipw-btn {
