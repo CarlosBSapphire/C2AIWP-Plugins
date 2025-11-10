@@ -20,11 +20,25 @@ class N8nClient
      */
     private bool $isTest = true;
 
+
+    public string $N8N_BASE_URL = 'https://n8n.workflows.organizedchaos.cc/';
+
+
+    /* Twilio Porting Endpoints */
+    public string $TWILIO_CHECK_PORTABILITY_ENDPOINT;
+    public string $TWILIO_UPLOAD_UTILITY_BILL;
+    public string $TWILIO_GET_PORT_IN_REQUESTS;
+    public string $TWILIO_REQUEST_PORT;
+
+    /* Gebneral n8n Webhook Endpoints */
     public string $ENDPOINT_SELECT;
     public string $ENDPOINT_CHARGE_CUSTOMER;
     public string $ENDPOINT_WEBSITE_PAYLOAD_PURCHASE;
     public string $ENDPOINT_SUBMIT_PORTING_LOA;
     public string $TICKET_GENERATOR_EMAIL_ADDRESS;
+    public string $TWILIO_CANCEL_PORT_IN_REQUEST;
+
+
     /**
      * HTTP client adapter
      *
@@ -60,18 +74,18 @@ class N8nClient
         $this->cache = $cache;
 
         /* Dynamic Select Endpoint for selecting table data */
-        $this->ENDPOINT_SELECT = 'https://n8n.workflows.organizedchaos.cc/webhook/da176ae9-496c-4f08-baf5-6a78a6a42adb';
+        $this->ENDPOINT_SELECT = $this->N8N_BASE_URL . 'da176ae9-496c-4f08-baf5-6a78a6a42adb';
 
         /* Payment Charge Endpoint - Test or Live */
         $this->ENDPOINT_CHARGE_CUSTOMER = $this->isTest
-            ? 'https://n8n.workflows.organizedchaos.cc/webhook/charge-test'
-            : 'https://n8n.workflows.organizedchaos.cc/webhook/charge-customer';
+            ? $this->N8N_BASE_URL . 'charge-test'
+            : $this->N8N_BASE_URL . 'charge-customer';
 
-         /**
+        /**
          * Data object is orderComplete payload
          * To Do: give example here
          */
-        $this->ENDPOINT_WEBSITE_PAYLOAD_PURCHASE = 'https://n8n.workflows.organizedchaos.cc/webhook/website-payload-purchase';
+        $this->ENDPOINT_WEBSITE_PAYLOAD_PURCHASE = $this->N8N_BASE_URL . 'website-payload-purchase';
 
         /**
          * Data object example:
@@ -86,11 +100,21 @@ class N8nClient
          *   "attachment":""
          *  }
          */
-        $this->ENDPOINT_SUBMIT_PORTING_LOA = 'https://n8n.workflows.organizedchaos.cc/webhook/59bc28f3-2fc6-42cd-8bc8-a8add1b5f6c4';
+        $this->ENDPOINT_SUBMIT_PORTING_LOA = $this->N8N_BASE_URL . '59bc28f3-2fc6-42cd-8bc8-a8add1b5f6c4';
 
 
         /* Trello Ticket Generator Email Address */
-        $this->TICKET_GENERATOR_EMAIL_ADDRESS = $this->isTest ? 'ianf@sapphiremediallc.com':'dev@sapphiremediallc.com';
+        $this->TICKET_GENERATOR_EMAIL_ADDRESS = $this->isTest ? 'ianf@sapphiremediallc.com' : 'dev@sapphiremediallc.com';
+
+        $this->TWILIO_CHECK_PORTABILITY_ENDPOINT = $this->N8N_BASE_URL . '';
+
+        $this->TWILIO_REQUEST_PORT = $this->N8N_BASE_URL . '';
+
+        $this->TWILIO_UPLOAD_UTILITY_BILL = $this->N8N_BASE_URL . '';
+
+        $this->TWILIO_GET_PORT_IN_REQUESTS = $this->N8N_BASE_URL . '';
+
+        $this->TWILIO_CANCEL_PORT_IN_REQUEST = $this->N8N_BASE_URL . '';
     }
 
     /**
@@ -124,7 +148,7 @@ class N8nClient
         }
 
         // Build payload
-        $payload = 
+        $payload =
             [
                 'table_name' => $table_name,
                 'columns' => $columns,
@@ -137,6 +161,22 @@ class N8nClient
         // Execute request
         return $this->request($this->ENDPOINT_SELECT, 'POST', $payload);
     }
+
+    /* Check Required Fields & Sanitize Input
+     * @param array $items
+     * @return bool
+    */
+
+    private function checkRequiredFields(array $items, array $requiredFields): bool
+    {
+        foreach ($requiredFields as $field) {
+            if (!isset($items[$field]) || empty($items[$field])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
 
     /**
@@ -154,17 +194,17 @@ class N8nClient
 
         // Validate required fields for charge-customer webhook
         $required = ['card_token', 'email', 'first_name', 'last_name', 'total_to_charge'];
-        foreach ($required as $field) {
-            if (empty($chargeData[$field])) {
-                $this->log('[chargeCustomer] Validation failed', 'error', [
-                    'missing_field' => $field
-                ]);
-                return [
-                    'success' => false,
-                    'data' => null,
-                    'error' => "Required field missing: {$field}"
-                ];
-            }
+        if ($this->checkRequiredFields($chargeData, $required) === false) {
+            $this->log('[chargeCustomer] Missing required fields', 'error', [
+                'required_fields' => $required,
+                'provided_fields' => array_keys($chargeData)
+            ]);
+
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'Missing required fields for charging customer'
+            ];
         }
 
         // Sanitize input
@@ -176,7 +216,7 @@ class N8nClient
                     'key' => $key
                 ]]);
 
-                if(!$validateData){
+                if (!$validateData) {
                     $this->log('[chargeCustomer] Validation failed', 'error', [
                         'field' => $key,
                         'value' => $value
@@ -196,7 +236,7 @@ class N8nClient
                     'key' => $key
                 ]]);
 
-                if(!$validateData){
+                if (!$validateData) {
                     $this->log('[chargeCustomer] Validation failed', 'error', [
                         'field' => $key,
                         'value' => $value
@@ -355,9 +395,9 @@ class N8nClient
                 "cost_per_lead": "0.00"
             }
         ]*/
-            
+
         // Fetch from API
-            $result = $this->select(
+        $result = $this->select(
             'Website_Pricing',
             [
                 'cost_json',
@@ -404,6 +444,19 @@ class N8nClient
         $this->log('[submitOrder] Sending to webhook', 'info', [
             'endpoint' => $this->ENDPOINT_WEBSITE_PAYLOAD_PURCHASE
         ]);
+
+        if ($this->checkRequiredFields($orderData, ['products', 'setup_total', 'total_charge']) === false) {
+            $this->log('[submitOrder] Missing required fields', 'error', [
+                'required_fields' => ['products', 'setup_total', 'total_charge'],
+                'provided_fields' => array_keys($orderData)
+            ]);
+
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'Missing required fields for submitting order'
+            ];
+        }
 
         $response = $this->request(
             $this->ENDPOINT_WEBSITE_PAYLOAD_PURCHASE,
@@ -453,6 +506,19 @@ class N8nClient
             'user_id' => $loaData['userId'] ?? null,
             'phone_count' => isset($loaData['phone_numbers']) ? count(json_decode($loaData['phone_numbers'], true)) : 0
         ]);
+
+        if ($this->checkRequiredFields($loaData, ['userId', 'loa_pdf_base64', 'phone_numbers']) === false) {
+            $this->log('[submitPortingLOA] Missing required fields', 'error', [
+                'required_fields' => ['userId', 'loa_pdf_base64', 'phone_numbers'],
+                'provided_fields' => array_keys($loaData)
+            ]);
+
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'Missing required fields for submitting porting LOA'
+            ];
+        }
 
         $response = $this->request(
             $this->ENDPOINT_SUBMIT_PORTING_LOA,
@@ -549,25 +615,25 @@ class N8nClient
     {
         $errors = [];
         $sanitized = [];
-        
+
         // Valid data types
         $validDataTypes = ['string', 'number', 'integer', 'float', 'boolean', 'email', 'url'];
-        
+
         foreach ($items as $index => $item) {
             $itemErrors = [];
-            
+
             // Check if item is an array/object
             if (!is_array($item)) {
                 $errors[] = "Item at index $index is not an array/object";
                 continue;
             }
-            
+
             // Check required fields exist
             if (!isset($item['data_type']) || !isset($item['value']) || !isset($item['key'])) {
                 $errors[] = "Item at index $index is missing required fields (data_type, value, key)";
                 continue;
             }
-            
+
             // Validate and sanitize key
             $key = $item['key'];
             if (!is_string($key)) {
@@ -580,17 +646,17 @@ class N8nClient
                 $itemErrors[] = "Key exceeds maximum length of 64 characters";
             }
             $sanitizedKey = htmlspecialchars(trim($key), ENT_QUOTES, 'UTF-8');
-            
+
             // Validate data_type
             $dataType = strtolower(trim($item['data_type']));
             if (!in_array($dataType, $validDataTypes, true)) {
                 $itemErrors[] = "Invalid data_type. Allowed: " . implode(', ', $validDataTypes);
             }
-            
+
             // Validate value based on data_type
             $value = $item['value'];
             $sanitizedValue = null;
-            
+
             switch ($dataType) {
                 case 'string':
                     if (!is_string($value)) {
@@ -604,7 +670,7 @@ class N8nClient
                         }
                     }
                     break;
-                    
+
                 case 'number':
                 case 'integer':
                     if (!is_numeric($value)) {
@@ -616,7 +682,7 @@ class N8nClient
                         }
                     }
                     break;
-                    
+
                 case 'float':
                     if (!is_numeric($value)) {
                         $itemErrors[] = "Value must be a float";
@@ -627,7 +693,7 @@ class N8nClient
                         }
                     }
                     break;
-                    
+
                 case 'boolean':
                     if (!is_bool($value) && !in_array($value, [0, 1, '0', '1', 'true', 'false'], true)) {
                         $itemErrors[] = "Value must be boolean or boolean-like (0, 1, 'true', 'false')";
@@ -638,7 +704,7 @@ class N8nClient
                         }
                     }
                     break;
-                    
+
                 case 'email':
                     if (!is_string($value)) {
                         $itemErrors[] = "Email value must be a string";
@@ -649,7 +715,7 @@ class N8nClient
                         }
                     }
                     break;
-                    
+
                 case 'url':
                     if (!is_string($value)) {
                         $itemErrors[] = "URL value must be a string";
@@ -661,7 +727,7 @@ class N8nClient
                     }
                     break;
             }
-            
+
             // Add errors for this item
             if (!empty($itemErrors)) {
                 $errors[] = "Item at index $index (key: '$key'): " . implode('; ', $itemErrors);
@@ -674,11 +740,271 @@ class N8nClient
                 ];
             }
         }
-        
+
         return [
             'valid' => empty($errors),
             'errors' => $errors,
             'sanitized' => $sanitized
         ];
+    }
+
+    /**
+     * Check if a phone number is portable to Twilio
+     *
+     * @param array $data: Phone number in E.164 format & userId (ID of customer)
+     * @return array ['success' => bool, 'data' => array|null, 'error' => string|null]
+     */
+    public function checkPortability($data)
+    {
+        $this->log('[checkPortability] Checking portability', 'info', [
+            'phone_number' => $data['phone_number'] ?? null,
+            'userId' => $data['userId'] ?? null
+        ]);
+
+        if ($this->checkRequiredFields($data, ['phone_number', 'userId']) === false) {
+            $this->log('[checkPortability] Missing required fields', 'error', [
+                'required_fields' => ['phone_number', 'userId'],
+                'provided_fields' => array_keys($data)
+            ]);
+
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'Missing required fields for checking portability'
+            ];
+        }
+
+        $payload = [
+            'phone_number' => $data['phone_number'],
+            'userId' => $data['userId']
+        ];
+
+        $response = $this->request(
+            $this->TWILIO_CHECK_PORTABILITY_ENDPOINT,
+            'POST',
+            $payload
+        );
+
+        $this->log('[checkPortability] Response received', 'info', [
+            'success' => $response['success'] ?? false,
+            'portable' => $response['data']['portable'] ?? null,
+            'error' => $response['error'] ?? null
+        ]);
+
+        return $response;
+    }
+
+    /**
+     * Upload utility bill document to Twilio
+     *
+     * @param array $documentData ['document_name' => string, 'file_base64' => string, 'mime_type' => string]
+     * @return array ['success' => bool, 'data' => array|null, 'error' => string|null]
+     */
+    public function uploadUtilityBill($documentData)
+    {
+        $this->log('[uploadUtilityBill] Uploading utility bill', 'info', [
+            'document_name' => $documentData['document_name'] ?? null,
+            'mime_type' => $documentData['mime_type'] ?? null,
+            'userId' => $documentData['userId'] ?? null
+        ]);
+
+        // Validate required fields
+        if ($this->checkRequiredFields($documentData, ['document_name', 'file_base64', 'mime_type', 'userId']) === false) {
+            $this->log('[uploadUtilityBill] Missing required fields', 'error', [
+                'required_fields' => ['document_name', 'file_base64', 'mime_type', 'userId'],
+                'provided_fields' => array_keys($documentData)
+            ]);
+
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'Missing required fields for uploading utility bill'
+            ];
+        }
+
+        $payload = [
+            'document_type' => 'utility_bill',
+            'friendly_name' => $documentData['document_name'],
+            'file_base64' => $documentData['file_base64'],
+            'mime_type' => $documentData['mime_type'],
+            'userId' => $documentData['userId']
+        ];
+
+        $response = $this->request(
+            $this->TWILIO_UPLOAD_UTILITY_BILL,
+            'POST',
+            $payload
+        );
+
+        $this->log('[uploadUtilityBill] Response received', 'info', [
+            'success' => $response['success'] ?? false,
+            'document_sid' => $response['data']['sid'] ?? null,
+            'error' => $response['error'] ?? null
+        ]);
+
+        return $response;
+    }
+
+    /**
+     * Create a port-in request with Twilio
+     *
+     * @param array $data Port-in request data
+     * @return array ['success' => bool, 'data' => array|null, 'error' => string|null]
+     */
+    public function createPortInRequest($data)
+    {
+        $this->log('[createPortInRequest] Creating port-in request', 'info', [
+            'phone_count' => isset($data['phone_numbers']) ? count($data['phone_numbers']) : 0,
+            'phone_numbers' => isset($data['phone_numbers']) ? $data['phone_numbers'] : [],
+            'userId' => $data['userId'] ?? null,
+            'customer_name' => $data['losing_carrier_information']['customer_name'] ?? null
+        ]);
+
+        // Validate phone_numbers array
+        if (!is_array($data['phone_numbers']) || empty($data['phone_numbers'])) {
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'phone_numbers must be a non-empty array'
+            ];
+        }
+
+        // Validate required fields
+        if ($this->checkRequiredFields($data, ['losing_carrier_information', 'phone_numbers', 'userId', 'notification_emails']) === false) {
+            $this->log('[createPortInRequest] Missing required fields', 'error', [
+                'required_fields' => ['losing_carrier_information', 'phone_numbers', 'userId'],
+                'provided_fields' => array_keys($data)
+            ]);
+
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'Missing required fields for creating port-in request'
+            ];
+        }
+
+        $data['losing_carrier_information']['customer_type'] =  empty($data['losing_carrier_information']['customer_type']) ? 'business' : $data['losing_carrier_information']['customer_type'];
+        $data['losing_carrier_information']['account_telephone_number'] = empty($data['losing_carrier_information']['account_telephone_number']) ? $data['phone_numbers'][0] : $data['losing_carrier_information']['account_telephone_number'];
+        $data['notification_emails'] = empty($data['notification_emails']) ? $data['notification_emails'] : [$this->TICKET_GENERATOR_EMAIL_ADDRESS, $data['losing_carrier_information']['authorized_representative_email']];
+
+        /* First and Last Name are required in authorized_representative */
+        if (!isset($data['losing_carrier_information']['authorized_representative']) || empty($data['losing_carrier_information']['authorized_representative'])) {
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'losing_carrier_information.customer_name is required'
+            ];
+        }
+
+        /* First and Last Name are required in authorized_representative */
+        if (!isset($data['losing_carrier_information']['authorized_representative_email']) || empty($data['losing_carrier_information']['authorized_representative_email'])) {
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'losing_carrier_information.customer_name is required'
+            ];
+        } else {
+            if ($this->validateDataObjects([[
+                'data_type' => 'email',
+                'value' => $data['losing_carrier_information']['authorized_representative_email'],
+                'key' => 'authorized_representative_email'
+            ]])['valid'] === false) {
+                return [
+                    'success' => false,
+                    'data' => null,
+                    'error' => 'losing_carrier_information.authorized_representative_email is not a valid email address'
+                ];
+            }
+        }
+
+        $data['notification_emails'] = empty($data['notification_emails']) ? $data['notification_emails'] : [$this->TICKET_GENERATOR_EMAIL_ADDRESS, $data['losing_carrier_information']['authorized_representative_email']];
+
+        // Validate phone_numbers count (max 1000)
+        if (count($data['phone_numbers']) >= 1000) {
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'phone_numbers: size must be between 1 and 1000'
+            ];
+        }
+
+        $response = $this->request(
+            $this->TWILIO_REQUEST_PORT,
+            'POST',
+            $data
+        );
+
+        $this->log('[createPortInRequest] Response received', 'info', [
+            'success' => $response['success'] ?? false,
+            'port_in_request_sid' => $response['data']['port_in_request_sid'] ?? null,
+            'error' => $response['error'] ?? null
+        ]);
+
+        return $response;
+    }
+
+    /**
+     * Get port-in requests from Twilio
+     *
+     * @param array $filters ['size' => int, 'port_in_request_sid' => string, 'status' => string, 'created_before' => string, 'created_after' => string]
+     * @return array ['success' => bool, 'data' => array|null, 'error' => string|null]
+     */
+    public function getPortInRequests($filters = [])
+    {
+        $this->log('[getPortInRequests] Fetching port-in requests', 'info', [
+            'filters' => $filters
+        ]);
+
+        $payload = array_merge([
+            'size' => 20
+        ], $filters);
+
+        $response = $this->request(
+            $this->TWILIO_GET_PORT_IN_REQUESTS,
+            'POST',
+            $payload
+        );
+
+        $this->log('[getPortInRequests] Response received', 'info', [
+            'success' => $response['success'] ?? false,
+            'count' => isset($response['data']) ? count($response['data']) : 0,
+            'error' => $response['error'] ?? null
+        ]);
+
+        return $response;
+    }
+
+    public function cancelPortInRequest($portInRequestSid)
+    {
+        $this->log('[cancelPortInRequest] Cancelling port-in request', 'info', [
+            'port_in_request_sid' => $portInRequestSid
+        ]);
+
+        if (empty($portInRequestSid)) {
+            $this->log('[cancelPortInRequest] Missing port_in_request_sid', 'error', []);
+
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'Missing port_in_request_sid for cancelling port-in request'
+            ];
+        }
+
+        $payload = [
+            'port_in_request_sid' => $portInRequestSid
+        ];
+
+        $response = $this->request(
+            $this->TWILIO_CANCEL_PORT_IN_REQUEST,
+            'POST',
+            $payload
+        );
+
+        $this->log('[cancelPortInRequest] Response received', 'info', [
+            'success' => $response['success'] ?? false,
+            'error' => $response['error'] ?? null
+        ]);
+
+        return $response;
     }
 }

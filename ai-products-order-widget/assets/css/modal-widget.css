@@ -23,13 +23,55 @@
 
 /* Modal Container */
 .aipw-modal {
-    background: #fff;
-    color: #000;
-    max-width: 1200px;
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
     width: 100%;
-    padding: 40px;
+    height: 100%;
+    background-color: rgba(0, 18, 74, 0.95); /* #00124a with 95% opacity */
+    backdrop-filter: blur(8px);
+    overflow-y: auto;
+}
+
+.aipw-modal.aipw-active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.aipw-modal-content {
+    background: var(--bg-plugin-gradient, linear-gradient(to bottom, #1a1a2e, #141421));
+    border-radius: 0.5rem;
+    box-shadow: var(--modal-header-shadow, 0rem 0rem 1rem rgba(0, 53, 111, 0.8));
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
     position: relative;
-    border: 2px solid #000;
+    margin: auto;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 768px) {
+    .aipw-modal-content {
+        max-width: 95%;
+        max-height: 95vh;
+    }
+}
+
+@media (max-width: 480px) {
+    .aipw-modal-content {
+        max-width: 100%;
+        border-radius: 0;
+        max-height: 100vh;
+    }
+    
+    .aipw-modal.aipw-active {
+        padding: 0;
+    }
 }
 
 /* Progress Bar */
@@ -85,7 +127,7 @@
 
 .aipw-modal-subtitle {
     font-size: 16px;
-    color: #666;
+    color:  #00124a;
     margin: 0;
 }
 
