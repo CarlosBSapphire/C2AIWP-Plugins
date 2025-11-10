@@ -18,7 +18,7 @@
                 stripePublicKey: config.stripePublicKey || 'pk_test_51RO1TFI6Mo3ACLGTuEJTA0vmAS6XovFb3ym9oTp9kPW6OO7s9IZI9DTsxQfLaAdzLQqBB4bzQeFfDu6Ux4YpB2hw002QJW8iRr',
                 ...config
             };
-            
+
 
             // Load saved state from localStorage or use defaults
             this.state = this.loadState() || {
@@ -37,7 +37,7 @@
                 userId: null, // User ID from create_user API
                 utilityBillBase64: null,
                 utilityBillFilename: null,
-                utilityBillMimeType: null, 
+                utilityBillMimeType: null,
                 utilityBillExtension: null
             };
 
@@ -233,7 +233,7 @@
                     // Convert to cents (integer) for calculations
                     const parseRate = (rateStr) => {
                         if (!rateStr) return 0;
-                        if(typeof rateStr === 'number') return Math.round(rateStr * 100);
+                        if (typeof rateStr === 'number') return Math.round(rateStr * 100);
                         const cleaned = String(rateStr).replace(/[$,]/g, '');
                         const dollars = parseFloat(cleaned) || 0;
                         return Math.round(dollars * 100); // Convert to cents
@@ -360,10 +360,9 @@
                         // Handle Phone Number pricing
                         else if (type === 'Price Per Number' && frequency === 'Weekly') {
                             const cost_per_number = parseRate(item.cost_per_number);
+                            console.log(`[loadPricing] Phone Number: ${cost_per_number} cents per number/week`);
 
                             this.pricing.phoneNumberWeeklyCost = cost_per_number;
-
-                            console.log(`[loadPricing] Phone Number: ${cost_per_number} cents per number/week`);
                         }
                     });
 
@@ -1366,7 +1365,7 @@
             const fields = [
                 'first_name', 'last_name', 'email', 'phone_number',
                 'shipping_address', 'shipping_city', 'shipping_state',
-                'shipping_zip', 'shipping_country','billing_address', 'billing_city', 'billing_state',
+                'shipping_zip', 'shipping_country', 'billing_address', 'billing_city', 'billing_state',
                 'billing_zip', 'billing_country'
             ];
 
@@ -1529,12 +1528,12 @@
 
                 console.log('Payment info stored:', this.state.paymentInfo);
 
-                
+
                 // Save state to localStorage (payment info without sensitive card data)
                 this.saveState();
                 this.calculatePricing();
                 console.log('this.pricing: ', this.pricing);
-                
+
 
                 //user created here
                 const chargeCustomer = await this.apiCall('charge_customer', {
@@ -1558,10 +1557,10 @@
                     payment_info: this.state.paymentInfo,
                     selected_products: this.state.selectedProducts
                 });
-                if(chargeCustomer.success === false){
+                if (chargeCustomer.success === false) {
                     console.log('Charge customer failed:', chargeCustomer);
                     throw new Error(chargeCustomer.message || 'Payment failed');
-                }else{
+                } else {
                     console.log('Customer charged successfully:', chargeCustomer);
                 }
 
@@ -1572,12 +1571,12 @@
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
                 console.log("Selected products: ", this.state.selectedProducts)
-                
+
                 console.log("User ID after charge: ", chargeCustomer);
                 this.state.userId = chargeCustomer.data;
                 this.saveState();
-                
-        
+
+
                 // Check if calls selected
                 if (this.state.selectedProducts.includes('inbound_outbound_calls')) {
                     this.renderStep(3); // Go to call setup
@@ -2040,7 +2039,7 @@
             if (this.state.utilityBillFilename) {
                 const preview = document.getElementById('aipwUtilityBillPreview');
                 const nameSpan = document.getElementById('aipwUtilityBillName');
-                
+
                 if (preview && nameSpan) {
                     nameSpan.textContent = this.state.utilityBillFilename;
                     preview.style.display = 'block';
@@ -2153,7 +2152,7 @@
             document.getElementById('aipwSubmitLOA').addEventListener('click', () => {
                 this.submitPortingLOA();
             });
-            
+
 
             // Save phone numbers on blur
             const form = document.getElementById('aipwLOAForm');
@@ -2179,10 +2178,10 @@
                     });
                 }
             }
-            
-                this.handleUtilityBillUpload();
 
-            
+            this.handleUtilityBillUpload();
+
+
         }
 
         /**
@@ -2190,14 +2189,14 @@
          */
         handleUtilityBillUpload() {
             const fileInput = document.getElementById('aipwUtilityBillUpload');
-            
+
             if (!fileInput) return;
-            
+
             fileInput.addEventListener('change', async (e) => {
                 const file = e.target.files[0];
-                
+
                 if (!file) return;
-                
+
                 // Validate file size (5MB max)
                 const maxSize = 5 * 1024 * 1024; // 5MB
                 if (file.size > maxSize) {
@@ -2205,7 +2204,7 @@
                     fileInput.value = '';
                     return;
                 }
-                
+
                 // Validate file type
                 const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
                 if (!allowedTypes.includes(file.type)) {
@@ -2213,23 +2212,23 @@
                     fileInput.value = '';
                     return;
                 }
-                
+
                 try {
                     // Convert to base64
                     const base64 = await this.fileToBase64(file);
-                    
+
                     // Store in state (remove data URI prefix)
                     this.state.utilityBillBase64 = base64.split(',')[1];
                     this.state.utilityBillFilename = file.name;
                     this.state.utilityBillMimeType = file.type;
                     this.state.utilityBillExtension = file.name.split('.').pop();
-                    
+
                     // Show preview
                     this.showUtilityBillPreview(file.name);
-                    
+
                     // Save state
                     this.saveState();
-                    
+
                 } catch (error) {
                     console.error('[handleUtilityBillUpload] Error:', error);
                     alert('Error reading file. Please try again.');
@@ -2238,48 +2237,48 @@
             });
         }
 
-            /**
-             * Convert file to base64
-             */
-            fileToBase64(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-            }
+        /**
+         * Convert file to base64
+         */
+        fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
 
-            /**
-             * Show utility bill preview
-             */
-            showUtilityBillPreview(filename) {
-                const preview = document.getElementById('aipwUtilityBillPreview');
-                const nameSpan = document.getElementById('aipwUtilityBillName');
-                
-                if (preview && nameSpan) {
-                    nameSpan.textContent = filename;
-                    preview.style.display = 'block';
-                }
-            }
+        /**
+         * Show utility bill preview
+         */
+        showUtilityBillPreview(filename) {
+            const preview = document.getElementById('aipwUtilityBillPreview');
+            const nameSpan = document.getElementById('aipwUtilityBillName');
 
-            /**
-             * Clear utility bill upload
-             */
-            clearUtilityBill() {
-                const fileInput = document.getElementById('aipwUtilityBillUpload');
-                const preview = document.getElementById('aipwUtilityBillPreview');
-                
-                if (fileInput) fileInput.value = '';
-                if (preview) preview.style.display = 'none';
-                
-                this.state.utilityBillBase64 = null;
-                this.state.utilityBillFilename = null;
-                this.state.utilityBillMimeType = null;
-                this.state.utilityBillExtension = null;
-                
-                this.saveState();
+            if (preview && nameSpan) {
+                nameSpan.textContent = filename;
+                preview.style.display = 'block';
             }
+        }
+
+        /**
+         * Clear utility bill upload
+         */
+        clearUtilityBill() {
+            const fileInput = document.getElementById('aipwUtilityBillUpload');
+            const preview = document.getElementById('aipwUtilityBillPreview');
+
+            if (fileInput) fileInput.value = '';
+            if (preview) preview.style.display = 'none';
+
+            this.state.utilityBillBase64 = null;
+            this.state.utilityBillFilename = null;
+            this.state.utilityBillMimeType = null;
+            this.state.utilityBillExtension = null;
+
+            this.saveState();
+        }
 
         /**
          * Capture porting phone numbers from form
@@ -2343,7 +2342,7 @@
                 return;
             }
 
-            
+
 
             try {
                 // Capture phone numbers
@@ -2385,7 +2384,7 @@
 
                 console.log('[submitPortingLOA] LOA submitted successfully');
 
-        
+
 
                 // Complete the order
                 await this.completeOrder();
