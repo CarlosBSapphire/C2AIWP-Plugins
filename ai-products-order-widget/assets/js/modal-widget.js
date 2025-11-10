@@ -1753,6 +1753,7 @@
                 this.pricing.phoneCountPricingTotal = this.pricing.phoneNumberWeeklyCost * this.state.numberCount;
 
                 this.saveState();
+                this.calculatePricing();
                 console.log('numberCount updated:', this.state.numberCount);
                 console.log('pricing updated:', this.pricing.phoneCountPricingTotal);
             });
