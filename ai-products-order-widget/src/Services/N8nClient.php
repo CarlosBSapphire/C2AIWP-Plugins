@@ -21,7 +21,7 @@ class N8nClient
     private bool $isTest = true;
 
 
-    public string $N8N_BASE_URL = 'https://n8n.workflows.organizedchaos.cc/';
+    public string $N8N_BASE_URL = 'https://n8n.workflows.organizedchaos.cc/webhooks/';
 
 
     /* Twilio Porting Endpoints */

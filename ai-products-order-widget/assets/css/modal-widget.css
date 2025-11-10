@@ -11,9 +11,6 @@
     display: none;
     overflow-y: auto;
     padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .aipw-modal-overlay.active {
