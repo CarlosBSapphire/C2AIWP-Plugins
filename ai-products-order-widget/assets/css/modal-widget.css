@@ -61,16 +61,16 @@
 
 .aipw-progress-step {
     font-size: 12px;
-    color: #666;
+    color: #ffffff;
 }
 
 .aipw-progress-step.active {
-    color: #000;
+    color: #666;
     font-weight: bold;
 }
 
 .aipw-progress-step.completed {
-    color: #000;
+    color: #666;
 }
 
 /* Modal Header */
@@ -86,14 +86,10 @@
 
 .aipw-modal-subtitle {
     font-size: 16px;
-    color:  #00124a;
+    color:  #ffffff;
     margin: 0;
 }
 
-/* Modal Body */
-.aipw-modal-body {
-    min-height: 400px;
-}
 
 /* Product Selection Grid */
 .aipw-products-grid {
@@ -104,7 +100,7 @@
 }
 
 .aipw-product-card {
-    border: 2px solid #ccc;
+    border: 2px solid #00356f;
     padding: 30px;
     text-align: center;
     cursor: pointer;
@@ -113,11 +109,11 @@
 }
 
 .aipw-product-card:hover {
-    border-color: #000;
+    border-color: #fff;
 }
 
 .aipw-product-card.selected {
-    border-color: #000;
+    border-color: #efff;
     background: #f0f0f0;
 }
 
@@ -134,7 +130,7 @@
 
 .aipw-product-description {
     font-size: 14px;
-    color: #666;
+    color: #000;
     line-height: 1.6;
     margin-bottom: 15px;
 }
@@ -142,13 +138,13 @@
 .aipw-product-pricing {
     margin: 15px 0;
     padding: 10px;
-    background: #f8f8f8;
+    background: #000;
     border-radius: 4px;
 }
 
 .aipw-pricing-setup {
     font-size: 14px;
-    color: #666;
+    color: #000;
     margin-bottom: 5px;
 }
 
