@@ -705,7 +705,7 @@
 }
 
 .aipw-terms-agreement.selected {
-    background: var(--secondary);
+    background: transparent;
     box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
 }
 
@@ -713,13 +713,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--secondary);
+    background: var(--primary-btn-bg);
 }
 
 .aipw-terms-checkbox input[type="checkbox"] {
     width: 20px;
     height: 20px;
     margin-right: 10px;
+    background: transparent;
 }
 
 /* Number Input Group */
