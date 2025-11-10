@@ -1,6 +1,25 @@
 /* AI Products Order Widget - Modal System */
 /* Version: 2.0.0 - Basic Black & White for Testing */
 
+:root {
+    /* Modal shadows */
+    --modal-footer-shadow: 0rem 0rem 1rem rgba(0, 53, 111, 0.8);
+    --modal-header-shadow: 0rem 0rem 1rem rgba(0, 53, 111, 0.8);
+
+    /* Borders */
+    --input-active-border: #0467d2;
+
+    /* Dropdown */
+    --dropdown-hover: #545a82;
+
+    /* Text colors */
+    --text: #ffffff;
+    --text-muted: #9ca3af;
+    --text-placeholders: #545a82;
+    --pending-text: #ffb70b;
+    --menu-text: #ffffff;
+}
+
 /* Modal Overlay */
 .aipw-modal-overlay {
     position: fixed;
@@ -21,7 +40,7 @@
 
 /* Modal Container */
 .aipw-modal {
-    background:#141421;
+    background: #0a1330;
     color: #ffffff;
     padding: 40px;
     position: relative;
@@ -71,6 +90,8 @@
 /* Modal Header */
 .aipw-modal-header {
     margin-bottom: 30px;
+    box-shadow: var(--modal-header-shadow);
+    padding-bottom: 20px;
 }
 
 .aipw-modal-title {
@@ -318,16 +339,26 @@
 .aipw-form-select {
     width: 100%;
     padding: 12px;
-    border: 2px solid #ccc;
+    border: 2px solid #0467d2;
     font-size: 14px;
-    background: #fff;
-    color: #000;
+    background: #2e3045;
+    color: #fff;
 }
 
 .aipw-form-input:focus,
 .aipw-form-select:focus {
     outline: none;
-    border-color: #000;
+    border-color: #0467d2;
+    background: #0a1330;
+}
+
+.aipw-form-select option {
+    background: #2e3045;
+    color: #fff;
+}
+
+.aipw-form-select option:hover {
+    background: #545a82;
 }
 
 .aipw-form-checkbox-group {
@@ -445,6 +476,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: var(--modal-footer-shadow);
 }
 
 .aipw-btn {
@@ -584,9 +616,9 @@
 /* Stripe Element Styles */
 .aipw-stripe-element {
     padding: 12px;
-    border: 1px solid #ccc;
+    border: 2px solid #0467d2;
     border-radius: 4px;
-    background: #ffffff;
+    background: #2e3045;
     transition: border-color 0.3s ease;
     min-height: 44px;
 }
@@ -597,9 +629,10 @@
 }
 
 .aipw-stripe-element:focus-within {
-    border-color: #000;
+    border-color: #0467d2;
     outline: none;
-    box-shadow: 0 0 0 1px #000;
+    box-shadow: 0 0 0 1px #0467d2;
+    background: #0a1330;
 }
 
 .aipw-stripe-errors {
