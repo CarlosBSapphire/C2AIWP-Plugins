@@ -1779,7 +1779,7 @@
             }
 
             if (this.state.phoneNumberType) {
-                const card_phone = document.querySelector(`.aipw-assignment-options .aipw-config-card[data-assignment="${this.state.phoneNumberType}"]`);
+                const card_phone = document.querySelector(`.aipw-number-type-selection .aipw-config-card[data-assignment="${this.state.phoneNumberType}"]`);
                 if (card_phone) {
                     card_phone.classList.add('selected');
                     document.getElementById('aipwConfigNextBtn').disabled = false;
@@ -2530,6 +2530,7 @@
                         setup_type: this.state.setupType,
                         number_count: this.state.numberCount,
                         assignment_type: this.state.assignmentType,
+                        phone_number_type: this.state.phoneNumberType,
                         agent_style: this.state.agentStyle,
                         agent_style_pricing: agentStylePricing, // Include pricing details for backend,
                         numbers_to_port: this.state.setupType === 'byo' ? this.state.portingPhoneNumbers : []
