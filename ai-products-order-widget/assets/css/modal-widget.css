@@ -22,6 +22,18 @@
 }
 
 /* Modal Container */
+.aipw-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 18, 74, 0.95); /* #00124a with 95% opacity */
+    backdrop-filter: blur(8px);
+    overflow-y: auto;
+}
 
 .aipw-modal-content {
     background: var(--bg-plugin-gradient, linear-gradient(to bottom, #1a1a2e, #141421));
