@@ -112,6 +112,7 @@
                     setupType: this.state.setupType,
                     numberCount: this.state.numberCount,
                     assignmentType: this.state.assignmentType,
+                    phoneNumberType: this.state.phoneNumberType,
                     agentStyle: this.state.agentStyle,
                     termsAccepted: this.state.termsAccepted,
                     // Save payment info but exclude sensitive card data
@@ -1749,7 +1750,7 @@
 
                 this.saveState();
                 console.log('numberCount updated:', this.state.numberCount);
-                console.log('numberCount updated:', this.pricing.phoneNumberWeeklyCost);
+                console.log('pricing updated:', this.pricing.phoneCountPricingTotal);
             });
 
             document.getElementById('aipwConfigNextBtn').addEventListener('click', () => {
