@@ -360,11 +360,11 @@
 }
 
 .aipw-config-card:hover {
-    border-color: #008387;
+    border-color:  #00356f;
 }
 
 .aipw-config-card.selected {
-    border-color: #000;
+    border-color: #eff;
     background: #008387;
 }
 
@@ -418,7 +418,7 @@
 }
 
 .aipw-agent-card:hover {
-    border-color: #008387;
+    border-color: #00356f;
 }
 
 .aipw-agent-card.selected {
@@ -459,17 +459,17 @@
 }
 
 .aipw-btn:hover {
-    background: #008387;
+    background:  #00356f;
     color: #fff;
 }
 
 .aipw-btn-primary {
-    background: #000;
+    background:  #00356f;
     color: #fff;
 }
 
 .aipw-btn-primary:hover {
-    background: #008387;
+    background: #00356f;
     color: #000;
 }
 
