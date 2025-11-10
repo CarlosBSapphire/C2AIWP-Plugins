@@ -700,7 +700,6 @@
 }
 
 .aipw-terms-agreement:hover {
-    background: var(--input-active-border);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
@@ -720,7 +719,6 @@
     width: 20px;
     height: 20px;
     margin-right: 10px;
-    background: transparent;
 }
 
 /* Number Input Group */
