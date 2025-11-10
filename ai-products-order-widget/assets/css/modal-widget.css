@@ -713,6 +713,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background: var(--secondary);
 }
 
 .aipw-terms-checkbox input[type="checkbox"] {
