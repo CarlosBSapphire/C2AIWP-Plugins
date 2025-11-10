@@ -28,6 +28,7 @@
                 setupType: null,
                 numberCount: 1,
                 assignmentType: null,
+                phoneNumberType: null,
                 agentStyle: null,
                 paymentInfo: {},
                 termsAccepted: false,
@@ -37,7 +38,7 @@
                 utilityBillBase64: null,
                 utilityBillFilename: null,
                 utilityBillMimeType: null, 
-                utilityBillExtension: null  
+                utilityBillExtension: null
             };
 
             this.steps = [
@@ -1730,10 +1731,26 @@
                     this.saveState();
                 });
             });
+
+            document.querySelectorAll('.aipw-number-type-selection .aipw-config-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.aipw-number-type-selection .aipw-config-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    this.state.phoneNumberType = card.dataset.assignment;
+                    document.getElementById('aipwConfigNextBtn').disabled = false;
+
+                    // Save state to localStorage
+                    this.saveState();
+                });
+            });
+
             document.getElementById('aipwNumberCount').addEventListener('change', (e) => {
                 this.state.numberCount = parseInt(e.target.value);
+                this.state.pricing.pricingPerNumber = pricingPerNumber * this.state.numberCount;
+
                 this.saveState();
                 console.log('numberCount updated:', this.state.numberCount);
+                console.log('numberCount updated:', this.state.pricing.pricingPerNumber);
             });
 
             document.getElementById('aipwConfigNextBtn').addEventListener('click', () => {
