@@ -56,7 +56,8 @@
                 products: {},  // Product-specific pricing
                 addons: {},     // Addon-specific pricing
                 setupFees: {}, // Setup fees by service count (1, 2, 3+)
-                agentStyles: {} // Agent style pricing by type (Quick, Advanced, Conversational)
+                agentStyles: {}, // Agent style pricing by type (Quick, Advanced, Conversational)
+                pricingPerNumber: 0 // Cost per phone number setup (default $2)
             };
 
             // Stripe elements
@@ -353,6 +354,14 @@
                             };
 
                             console.log(`[loadPricing] ${qaKey}: ${cost} cents/week, ${cost_per_lead} cents/lead`);
+                        }
+                        // Handle Phone Number pricing
+                        else if (name === 'Phone Number' && frequency === 'Weekly') {
+                            const cost_per_number = parseRate(item.cost_per_number);
+
+                            this.pricing.phoneNumberWeeklyCost = cost_per_number;
+
+                            console.log(`[loadPricing] Phone Number: ${cost_per_number} cents per number/week`);
                         }
                     });
 
@@ -1661,6 +1670,7 @@
             const header = document.getElementById('aipwModalHeader');
             const body = document.getElementById('aipwModalBody');
             const footer = document.getElementById('aipwModalFooter');
+            const pricingPerNumber = this.pricing.number_setup_cost || 0;
 
             const setupTypeText = {
                 'purchase': 'Purchase Number',
@@ -1677,6 +1687,17 @@
                 <div class="aipw-number-input-group">
                     <label class="aipw-form-label">How many lines/numbers would you like?</label>
                     <input type="number" class="aipw-form-input" id="aipwNumberCount" value="1" min="1" style="max-width: 200px;">
+                </div>
+                <div class="aipw-number-type-selection">
+                    <div class="aipw-config-card" data-assignment="toll_free">
+                        <div class="aipw-config-radio"></div>
+                        <div class="aipw-config-title">Toll Free</div>
+                    </div>
+
+                    <div class="aipw-config-card" data-assignment="direct_dial">
+                        <div class="aipw-config-radio"></div>
+                        <div class="aipw-config-title">Direct Dial (DID)</div>
+                    </div>
                 </div>
 
                 <div class="aipw-assignment-options">
@@ -2639,17 +2660,17 @@
 
                 return `
                     <div class="aipw-product-pricing">
-                        <div class="aipw-pricing-title" style="font-weight: 600; margin-bottom: 6px; font-size: 12px;">Usage-Based Pricing:</div>
-                        <div class="aipw-pricing-tier" style="font-size: 11px; margin-bottom: 2px;">
+                        <div class="aipw-pricing-title" style="font-weight: 600; margin-bottom: 6px; font-size: 14px;">Usage-Based Pricing:</div>
+                        <div class="aipw-pricing-tier" style="font-size: 12px; margin-bottom: 2px;">
                             Quick: ${this.formatCurrency(quickPricing.phone_per_minute || 0)}/min
                         </div>
-                        <div class="aipw-pricing-tier" style="font-size: 11px; margin-bottom: 2px;">
+                        <div class="aipw-pricing-tier" style="font-size: 12px; margin-bottom: 2px;">
                             Advanced: ${this.formatCurrency(advancedPricing.phone_per_minute || 0)}/min
                         </div>
-                        <div class="aipw-pricing-tier" style="font-size: 11px; margin-bottom: 2px;">
+                        <div class="aipw-pricing-tier" style="font-size: 12px; margin-bottom: 2px;">
                             Conversational: ${this.formatCurrency(conversationalPricing.phone_per_minute || 0)}/min
                         </div>
-                        <div class="aipw-pricing-note" style="font-size: 10px; opacity: 0.7; margin-top: 4px; font-style: italic;">
+                        <div class="aipw-pricing-note" style="font-size: 12px; opacity: 0.7; margin-top: 4px; font-style: italic;">
                             Rate selected later
                         </div>
                     </div>
