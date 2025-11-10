@@ -1778,6 +1778,14 @@
                 }
             }
 
+            if (this.state.phoneNumberType) {
+                const card = document.querySelector(`.aipw-assignment-options .aipw-config-card[data-assignment="${this.state.phoneNumberType}"]`);
+                if (card) {
+                    card.classList.add('selected');
+                    document.getElementById('aipwConfigNextBtn').disabled = false;
+                }
+            }
+
             if (this.state.numberCount) {
                 const input = document.getElementById('aipwNumberCount');
                 if (input) {
