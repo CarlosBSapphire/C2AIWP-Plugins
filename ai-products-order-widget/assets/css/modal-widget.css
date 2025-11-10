@@ -530,6 +530,16 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.aipw-terms-agreement:hover {
+    background: #0467d2;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.aipw-terms-agreement.selected {
+    background: #008387;
+    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
+}
+
 .aipw-terms-checkbox {
     display: flex;
     align-items: center;
