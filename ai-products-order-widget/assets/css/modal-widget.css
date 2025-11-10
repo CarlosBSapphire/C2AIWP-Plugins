@@ -91,6 +91,7 @@
 }
 
 
+
 /* Product Selection Grid */
 .aipw-products-grid {
     display: grid;
@@ -100,7 +101,7 @@
 }
 
 .aipw-product-card {
-    border: 2px solid #00356f;
+    border: 2px solid #ccc;
     padding: 30px;
     text-align: center;
     cursor: pointer;
@@ -109,11 +110,11 @@
 }
 
 .aipw-product-card:hover {
-    border-color: #fff;
+    border-color: #000;
 }
 
 .aipw-product-card.selected {
-    border-color: #efff;
+    border-color: #000;
     background: #f0f0f0;
 }
 
@@ -130,7 +131,7 @@
 
 .aipw-product-description {
     font-size: 14px;
-    color: #000;
+    color: #666;
     line-height: 1.6;
     margin-bottom: 15px;
 }
@@ -138,13 +139,13 @@
 .aipw-product-pricing {
     margin: 15px 0;
     padding: 10px;
-    background: #000;
+    background: #f8f8f8;
     border-radius: 4px;
 }
 
 .aipw-pricing-setup {
     font-size: 14px;
-    color: #000;
+    color: #666;
     margin-bottom: 5px;
 }
 
