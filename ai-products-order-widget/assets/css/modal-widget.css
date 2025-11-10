@@ -101,16 +101,16 @@
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: #fff;
+    background: #008387;
 }
 
 .aipw-product-card:hover {
-    border-color: #000;
+    border-color: #008387;
 }
 
 .aipw-product-card.selected {
-    border-color: #000;
-    background: #f0f0f0;
+    border-color: #FFF;
+    background: #008387;
 }
 
 .aipw-product-icon {
@@ -126,7 +126,7 @@
 
 .aipw-product-description {
     font-size: 14px;
-    color: #666;
+    color: #00356f;
     line-height: 1.6;
     margin-bottom: 15px;
 }
@@ -134,20 +134,20 @@
 .aipw-product-pricing {
     margin: 15px 0;
     padding: 10px;
-    background: #f8f8f8;
+    background: #008387;
     border-radius: 4px;
 }
 
 .aipw-pricing-setup {
     font-size: 14px;
-    color: #666;
+    color: #000;
     margin-bottom: 5px;
 }
 
 .aipw-pricing-weekly {
     font-size: 18px;
     font-weight: bold;
-    color: #000;
+    color: rgb(204, 248, 248);
 }
 
 .aipw-product-checkbox {
@@ -159,7 +159,7 @@
     display: inline-block;
     width: 24px;
     height: 24px;
-    border: 2px solid #000;
+    border: 2px solid #fff;
     margin-top: 10px;
     position: relative;
 }
@@ -197,12 +197,12 @@
 }
 
 .aipw-addon-item:hover {
-    border-color: #000;
+    border-color: #008387;
 }
 
 .aipw-addon-item.selected {
-    border-color: #000;
-    background: #f0f0f0;
+    border-color: #008387;
+    background: #008387;
 }
 
 .aipw-addon-checkbox {
@@ -360,12 +360,12 @@
 }
 
 .aipw-config-card:hover {
-    border-color: #000;
+    border-color: #008387;
 }
 
 .aipw-config-card.selected {
     border-color: #000;
-    background: #f0f0f0;
+    background: #008387;
 }
 
 .aipw-config-radio {
@@ -418,7 +418,7 @@
 }
 
 .aipw-agent-card:hover {
-    border-color: #000;
+    border-color: #008387;
 }
 
 .aipw-agent-card.selected {
@@ -459,7 +459,7 @@
 }
 
 .aipw-btn:hover {
-    background: #000;
+    background: #008387;
     color: #fff;
 }
 
@@ -469,7 +469,7 @@
 }
 
 .aipw-btn-primary:hover {
-    background: #fff;
+    background: #008387;
     color: #000;
 }
 
@@ -671,7 +671,7 @@
 }
 
 .aipw-btn-clear-signature:hover {
-    background: #f0f0f0;
+    background: #008387;
 }
 
 .aipw-form-note {
