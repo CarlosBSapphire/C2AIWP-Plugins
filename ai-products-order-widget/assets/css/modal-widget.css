@@ -3,7 +3,7 @@
 
 /* Modal Overlay */
 .aipw-modal-overlay {
-    position: fixed;
+    position: center;
     top: 0;
     left: 0;
     background: #141421;
