@@ -1,0 +1,783 @@
+/* AI Products Order Widget - Modal System */
+/* Version: 3.0.0 - Root level styling */
+
+:root {
+    /* Modal shadows */
+    --modal-footer-shadow: 0rem 0rem 1rem rgba(0, 53, 111, 0.8);
+    --modal-header-shadow: 0rem 0rem 1rem rgba(0, 53, 111, 0.8);
+
+    /* Borders */
+    --input-active-border: #0467d2;
+
+    /* Dropdown */
+    --dropdown-hover: #545a82;
+
+    /* Text colors */
+    --text: #ffffff;
+    --text-muted: #9ca3af;
+    --text-placeholders: #545a82;
+    --pending-text: #ffb70b;
+    --menu-text: #ffffff;
+}
+
+/* Modal Overlay */
+
+.aipw-modal-overlay {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    background: #141421;
+    z-index: 999999;
+    display: none;
+    overflow-y: auto;
+    padding: 20px;
+    height: 100%;
+    width: 100%;
+}
+
+.aipw-modal-overlay.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Modal Container */
+.aipw-modal {
+    background: #0a1330;
+    color: #ffffff;
+    padding: 40px;
+    position: relative;
+    border: 2px solid #000;
+    height: 100%;
+    width: 100%;
+    max-width: 1200px;
+    bottom: 10px;
+}
+
+/* Progress Bar */
+.aipw-progress {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid  #ffffff;
+}
+
+.aipw-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: #ffffff;
+    position: relative;
+}
+
+.aipw-progress-fill {
+    height: 100%;
+    background: #efffff;
+    transition: width 0.3s ease;
+}
+
+.aipw-progress-steps {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.aipw-progress-step {
+    font-size: 12px;
+    color: #ffffff;
+}
+
+.aipw-progress-step.active {
+    color: #666;
+    font-weight: bold;
+}
+
+.aipw-progress-step.completed {
+    color: #666;
+}
+
+/* Modal Header */
+.aipw-modal-header {
+    margin-bottom: 30px;
+    box-shadow: var(--modal-header-shadow);
+    padding-bottom: 20px;
+}
+
+.aipw-modal-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 0 0 10px 0;
+}
+
+.aipw-modal-subtitle {
+    font-size: 16px;
+    color:  #ffffff;
+    margin: 0;
+}
+
+
+
+/* Product Selection Grid */
+.aipw-products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.aipw-product-card {
+    border-style: none;
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #00356f;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.aipw-product-card:hover {
+    background: #0467d2;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.aipw-product-card.selected {
+    background: #008387;
+    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
+}
+
+.aipw-product-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.aipw-product-name {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.aipw-product-description {
+    font-size: 14px;
+    color: #ffffff;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.aipw-product-pricing {
+    margin: 15px 0;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.aipw-pricing-setup {
+    font-size: 14px;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+.aipw-pricing-weekly {
+    font-size: 18px;
+    font-weight: bold;
+    color: rgb(204, 248, 248);
+}
+
+.aipw-product-checkbox {
+    position: absolute;
+    opacity: 0;
+}
+
+.aipw-product-checkmark {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 2px solid #fff;
+    margin-top: 10px;
+    position: relative;
+}
+
+.aipw-product-card.selected .aipw-product-checkmark::after {
+    content: "✓";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Addons Section */
+.aipw-addons-section {
+    margin-top: 40px;
+    padding-top: 40px;
+    border-top: 2px solid #000;
+}
+
+.aipw-addons-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.aipw-addon-item {
+    border-style: none;
+    border-radius: 16px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #00356f;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.aipw-addon-item:hover {
+    background: #0467d2;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.aipw-addon-item.selected {
+    background: #008387;
+    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
+}
+
+.aipw-addon-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #fff;
+    margin-right: 15px;
+    flex-shrink: 0;
+    border-radius: 4px;
+}
+
+.aipw-addon-item.selected .aipw-addon-checkbox::after {
+    content: "✓";
+    display: block;
+    text-align: center;
+    line-height: 16px;
+    font-weight: bold;
+}
+
+.aipw-addon-name {
+    font-weight: bold;
+}
+
+/* Summary Sidebar */
+.aipw-summary {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100vh;
+    background: #fff;
+    border-left: 2px solid #000;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.aipw-summary-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #000;
+}
+
+.aipw-summary-section {
+    margin-bottom: 20px;
+}
+
+.aipw-summary-section-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.aipw-summary-item {
+    padding: 5px 0;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+}
+
+.aipw-summary-total {
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 2px solid #000;
+}
+
+.aipw-summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.aipw-summary-row.total {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Payment Form */
+.aipw-payment-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.aipw-form-section {
+    grid-column: span 2;
+    margin-bottom: 20px;
+}
+
+.aipw-form-section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #000;
+}
+
+.aipw-form-group {
+    margin-bottom: 15px;
+}
+
+.aipw-form-group.full-width {
+    grid-column: span 2;
+}
+
+.aipw-form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.aipw-form-input,
+.aipw-form-select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #0467d2;
+    font-size: 14px;
+    background: #2e3045;
+    color: #fff;
+}
+
+.aipw-form-input:focus,
+.aipw-form-select:focus {
+    outline: none;
+    border-color: #0467d2;
+    background: #0a1330;
+}
+
+.aipw-form-select option {
+    background: #2e3045;
+    color: #fff;
+}
+
+.aipw-form-select option:hover {
+    background: #545a82;
+}
+
+.aipw-form-checkbox-group {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+}
+
+.aipw-form-checkbox-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+/* Configuration Cards */
+.aipw-config-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.aipw-config-card {
+    border: 2px solid #ccc;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.aipw-config-card:hover {
+    border-color:  #00356f;
+}
+
+.aipw-config-card.selected {
+    border-color: #eff;
+    background: #008387;
+}
+
+.aipw-config-radio {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #000;
+    border-radius: 50%;
+}
+
+.aipw-config-card.selected .aipw-config-radio::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: #000;
+    border-radius: 50%;
+}
+
+.aipw-config-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.aipw-config-description {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Agent Style Cards */
+.aipw-agent-styles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.aipw-agent-card {
+    border: 2px solid #ccc;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.aipw-agent-card:hover {
+    border-color: #00356f;
+}
+
+.aipw-agent-card.selected {
+    border-color: #000;
+    background: #f0f0f0;
+}
+
+.aipw-agent-name {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.aipw-agent-description {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Buttons */
+.aipw-modal-footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 2px solid #000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--modal-footer-shadow);
+}
+
+.aipw-btn {
+    padding: 15px 40px;
+    font-size: 16px;
+    font-weight: bold;
+    border-style: none;
+    border-radius: 16px;
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.aipw-btn:hover {
+    background: #00356f;
+    color: #fff;
+}
+
+.aipw-btn-primary {
+    background: #00356f;
+    color: #fff;
+    border-style: none;
+    border-radius: 16px;
+}
+
+.aipw-btn-primary:hover {
+    background: #0467d2;
+    color: #fff;
+}
+
+.aipw-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Terms Agreement */
+.aipw-terms-agreement {
+    text-align: center;
+    margin: 20px 0;
+    padding: 20px;
+    background: #00356f;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-style: none;
+    border-radius: 16px;
+    color: #fff;
+}
+
+.aipw-terms-agreement:hover {
+    background: #0467d2;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-style: none;
+    border-radius: 16px;
+    color: #fff;
+}
+
+.aipw-terms-agreement.selected {
+    background: #008387;
+    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
+    border-style: none;
+    border-radius: 16px;
+    color: #fff;
+}
+
+.aipw-terms-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    color: #fff;
+}
+
+.aipw-terms-checkbox input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    color: #fff;
+}
+
+/* Number Input Group */
+.aipw-number-input-group {
+    margin: 30px 0;
+}
+
+.aipw-assignment-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .aipw-products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .aipw-addons-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .aipw-config-options,
+    .aipw-agent-styles {
+        grid-template-columns: 1fr;
+    }
+
+    .aipw-payment-form {
+        grid-template-columns: 1fr;
+    }
+
+    .aipw-summary {
+        position: static;
+        width: 100%;
+        height: auto;
+        margin-top: 20px;
+    }
+}
+
+/* Loading State */
+.aipw-loading {
+    text-align: center;
+    padding: 40px;
+}
+
+.aipw-spinner {
+    border: 4px solid #ddd;
+    border-top: 4px solid #000;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Success Message */
+.aipw-success {
+    text-align: center;
+    padding: 60px;
+}
+
+.aipw-success-icon {
+    font-size: 80px;
+    color: #000;
+    margin-bottom: 20px;
+}
+
+.aipw-success-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.aipw-success-message {
+    font-size: 16px;
+    color: #666;
+}
+
+/* Stripe Element Styles */
+.aipw-stripe-element {
+    padding: 12px;
+    border: 2px solid #0467d2;
+    border-radius: 4px;
+    background: #0a1330;
+    transition: border-color 0.3s ease;
+    min-height: 44px;
+    color: #fff
+}
+/*
+.aipw-stripe-element iframe {
+    height: 100% !important;
+    width: 100% !important;
+}
+    */
+
+.aipw-stripe-element:focus-within {
+    border-color: #0467d2;
+    outline: none;
+    box-shadow: 0 0 0 1px #0467d2;
+    background: #0a1330;
+}
+
+.aipw-stripe-errors {
+    color: #fa755a;
+    font-size: 14px;
+    margin-top: 8px;
+    min-height: 20px;
+}
+
+/* ========================================
+   LOA Form Styles
+   ======================================== */
+
+.aipw-loa-form {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.aipw-phone-number-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.aipw-form-help-text {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+.aipw-authorization-text {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin: 20px 0;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.aipw-authorization-text p {
+    margin: 0;
+}
+
+/* Signature Pad */
+.aipw-signature-pad-container {
+    position: relative;
+}
+
+.aipw-signature-pad {
+    width: 100%;
+    height: 150px;
+    border: 2px solid #000;
+    background: #fff;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.aipw-btn-clear-signature {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 5px 10px;
+    font-size: 12px;
+    background: #fff;
+    border: 1px solid #000;
+    cursor: pointer;
+}
+
+.aipw-btn-clear-signature:hover {
+    background: #008387;
+}
+
+.aipw-form-note {
+    background: #fffbe5;
+    border: 1px solid #e6d85c;
+    padding: 15px;
+    margin-top: 20px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.aipw-form-note strong {
+    font-weight: 600;
+}
+
+/* Responsive LOA Form */
+@media (max-width: 768px) {
+    .aipw-phone-number-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .aipw-signature-pad {
+        height: 120px;
+    }
+
+    .aipw-authorization-text {
+        padding: 15px;
+        font-size: 12px;
+    }
+}
