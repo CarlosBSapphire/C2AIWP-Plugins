@@ -24,7 +24,7 @@
 /* Modal Container */
 
 .aipw-modal-content {
-    background: var(--bg-plugin-gradient, linear-gradient(to bottom, #1a1a2e, #141421));
+    background: var(--bg-plugin-gradient, linear-gradient(to bottom,  #00356f,  #00356f));
     border-radius: 0.5rem;
     box-shadow: var(--modal-header-shadow, 0rem 0rem 1rem rgba(0, 53, 111, 0.8));
     width: 100%;
