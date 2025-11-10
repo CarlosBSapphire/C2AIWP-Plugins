@@ -166,6 +166,10 @@
 /* Modal Overlay */
 .aipw-modal-overlay {
     position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 10px;
     background: var(--bg);
     z-index: 999999;
     display: none;
