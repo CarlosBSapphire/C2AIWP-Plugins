@@ -276,6 +276,7 @@ class N8nClient
         $cacheKey = 'aipw_pricing_data';
 
         // Try cache first
+        /*
         if ($this->cache && $this->cache->has($cacheKey)) {
             $cached = $this->cache->get($cacheKey);
             if ($cached !== false) {
@@ -285,7 +286,7 @@ class N8nClient
                     'cached' => true
                 ];
             }
-        }
+        }*/
 
         /*default json example:
         [
@@ -413,9 +414,9 @@ class N8nClient
 
         if ($result['success'] && !empty($result['data'])) {
             // Cache the result
-            if ($this->cache) {
+            /*if ($this->cache) {
                 $this->cache->set($cacheKey, $result['data'], $cacheTtl);
-            }
+            }*/
 
             return [
                 'success' => true,
