@@ -371,7 +371,8 @@
                         setupFees: this.pricing.setupFees,
                         agentStyles: this.pricing.agentStyles,
                         products: this.pricing.products,
-                        addons: this.pricing.addons
+                        addons: this.pricing.addons,
+                        phoneNumberWeeklyCost: this.pricing.phoneNumberWeeklyCost
                     });
 
                     // Calculate initial totals based on default selections
@@ -1746,7 +1747,7 @@
 
             document.getElementById('aipwNumberCount').addEventListener('change', (e) => {
                 this.state.numberCount = parseInt(e.target.value);
-                this.pricing.phoneCountPricingTotal = this.phoneNumberWeeklyCost * this.state.numberCount;
+                this.pricing.phoneCountPricingTotal = this.pricing.phoneNumberWeeklyCost * this.state.numberCount;
 
                 this.saveState();
                 console.log('numberCount updated:', this.state.numberCount);
