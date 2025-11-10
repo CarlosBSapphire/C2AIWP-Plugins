@@ -271,7 +271,7 @@ class N8nClient
      * @param int $cacheTtl Cache TTL in seconds (default: 3600 = 1 hour)
      * @return array
      */
-    public function getPricing($cacheTtl = 60)
+    public function getPricing($cacheTtl = 0)
     {
         $cacheKey = 'aipw_pricing_data';
 
