@@ -117,21 +117,24 @@
 }
 
 .aipw-product-card {
-    border: 2px solid #ccc;
+    border-style: none;
+    border-radius: 16px;
     padding: 30px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: #008387;
+    background: #00356f;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .aipw-product-card:hover {
-    border-color: #008387;
+    background: #0467d2;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .aipw-product-card.selected {
-    border-color: #FFF;
     background: #008387;
+    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
 }
 
 .aipw-product-icon {
@@ -147,7 +150,7 @@
 
 .aipw-product-description {
     font-size: 14px;
-    color: #00356f;
+    color: #ffffff;
     line-height: 1.6;
     margin-bottom: 15px;
 }
@@ -155,13 +158,13 @@
 .aipw-product-pricing {
     margin: 15px 0;
     padding: 10px;
-    background: #008387;
-    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
 }
 
 .aipw-pricing-setup {
     font-size: 14px;
-    color: #000;
+    color: #ffffff;
     margin-bottom: 5px;
 }
 
@@ -209,29 +212,34 @@
 }
 
 .aipw-addon-item {
-    border: 1px solid #ccc;
+    border-style: none;
+    border-radius: 16px;
     padding: 15px;
     display: flex;
     align-items: center;
     cursor: pointer;
     transition: all 0.3s ease;
+    background: #00356f;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .aipw-addon-item:hover {
-    border-color: #008387;
+    background: #0467d2;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .aipw-addon-item.selected {
-    border-color: #008387;
     background: #008387;
+    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
 }
 
 .aipw-addon-checkbox {
     width: 20px;
     height: 20px;
-    border: 2px solid #000;
+    border: 2px solid #fff;
     margin-right: 15px;
     flex-shrink: 0;
+    border-radius: 4px;
 }
 
 .aipw-addon-item.selected .aipw-addon-checkbox::after {
