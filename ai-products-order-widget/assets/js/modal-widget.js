@@ -1745,7 +1745,7 @@
 
             document.getElementById('aipwNumberCount').addEventListener('change', (e) => {
                 this.state.numberCount = parseInt(e.target.value);
-                this.pricing.phoneCountPricingTotal = phoneNumberWeeklyCost * this.state.numberCount;
+                this.pricing.phoneCountPricingTotal = this.phoneNumberWeeklyCost * this.state.numberCount;
 
                 this.saveState();
                 console.log('numberCount updated:', this.state.numberCount);
