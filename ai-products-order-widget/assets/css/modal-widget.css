@@ -526,7 +526,8 @@
     text-align: center;
     margin: 20px 0;
     padding: 20px;
-    border: 2px solid #000;
+    background: #00356f;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .aipw-terms-checkbox {

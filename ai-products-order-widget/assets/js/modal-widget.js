@@ -18,6 +18,7 @@
                 stripePublicKey: config.stripePublicKey || 'pk_test_51RO1TFI6Mo3ACLGTuEJTA0vmAS6XovFb3ym9oTp9kPW6OO7s9IZI9DTsxQfLaAdzLQqBB4bzQeFfDu6Ux4YpB2hw002QJW8iRr',
                 ...config
             };
+            
 
             // Load saved state from localStorage or use defaults
             this.state = this.loadState() || {
