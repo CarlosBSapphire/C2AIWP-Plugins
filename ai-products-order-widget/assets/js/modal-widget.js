@@ -38,7 +38,8 @@
                 utilityBillBase64: null,
                 utilityBillFilename: null,
                 utilityBillMimeType: null,
-                utilityBillExtension: null
+                utilityBillExtension: null,
+                phoneCountPricingTotal: 0
             };
 
             this.steps = [
@@ -58,8 +59,7 @@
                 addons: {},     // Addon-specific pricing
                 setupFees: {}, // Setup fees by service count (1, 2, 3+)
                 agentStyles: {}, // Agent style pricing by type (Quick, Advanced, Conversational)
-                phoneNumberWeeklyCost: 0, // Cost per phone number setup (default $2)
-                phoneCountPricingTotal: 0
+                phoneNumberWeeklyCost: 0
             };
 
             // Stripe elements
@@ -409,7 +409,7 @@
                 selectedProducts: this.state.selectedProducts,
                 selectedAddons: this.state.selectedAddons,
                 agentStyle: this.state.agentStyle,
-                phoneCountPricingTotal: this.pricing.phoneCountPricingTotal
+                phoneCountPricingTotal: this.state.phoneCountPricingTotal
             });
 
             // Step 1: Calculate setup fee based on number of selected services
@@ -458,7 +458,7 @@
                 }
             });
 
-            weeklyTotal += this.pricing.phoneCountPricingTotal || 0;
+            weeklyTotal += this.state.phoneCountPricingTotal || 0;
 
             // Update pricing state
             this.pricing.setup = setupTotal;
@@ -1750,12 +1750,12 @@
 
             document.getElementById('aipwNumberCount').addEventListener('change', (e) => {
                 this.state.numberCount = parseInt(e.target.value);
-                this.pricing.phoneCountPricingTotal = this.pricing.phoneNumberWeeklyCost * this.state.numberCount;
+                this.state.phoneCountPricingTotal = this.pricing.phoneNumberWeeklyCost * this.state.numberCount;
 
                 this.saveState();
                 this.calculatePricing();
                 console.log('numberCount updated:', this.state.numberCount);
-                console.log('pricing updated:', this.pricing.phoneCountPricingTotal);
+                console.log('pricing updated:', this.state.phoneCountPricingTotal);
             });
 
             document.getElementById('aipwConfigNextBtn').addEventListener('click', () => {
