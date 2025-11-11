@@ -1930,8 +1930,8 @@
 
                     <div class="aipw-config-card" data-assignment="direct_dial">
                         <div class="aipw-config-radio"></div>
-                        <div class="aipw-config-title tooltip">Direct Dial (DID)</div>
-                        <span class="tooltiptext">Allows external callers to dial directly to that individual or group.</span>
+                        <div class="aipw-config-title aiwp-tooltip">Direct Dial (DID)</div>
+                        <span class="aiwp-tooltiptext">Allows external callers to dial directly to that individual or group.</span>
                     </div>
                 </div>
 
