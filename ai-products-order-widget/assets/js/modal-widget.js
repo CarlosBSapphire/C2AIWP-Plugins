@@ -57,7 +57,7 @@
                 products: {},  // Product-specific pricing
                 addons: {},     // Addon-specific pricing
                 setupFees: {}, // Setup fees by service count (1, 2, 3+)
-                agentStyles: {}, // Agent style pricing by type (Quick, Advanced, Conversational)
+                agentQuality: {}, // Agent style pricing by type (Quick, Advanced, Conversational)
                 phoneNumberWeeklyCost: 0
             };
 
@@ -269,8 +269,8 @@
                             // Store by agent style type (Quick, Advanced, Conversational)
                             const styleKey = type; // "Quick", "Advanced", or "Conversational"
 
-                            if (!this.pricing.agentStyles[styleKey]) {
-                                this.pricing.agentStyles[styleKey] = {
+                            if (!this.pricing.agentQuality[styleKey]) {
+                                this.pricing.agentQuality[styleKey] = {
                                     phone_per_minute: 0,
                                     phone_per_minute_overage: 0,
                                     call_threshold: 0
@@ -278,9 +278,9 @@
                             }
 
                             // Combine Inbound and Outbound (they should have same rates)
-                            this.pricing.agentStyles[styleKey].phone_per_minute = phone_per_minute;
-                            this.pricing.agentStyles[styleKey].phone_per_minute_overage = phone_per_minute_overage;
-                            this.pricing.agentStyles[styleKey].call_threshold = call_threshold;
+                            this.pricing.agentQuality[styleKey].phone_per_minute = phone_per_minute;
+                            this.pricing.agentQuality[styleKey].phone_per_minute_overage = phone_per_minute_overage;
+                            this.pricing.agentQuality[styleKey].call_threshold = call_threshold;
 
                             console.log(`[loadPricing] ${styleKey} calls: ${phone_per_minute} cents/min`);
                         }
@@ -368,7 +368,7 @@
 
                     console.log('[loadPricing] Parsed pricing:', {
                         setupFees: this.pricing.setupFees,
-                        agentStyles: this.pricing.agentStyles,
+                        agentQuality: this.pricing.agentQuality,
                         products: this.pricing.products,
                         addons: this.pricing.addons,
                         phoneNumberWeeklyCost: this.pricing.phoneNumberWeeklyCost
@@ -1397,7 +1397,7 @@
                 this.stripe = Stripe(this.config.stripePublicKey);
                 const elements = this.stripe.elements();
 
-                // Create card element with simpler, more compatible styles
+                // Create card element with simpler, more compatible Quality
                 this.cardElement = elements.create('card', {
                     style: {
                         base: {
@@ -1682,26 +1682,24 @@
             section.style.display = 'block';
 
             // Populate agent quality options from pricing data
-            const agentStyles = this.pricing.agentStyles || {};
-            let agentStylesHTML = '';
+            const agentQuality = this.pricing.agentQuality || {};
+            let agentQualityHTML = '';
 
-            for (const [key, style] of Object.entries(agentStyles)) {
-                const setupCost = style.setup || 0;
-                const weeklyCost = style.weekly || 0;
+            for (const [key, style] of Object.entries(agentQuality)) {
 
-                agentStylesHTML += `
+                agentQualityHTML += `
                     <div class="aipw-agent-card" data-style="${key}">
                         <div class="aipw-agent-name">${style.name || key}</div>
                         <div class="aipw-agent-description">${style.description || ''}</div>
                         <div class="aipw-product-pricing">
-                            <div class="aipw-pricing-setup">Setup: $${setupCost.toFixed(2)}</div>
-                            <div class="aipw-pricing-weekly">$${weeklyCost.toFixed(2)}/week</div>
+                            <div class="aipw-pricing-weekly">Per Minute: $${this.pricing.phone_per_minute.toFixed(2)}/minute</div>
+                            <div class="aipw-pricing-weekly">Per Overage: $${this.pricing.phone_per_minute_overage.toFixed(2)}/minute</div>
                         </div>
                     </div>
                 `;
             }
 
-            optionsContainer.innerHTML = agentStylesHTML;
+            optionsContainer.innerHTML = agentQualityHTML;
 
             // Add click handlers for agent quality cards
             document.querySelectorAll('.aipw-agent-card').forEach(card => {
@@ -2517,7 +2515,7 @@
                 if (this.state.selectedProducts.includes('inbound_outbound_calls') && this.state.agentStyle) {
                     // Capitalize first letter to match pricing key (Quick, Advanced, Conversational)
                     const styleKey = this.state.agentStyle.charAt(0).toUpperCase() + this.state.agentStyle.slice(1);
-                    agentStylePricing = this.pricing.agentStyles[styleKey] || null;
+                    agentStylePricing = this.pricing.agentQuality[styleKey] || null;
                 }
 
                 // Prepare complete order payload
@@ -2694,9 +2692,9 @@
         getProductPricingHTML(productKey) {
             if (productKey === 'inbound_outbound_calls') {
                 // Call pricing is usage-based and depends on agent style
-                const quickPricing = this.pricing.agentStyles['Quick'] || {};
-                const advancedPricing = this.pricing.agentStyles['Advanced'] || {};
-                const conversationalPricing = this.pricing.agentStyles['Conversational'] || {};
+                const quickPricing = this.pricing.agentQuality['Quick'] || {};
+                const advancedPricing = this.pricing.agentQuality['Advanced'] || {};
+                const conversationalPricing = this.pricing.agentQuality['Conversational'] || {};
 
                 return `
                     <div class="aipw-product-pricing">
