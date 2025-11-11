@@ -940,13 +940,13 @@
     color: var(--warning-text);
 }
 
-.tooltip {
+.aiwp-tooltip {
     position: relative;
     display: inline-block;
     border-bottom: 1px dotted var(--tooltip-text);
 }
 
-.tooltiptext {
+.aiwp-tooltiptext {
     position: relative;
     visibility: hidden;
     display: inline-block;
@@ -954,10 +954,10 @@
     color: var(--tooltip-text);
     z-index: 1;
     border-radius: 6px;
-    padding: 5px 5px;
+    padding: 3px 3px;
 }
 
-.tooltip:hover .tooltiptext {
+.aiwp-tooltip:hover .tooltiptext {
   visibility: visible;
 }
 
