@@ -670,25 +670,38 @@
                     <h2 class="aipw-modal-title">Addons</h2>
                     <div class="aipw-addons-grid">
                         <div class="aipw-addon-item" data-addon="Quality Assurance">
-                            <div class="aipw-addon-checkbox"></div>
-                            <div class="aipw-addon-name">Quality Assurance</div>
+                            <div style="display: flex; align-items: center;">
+                                <div class="aipw-addon-checkbox"></div>
+                                <div class="aipw-addon-name">Quality Assurance</div>
+                            </div>
+                            ${this.getAddonPricingHTML('Quality Assurance')}
                         </div>
                         <div class="aipw-addon-item" data-addon="AVS Match">
-                            <div class="aipw-addon-checkbox"></div>
-                            <div class="aipw-addon-name">AVS Match</div>
+                            <div style="display: flex; align-items: center;">
+                                <div class="aipw-addon-checkbox"></div>
+                                <div class="aipw-addon-name">AVS Match</div>
+                            </div>
+                            ${this.getAddonPricingHTML('AVS Match')}
                         </div>
                         <div class="aipw-addon-item" data-addon="Custom Packages">
-                            <div class="aipw-addon-checkbox"></div>
-                            <div class="aipw-addon-name">Custom Packages</div>
+                            <div style="display: flex; align-items: center;">
+                                <div class="aipw-addon-checkbox"></div>
+                                <div class="aipw-addon-name">Custom Packages</div>
+                            </div>
+                            ${this.getAddonPricingHTML('Custom Packages')}
                         </div>
                         <div class="aipw-addon-item" data-addon="Phone Numbers">
+                        <div style="display: flex; align-items: center;">
                             <div class="aipw-addon-checkbox"></div>
                             <div class="aipw-addon-name">Phone Numbers</div>
+                            </div>
                             ${this.getAddonPricingHTML('Phone Numbers')}
                         </div>
                         <div class="aipw-addon-item" data-addon="Lead Verification">
-                            <div class="aipw-addon-checkbox"></div>
-                            <div class="aipw-addon-name">Lead Verification</div>
+                            <div style="display: flex; align-items: center;">
+                                <div class="aipw-addon-checkbox"></div>
+                                <div class="aipw-addon-name">Lead Verification</div>
+                            </div>
                             ${this.getAddonPricingHTML('Lead Verification')}
                         </div>
                         <div class="aipw-addon-item" data-addon="Transcriptions & Recordings">
@@ -2864,15 +2877,26 @@
         getAddonPricingHTML(addon) {
             const addon_pricing = this.pricing.addons[addon];
 
-            if (!addon_pricing) {
-                return '<div class="aipw-product-pricing">Pricing loading...</div>';
+            // Default pricing for addons not in database
+            let price = 0;
+            let unit = '/week';
+
+            if (addon_pricing) {
+                price = addon_pricing.weekly || 0;
+            } else {
+                // Set default $0 pricing for missing addons
+                if (addon === 'Lead Verification') {
+                    unit = '/lead';
+                } else {
+                    unit = '/week';
+                }
             }
 
             // Return pricing HTML for addons
             return `
                 <div class="aipw-addon-pricing">
-                    <div class="aipw-addon-pricing-tier" style="font-size: 14px; align-items: right">
-                        ${this.formatCurrency(addon_pricing.weekly || 0)}/week
+                    <div class="aipw-addon-pricing-tier" style="font-size: 14px;">
+                        ${this.formatCurrency(price)}${unit}
                     </div>
                 </div>
             `;
