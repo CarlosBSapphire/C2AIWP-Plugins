@@ -1804,8 +1804,8 @@
                         <div class="aipw-agent-name">${style.name || key}</div>
                         <div class="aipw-agent-description">${style.description || ''}</div>
                         <div class="aipw-product-pricing">
-                            <div class="aipw-pricing-setup">Per Minute: $${phonePerMinute.toFixed(2)}</div>
-                            <div class="aipw-pricing-weekly">Overage: $${phonePerMinuteOverage.toFixed(2)}/min</div>
+                            <div class="aipw-pricing-setup">Per Minute: ${this.formatCurrency(phonePerMinute)}</div>
+                            <div class="aipw-pricing-weekly">Overage: ${this.formatCurrency(phonePerMinuteOverage)}/min</div>
                         </div>
                     </div>
                 `;
