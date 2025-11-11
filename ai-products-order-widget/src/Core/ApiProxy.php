@@ -548,13 +548,13 @@ class ApiProxy
                 'user_id' => $data['userId']['user_id'],
                 'numbers_to_port' => $data['numbers_to_port'],
                 'submitted_at' => date('Y-m-d H:i:s'),
-                'sales_generated_id' => $data['sales_generated_id']
+                'sales_generated_id' => (!empty($data['sales_generated_id']) && isset($data['sales_generated_id'])) ? $data['sales_generated_id'] : '4c26d41a-6c83-4e44-9b17-7a243b2aeb17'
             ];
 
             // Prepare attachments array
             $attachments = [
                 [
-                    'filename' => 'porting_loa_' . $data['userId'] . '_' . date('Ymd') . '.pdf',
+                    'filename' => 'porting_loa_' . $data['userId']['userId'] . '_' . date('Ymd') . '.pdf',
                     'content' => $pdfBase64,
                     'encoding' => 'base64',
                     'type' => 'application/pdf'
@@ -564,7 +564,7 @@ class ApiProxy
             // Add utility bill if provided
             if (!empty($data['utility_bill_base64'])) {
                 $attachments[] = [
-                    'filename' => 'utility_bill_' . $data['userId'] . '.' . ($data['utility_bill_extension'] ?? 'pdf'),
+                    'filename' => 'utility_bill_' . $data['userId']['userId'] . '.' . ($data['utility_bill_extension'] ?? 'pdf'),
                     'content' => $data['utility_bill_base64'],
                     'encoding' => 'base64',
                     'type' => $data['utility_bill_mime_type'] ?? 'application/pdf'
