@@ -176,7 +176,7 @@
     bottom: 10px;
     background: var(--bg);
     z-index: 999999;
-    display: flex;
+    display: none; 
     overflow-y: auto;
     padding: 20px;
     /*height: 100%;
@@ -185,7 +185,7 @@
 
 .aipw-modal-overlay.active {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
 }
 
