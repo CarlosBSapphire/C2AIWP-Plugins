@@ -45,8 +45,8 @@
             this.steps = [
                 { id: 1, name: 'Products', handler: this.renderProductSelection.bind(this) },
                 { id: 2, name: 'Setup', handler: this.renderCallSetup.bind(this) },
-                { id: 3, name: 'Payment', handler: this.renderPaymentForm.bind(this) },
-                { id: 4, name: 'Configuration', handler: this.renderConfiguration.bind(this) },
+                { id: 3, name: 'Configuration', handler: this.renderConfiguration.bind(this) },
+                { id: 4, name: 'Payment', handler: this.renderPaymentForm.bind(this) },
                 { id: 5, name: 'Porting LOA', handler: this.renderPortingLOA.bind(this) }
             ];
 
@@ -762,7 +762,7 @@
                 if (this.state.selectedProducts.includes('inbound_outbound_calls')) {
                     this.renderStep(2); // Go to Setup
                 } else {
-                    this.renderStep(3); // Go to Payment
+                    this.renderStep(4); // Go to Payment (skip Setup & Configuration)
                 }
             });
         }
@@ -1592,12 +1592,16 @@
                 this.saveState();
 
 
-                // Go to Configuration step
-                this.renderStep(4);
+                // Check if BYO porting is selected - if so, show LOA form
+                if (this.state.setupType === 'byo') {
+                    this.renderStep(5); // Show LOA form (Porting LOA is step 5)
+                } else {
+                    await this.completeOrder(); // Complete order directly
+                }
             } catch (error) {
                 console.error('Payment error:', error);
                 alert('Payment error: ' + error.message);
-                this.renderStep(3); // Back to Payment
+                this.renderStep(4); // Back to Payment
             }
         }
 
@@ -1671,7 +1675,7 @@
             });
 
             document.getElementById('aipwSetupNextBtn').addEventListener('click', () => {
-                this.renderStep(3); // Go to Payment
+                this.renderStep(3); // Go to Configuration
             });
 
             // Restore saved selection
@@ -1876,12 +1880,7 @@
             });
 
             document.getElementById('aipwConfigNextBtn').addEventListener('click', () => {
-                // Check if BYO porting is selected - if so, show LOA form
-                if (this.state.setupType === 'byo') {
-                    this.renderStep(5); // Show LOA form (Porting LOA is now step 5)
-                } else {
-                    this.completeOrder(); // Complete order directly
-                }
+                this.renderStep(4); // Go to Payment
             });
 
             // Restore saved selection
