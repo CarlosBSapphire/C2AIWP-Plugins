@@ -545,7 +545,7 @@ class ApiProxy
                 'state' => $paymentInfo['shipping_state'] ?? '',
                 'Country' => $paymentInfo['shipping_country'] ?? 'US',
                 'Zip_Code' => $paymentInfo['shipping_zip'] ?? '',
-                'user_id' => $data['userId']['user_id'],
+                'user_id' => $data['userId']['userId'],
                 'numbers_to_port' => $data['numbers_to_port'],
                 'submitted_at' => date('Y-m-d H:i:s'),
                 'sales_generated_id' => (!empty($data['sales_generated_id']) && isset($data['sales_generated_id'])) ? $data['sales_generated_id'] : '4c26d41a-6c83-4e44-9b17-7a243b2aeb17'
