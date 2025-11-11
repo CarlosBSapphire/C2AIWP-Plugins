@@ -493,12 +493,12 @@
     gap: 20px;
 }
 
-.InputElement {
+.CardField-number {
     color: var(--text); 
     background-color: var(--input-bg); 
 }
 
-.InputElement::placeholder {
+.CardField-number::placeholder {
     color: var(--text-placeholders); 
 }
 
