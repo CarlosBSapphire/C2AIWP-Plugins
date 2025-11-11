@@ -104,6 +104,10 @@
         --menu-text: #ffffff;
         /* menu text */
 
+        /* Tooltips */
+        --tooltip-bg: #00356f;
+        --tooltip-text: #ffffff;
+
         /* Borders / Dividers */
         --border: #2e3045;
 
@@ -934,6 +938,27 @@
 .aipw-form-note strong {
     font-weight: 600;
     color: var(--warning-text);
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted var(--tooltip-text);
+}
+
+.tooltiptext {
+    position: relative;
+    visibility: hidden;
+    display: inline-block;
+    cursor: pointer;
+    color: var(--tooltip-text);
+    z-index: 1;
+    border-radius: 6px;
+    padding: 5px 5px;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
 
 /* Responsive LOA Form */
