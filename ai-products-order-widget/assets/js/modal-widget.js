@@ -1680,16 +1680,28 @@
          * Show Agent Quality section within Setup step
          */
         showAgentQualitySection() {
+            console.log('[showAgentQualitySection] Called');
             const section = document.getElementById('aipwAgentQualitySection');
             const optionsContainer = document.getElementById('aipwAgentQualityOptions');
 
-            if (!section || !optionsContainer) return;
+            console.log('[showAgentQualitySection] Elements found:', {
+                section: !!section,
+                optionsContainer: !!optionsContainer
+            });
+
+            if (!section || !optionsContainer) {
+                console.warn('[showAgentQualitySection] Elements not found, returning early');
+                return;
+            }
 
             // Show the section
             section.style.display = 'block';
 
             // Populate agent quality options from pricing data
             const agentQuality = this.pricing.agentQuality || {};
+            console.log('[showAgentQualitySection] agentQuality data:', agentQuality);
+            console.log('[showAgentQualitySection] agentQuality keys:', Object.keys(agentQuality));
+
             let agentQualityHTML = '';
 
             for (const [key, style] of Object.entries(agentQuality)) {
@@ -1708,7 +1720,12 @@
                 `;
             }
 
+            console.log('[showAgentQualitySection] Generated HTML length:', agentQualityHTML.length);
+            console.log('[showAgentQualitySection] Generated HTML preview:', agentQualityHTML.substring(0, 200));
+
             optionsContainer.innerHTML = agentQualityHTML;
+
+            console.log('[showAgentQualitySection] Section should now be visible');
 
             // Add click handlers for agent quality cards
             document.querySelectorAll('.aipw-agent-card').forEach(card => {
