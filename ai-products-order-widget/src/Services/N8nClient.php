@@ -268,7 +268,7 @@ class N8nClient
     /**
      * Get pricing data with caching
      *
-     * @param data
+     * @param array data
      * @return array
      */
     public function getPricing($data)
