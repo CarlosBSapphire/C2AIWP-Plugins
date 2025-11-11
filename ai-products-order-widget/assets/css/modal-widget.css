@@ -563,10 +563,6 @@
     margin-right: 10px;
 }
 
-.aipw-form-input[readonly] {
-    color: white;
-    opacity: 0.7; /* Optional: to show it's readonly */
-}
 
 /* Configuration Cards */
 .aipw-config-options {
