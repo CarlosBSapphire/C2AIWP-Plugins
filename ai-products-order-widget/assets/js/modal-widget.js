@@ -2867,14 +2867,14 @@
             // Add threshold and overage information if available
             if (productKey === 'emails' && pricing.email_threshold) {
                 pricingHTML += `
-                    <div class="aipw-pricing-details" style="font-size: 10px; opacity: 0.8;">
+                    <div class="aipw-pricing-details" style="font-size: 12px; opacity: 0.8;">
                         <div style="margin-bottom: 2px;">Includes ${pricing.email_threshold} emails/week</div>
                         ${pricing.email_cost_overage ? `<div>Overage: ${this.formatCurrency(pricing.email_cost_overage)}/email</div>` : ''}
                     </div>
                 `;
             } else if (productKey === 'chatbot' && pricing.chat_threshold) {
                 pricingHTML += `
-                    <div class="aipw-pricing-details" style="font-size: 10px; opacity: 0.8;">
+                    <div class="aipw-pricing-details" style="font-size: 12px; opacity: 0.8;">
                         <div style="margin-bottom: 2px;">Includes ${pricing.chat_threshold} chats/week</div>
                         ${pricing.chat_cost_overage ? `<div>Overage: ${this.formatCurrency(pricing.chat_cost_overage)}/chat</div>` : ''}
                     </div>
