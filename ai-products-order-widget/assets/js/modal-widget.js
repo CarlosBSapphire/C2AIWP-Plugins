@@ -29,7 +29,7 @@
                 numberCount: 0,
                 assignmentType: null,
                 phoneNumberType: null,
-                agentStyle: null,
+                agentQuality: null,
                 paymentInfo: {},
                 termsAccepted: false,
                 portingPhoneNumbers: [], // Array of {phone_number, service_provider}
@@ -44,8 +44,8 @@
 
             this.steps = [
                 { id: 1, name: 'Products', handler: this.renderProductSelection.bind(this) },
-                { id: 2, name: 'Payment', handler: this.renderPaymentForm.bind(this) },
-                { id: 3, name: 'Setup', handler: this.renderCallSetup.bind(this) },
+                { id: 2, name: 'Setup', handler: this.renderCallSetup.bind(this) },
+                { id: 3, name: 'Payment', handler: this.renderPaymentForm.bind(this) },
                 { id: 4, name: 'Configuration', handler: this.renderConfiguration.bind(this) },
                 { id: 5, name: 'Porting LOA', handler: this.renderPortingLOA.bind(this) }
             ];
@@ -112,7 +112,7 @@
                     numberCount: this.state.numberCount,
                     assignmentType: this.state.assignmentType,
                     phoneNumberType: this.state.phoneNumberType,
-                    agentStyle: this.state.agentStyle,
+                    agentQuality: this.state.agentQuality,
                     termsAccepted: this.state.termsAccepted,
                     // Save payment info but exclude sensitive card data
                     paymentInfo: {
@@ -757,9 +757,13 @@
                 this.saveState();
             });
 
-            // Payment button
+            // Next button - go to Setup if calls selected, otherwise Payment
             document.getElementById('aipwPaymentBtn').addEventListener('click', () => {
-                this.renderStep(2);
+                if (this.state.selectedProducts.includes('inbound_outbound_calls')) {
+                    this.renderStep(2); // Go to Setup
+                } else {
+                    this.renderStep(3); // Go to Payment
+                }
             });
         }
 
@@ -1588,16 +1592,12 @@
                 this.saveState();
 
 
-                // Check if calls selected
-                if (this.state.selectedProducts.includes('inbound_outbound_calls')) {
-                    this.renderStep(3); // Go to call setup
-                } else {
-                    await this.completeOrder();
-                }
+                // Go to Configuration step
+                this.renderStep(4);
             } catch (error) {
                 console.error('Payment error:', error);
                 alert('Payment error: ' + error.message);
-                this.renderStep(2);
+                this.renderStep(3); // Back to Payment
             }
         }
 
@@ -1646,7 +1646,7 @@
             `;
 
             footer.innerHTML = `
-                <button class="aipw-btn" onclick="aipwWidget.renderStep(2)">Back</button>
+                <button class="aipw-btn" onclick="aipwWidget.renderStep(1)">Back</button>
                 <button class="aipw-btn aipw-btn-primary" id="aipwSetupNextBtn" disabled>Next</button>
             `;
 
@@ -1671,7 +1671,7 @@
             });
 
             document.getElementById('aipwSetupNextBtn').addEventListener('click', () => {
-                this.renderStep(4);
+                this.renderStep(3); // Go to Payment
             });
 
             // Restore saved selection
@@ -1836,7 +1836,7 @@
             `;
 
             footer.innerHTML = `
-                <button class="aipw-btn" onclick="aipwWidget.renderStep(3)">Back</button>
+                <button class="aipw-btn" onclick="aipwWidget.renderStep(2)">Back</button>
                 <button class="aipw-btn aipw-btn-primary" id="aipwConfigNextBtn" disabled>Next</button>
             `;
 
