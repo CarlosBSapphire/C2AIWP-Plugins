@@ -372,14 +372,14 @@ class N8nClient
 
         if ($this->checkRequiredFields($orderData, ['products', 'setup_total', 'total_to_charge']) === false) {
             $this->log('[submitOrder] Missing required fields', 'error', [
-                'required_fields' => ['products', 'setup_total', 'total_charge'],
+                'required_fields' => ['products', 'setup_total', 'total_to_charge'],
                 'provided_fields' => array_keys($orderData)
             ]);
 
             return [
                 'success' => false,
                 'data' => null,
-                'error' => 'Missing required fields for submitting order'
+                'error' => 'Missing required fields for submitting order '. json_encode($orderData)
             ];
         }
 
