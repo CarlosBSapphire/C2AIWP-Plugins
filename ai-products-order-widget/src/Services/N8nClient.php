@@ -370,7 +370,7 @@ class N8nClient
             'endpoint' => $this->ENDPOINT_WEBSITE_PAYLOAD_PURCHASE
         ]);
 
-        if ($this->checkRequiredFields($orderData, ['products', 'setup_total', 'total_charge']) === false) {
+        if ($this->checkRequiredFields($orderData, ['products', 'setup_total', 'total_to_charge']) === false) {
             $this->log('[submitOrder] Missing required fields', 'error', [
                 'required_fields' => ['products', 'setup_total', 'total_charge'],
                 'provided_fields' => array_keys($orderData)

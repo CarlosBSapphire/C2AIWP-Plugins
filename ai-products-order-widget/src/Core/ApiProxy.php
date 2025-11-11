@@ -264,7 +264,7 @@ class ApiProxy
      */
     private function handleGetPricing($data)
     {
-        return $this->n8nClient->getPricing();
+        return $this->n8nClient->getPricing($data);
     }
 
     /**
