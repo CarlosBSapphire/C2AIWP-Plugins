@@ -2866,7 +2866,7 @@
 
             // Return pricing HTML for addons
             return `
-                <div class="aipw-addon-pricing" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div class="aipw-addon-pricing" style="text-align: left;">
                     <div class="aipw-addon-pricing-tier" style="font-size: 14px;">
                         ${this.formatCurrency(addon_pricing.weekly || 0)}/week
                     </div>
