@@ -165,22 +165,31 @@ class ApiProxy
 
         $get_current_pricing = $this->n8nClient->select('Website_Pricing', $columns, $filters);
 
+        // Validate pricing data was returned
+        if (!$get_current_pricing['success'] || empty($get_current_pricing['data']['cost_json'])) {
+            return [
+                'success' => false,
+                'error' => 'Unable to retrieve pricing information',
+                'error_code' => 'PRICING_NOT_FOUND'
+            ];
+        }
+
         $total_to_charge = 0;
         //$weekly_charge = 0;
 
-        foreach (json_decode($get_current_pricing['cost_json']) as $price_obj) {
+        foreach (json_decode($get_current_pricing['data']['cost_json']) as $price_obj) {
 
             if ($product_count == 1) {
-                if ($price_obj['type'] == "1 Service") {
-                    $total_to_charge = $price_obj['cost'] * 100;
+                if ($price_obj->type == "1 Service") {
+                    $total_to_charge = $price_obj->cost * 100;
                 }
             } elseif ($product_count == 2) {
-                if ($price_obj['type'] == "2 Services") {
-                    $total_to_charge = $price_obj['cost'] * 100;
+                if ($price_obj->type == "2 Services") {
+                    $total_to_charge = $price_obj->cost * 100;
                 }
             } elseif ($product_count >= 3) {
-                if ($price_obj['type'] == "3+ Services") {
-                    $total_to_charge = $price_obj['cost'] * 100;
+                if ($price_obj->type == "3+ Services") {
+                    $total_to_charge = $price_obj->cost * 100;
                 }
             }
         }
