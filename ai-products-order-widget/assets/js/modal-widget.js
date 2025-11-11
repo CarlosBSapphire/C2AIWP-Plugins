@@ -690,8 +690,10 @@
                             <div class="aipw-addon-name">Lead Verification</div>
                         </div>
                         <div class="aipw-addon-item" data-addon="Transcriptions & Recordings">
-                            <div class="aipw-addon-checkbox"></div>
-                            <div class="aipw-addon-name">Transcriptions & Recordings</div>
+                            <div style="display: flex; align-items: center;">
+                                <div class="aipw-addon-checkbox"></div>
+                                <div class="aipw-addon-name">Transcriptions & Recordings</div>
+                            </div>
                             ${this.getAddonPricingHTML('Transcriptions & Recordings')}
                         </div>
                     </div>
