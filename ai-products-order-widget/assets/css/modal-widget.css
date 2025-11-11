@@ -940,6 +940,7 @@
     color: var(--warning-text);
 }
 
+/*
 .aiwp-tooltip {
     position: relative;
     display: inline-block;
@@ -960,6 +961,7 @@
 .aiwp-tooltip:hover .apwi-tooltiptext {
   visibility: visible;
 }
+  */
 
 /* Responsive LOA Form */
 @media (max-width: 768px) {
