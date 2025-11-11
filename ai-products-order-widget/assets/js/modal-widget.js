@@ -696,16 +696,6 @@
                     </div>
                 </div>
 
-                <div class="aipw-coupon-section" style="margin: 30px 0;">
-                    <h3 class="aipw-form-section-title" style="margin-bottom: 15px;">Have a Coupon Code?</h3>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="aipwCouponCode" placeholder="Enter coupon code"
-                               style="flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
-                        <button id="aipwApplyCoupon" class="aipw-btn aipw-btn-primary" style="white-space: nowrap;">Apply Coupon</button>
-                    </div>
-                    <div id="aipwCouponMessage" style="margin-top: 10px; font-size: 14px;"></div>
-                </div>
-
                 <div class="aipw-terms-agreement">
                     <div class="aipw-terms-checkbox">
                         <input type="checkbox" id="aipwTermsCheckbox">
@@ -1445,6 +1435,16 @@
 
                     <div class="aipw-form-section">
                         <div class="aipw-form-section-title">Payment Method</div>
+                    </div>
+
+                    <div class="aipw-coupon-section" style="margin: 30px 0;">
+                        <h3 class="aipw-form-section-title" style="margin-bottom: 15px;">Have a Coupon Code?</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="aipwCouponCode" placeholder="Enter coupon code"
+                                style="flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                            <button id="aipwApplyCoupon" class="aipw-btn aipw-btn-primary" style="white-space: nowrap;">Apply Coupon</button>
+                        </div>
+                        <div id="aipwCouponMessage" style="margin-top: 10px; font-size: 14px;"></div>
                     </div>
 
                     <div class="aipw-form-group full-width">
