@@ -2003,7 +2003,7 @@
                         <div class="aipw-form-group">
                             <label class="aipw-form-label">Phone Number ${rowNumber}*</label>
                             <input type="tel" class="aipw-form-input" name="phone_number_${i}"
-                                   placeholder="5558889000" required
+                                   placeholder="555888900${i}" required
                                    data-phone-index="${i}">
                         </div>
                         <div class="aipw-form-group">
@@ -2460,7 +2460,7 @@
 
             try {
                 // Capture phone numbers
-                //this.capturePortingPhoneNumbers();
+                this.capturePortingPhoneNumbers();
 
                 // Get signature as base64
                 const signatureBase64 = canvas.toDataURL('image/png');

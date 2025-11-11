@@ -429,12 +429,12 @@ class N8nClient
     {
         $this->log('[submitPortingLOA] Starting LOA submission', 'info', [
             'user_id' => $loaData['userId'] ?? null,
-            'phone_count' => isset($loaData['phone_numbers']) ? count(json_decode($loaData['phone_numbers'], true)) : 0
+            'phone_count' => isset($loaData['numbers_to_port']) ? count(json_decode($loaData['numbers_to_port'], true)) : 0
         ]);
 
-        if ($this->checkRequiredFields($loaData, ['userId', 'loa_pdf_base64', 'phone_numbers']) === false) {
+        if ($this->checkRequiredFields($loaData, ['userId', 'loa_pdf_base64', 'numbers_to_port']) === false) {
             $this->log('[submitPortingLOA] Missing required fields', 'error', [
-                'required_fields' => ['userId', 'loa_pdf_base64', 'phone_numbers'],
+                'required_fields' => ['userId', 'loa_pdf_base64', 'numbers_to_port'],
                 'provided_fields' => array_keys($loaData)
             ]);
 
