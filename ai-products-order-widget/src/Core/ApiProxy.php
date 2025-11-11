@@ -135,8 +135,7 @@ class ApiProxy
             'stripe_token',
             'card_token',
             'total_to_charge',
-            'products',
-            'sales_generated_id'
+            'products'
         ];
         foreach ($required as $field) {
             if (empty($data[$field])) {
@@ -160,7 +159,7 @@ class ApiProxy
             'cost_json'
         ];
 
-        $filters = ['sales_generated_id' => $data['sales_generated_id'], 'Active' => 1];
+        $filters = ['sales_generated_id' => (!empty($data['sales_generated_id']) && isset($data['sales_generated_id'])) ? $data['sales_generated_id'] : '4c26d41a-6c83-4e44-9b17-7a243b2aeb17', 'Active' => 1];
 
         $product_count = count($data['products']);
 
@@ -212,7 +211,7 @@ class ApiProxy
             'card_token' => $data['card_token'],
             'total_to_charge' => $total_to_charge,
             //'weekly_charge' => $weekly_charge,
-            'sales_generated_id' => $data['sales_generated_id']
+            'sales_generated_id' => (!empty($data['sales_generated_id']) && isset($data['sales_generated_id'])) ? $data['sales_generated_id'] ? '4c26d41a-6c83-4e44-9b17-7a243b2aeb17'; 
         ];
 
         $result = $this->n8nClient->chargeCustomer($chargeData);
@@ -296,7 +295,7 @@ class ApiProxy
             'cost_json'
         ];
 
-        $filters = ['sales_generated_id' => $data['sales_generated_id'], 'Active' => 1];
+        $filters = ['sales_generated_id' => (!empty($data['sales_generated_id']) && isset($data['sales_generated_id'])) ? $data['sales_generated_id'] : '4c26d41a-6c83-4e44-9b17-7a243b2aeb17', 'Active' => 1];
 
         $product_count = count($data['products']);
 
