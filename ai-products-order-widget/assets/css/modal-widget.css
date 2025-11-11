@@ -502,6 +502,16 @@
     color: var(--text-placeholders); 
 }
 
+.CardField-number-fakeNumber {
+    color: var(--text); 
+    background-color: var(--input-bg); 
+}
+
+.CardField-number-fakeNumber::placeholder {
+    color: var(--text-placeholders); 
+}
+
+
 .aipw-form-section {
     grid-column: span 2;
     margin-bottom: 20px;
