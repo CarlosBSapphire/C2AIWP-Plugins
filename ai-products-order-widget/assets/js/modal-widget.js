@@ -2881,7 +2881,11 @@
             let price = 0;
             let unit = '/week';
 
-            if (addon_pricing) {
+            // Special case: Phone Numbers uses phoneNumberWeeklyCost
+            if (addon === 'Phone Numbers') {
+                price = this.pricing.phoneNumberWeeklyCost || 0;
+                unit = '/number/week';
+            } else if (addon_pricing) {
                 price = addon_pricing.weekly || 0;
             } else {
                 // Set default $0 pricing for missing addons
