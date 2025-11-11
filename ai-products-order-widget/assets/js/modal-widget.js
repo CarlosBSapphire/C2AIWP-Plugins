@@ -414,7 +414,7 @@
             console.log('[calculatePricing] Starting calculation with:', {
                 selectedProducts: this.state.selectedProducts,
                 selectedAddons: this.state.selectedAddons,
-                agentStyle: this.state.agentStyle,
+                agentQuality: this.state.agentQuality,
                 phoneCountPricingTotal: this.state.numberCount * this.pricing.phoneNumberWeeklyCost || 0
             });
 
