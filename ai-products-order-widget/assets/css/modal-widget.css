@@ -176,11 +176,11 @@
     bottom: 10px;
     background: var(--bg);
     z-index: 999999;
-    display: none;
+    display: flex;
     overflow-y: auto;
     padding: 20px;
-    height: 100%;
-    width: 100%;
+    /*height: 100%;
+    width: 100%;*/
 }
 
 .aipw-modal-overlay.active {
