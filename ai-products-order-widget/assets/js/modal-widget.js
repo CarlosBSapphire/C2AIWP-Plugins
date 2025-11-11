@@ -684,10 +684,12 @@
                         <div class="aipw-addon-item" data-addon="Phone Numbers">
                             <div class="aipw-addon-checkbox"></div>
                             <div class="aipw-addon-name">Phone Numbers</div>
+                            ${this.getAddonPricingHTML('Phone Numbers')}
                         </div>
                         <div class="aipw-addon-item" data-addon="Lead Verification">
                             <div class="aipw-addon-checkbox"></div>
                             <div class="aipw-addon-name">Lead Verification</div>
+                            ${this.getAddonPricingHTML('Lead Verification')}
                         </div>
                         <div class="aipw-addon-item" data-addon="Transcriptions & Recordings">
                             <div style="display: flex; align-items: center;">
