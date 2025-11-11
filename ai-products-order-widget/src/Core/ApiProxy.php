@@ -43,7 +43,8 @@ class ApiProxy
         'get_pricing',
         'create_user',
         'validate_phone',
-        'submit_porting_loa'
+        'submit_porting_loa',
+        'validate_coupon'
     ];
 
     /**
@@ -264,6 +265,17 @@ class ApiProxy
     private function handleGetPricing($data)
     {
         return $this->n8nClient->getPricing();
+    }
+
+    /**
+     * Handle validate_coupon action
+     *
+     * @param array $data
+     * @return array
+     */
+    private function handleValidateCoupon($data)
+    {
+        return $this->n8nClient->validateCoupon($data);
     }
 
 

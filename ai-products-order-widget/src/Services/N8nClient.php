@@ -268,134 +268,11 @@ class N8nClient
     /**
      * Get pricing data with caching
      *
-     * @param int $cacheTtl Cache TTL in seconds (default: 3600 = 1 hour)
+     * @param data
      * @return array
      */
-    public function getPricing($cacheTtl = 5)
+    public function getPricing($data)
     {
-        $cacheKey = 'aipw_pricing_data';
-
-        // Try cache first
-        /*
-        if ($this->cache && $this->cache->has($cacheKey)) {
-            $cached = $this->cache->get($cacheKey);
-            if ($cached !== false) {
-                return [
-                    'success' => true,
-                    'data' => $cached,
-                    'cached' => true
-                ];
-            }
-        }*/
-
-        /*default json example:
-        [
-            {
-                "type": "1 Service",
-                "name": "One Time Charge",
-                "cost": 499.00,
-                "frequency": "One Time",
-                "one_time_processed": 1
-            },
-            {
-                "type": "2 Services",
-                "name": "One Time Charge",
-                "cost": 799.00,
-                "frequency": "One Time",
-                "one_time_processed": 1
-            },
-            {
-                "type": "3+ Services",
-                "name": "One Time Charge",
-                "cost": 999.00,
-                "frequency": "One Time",
-                "one_time_processed": 1
-            },
-            {
-                "type": "Quick",
-                "name": "Inbound Calls",
-                "frequency": "Weekly",
-                "phone_per_minute": 0.45,
-                "phone_per_minute_overage": 0.00,
-                "call_threshold": 0
-            },
-            {
-                "type": "Advanced",
-                "name": "Inbound Calls",
-                "frequency": "Weekly",
-                "phone_per_minute": 0.55,
-                "phone_per_minute_overage": 0.00,
-                "call_threshold": 0
-            },
-            {
-                "type": "Conversational",
-                "name": "Inbound Calls",
-                "frequency": "Weekly",
-                "phone_per_minute": 0.65,
-                "phone_per_minute_overage": 0.00,
-                "call_threshold": 0
-            },
-            {
-                "type": "Quick",
-                "name": "Outbound Calls",
-                "frequency": "Weekly",
-                "phone_per_minute": 0.45,
-                "phone_per_minute_overage": 0.00,
-                "call_threshold": 0
-            },
-            {
-                "type": "Advanced",
-                "name": "Outbound Calls",
-                "frequency": "Weekly",
-                "phone_per_minute": 0.55,
-                "phone_per_minute_overage": 0.00,
-                "call_threshold": 0
-            },
-            {
-                "type": "Conversational",
-                "name": "Outbound Calls",
-                "frequency": "Weekly",
-                "phone_per_minute": 0.65,
-                "phone_per_minute_overage": 0.00,
-                "call_threshold": 0
-            },
-            {
-                "type": "Basic",
-                "name": "Email Agents",
-                "frequency": "Weekly",
-                "cost": 25.00,
-                "email_threshold": 250,
-                "email_cost_overage": 0.10
-            },
-            {
-                "type": "Basic",
-                "name": "Chat Agents",
-                "frequency": "Weekly",
-                "cost": 25.00,
-                "chat_threshold": 200,
-                "chat_cost_overage": 0.10
-            },
-            {
-                "type": "Addons",
-                "name": "Transcription & Call Recordings",
-                "frequency": "Weekly",
-                "cost": 125.00
-            },
-            {
-                "type": "Basic",
-                "name": "QA",
-                "frequency": "Weekly",
-                "cost": 0.00,
-                "cost_per_lead": "0.00"
-            },
-            {
-                "type": "Advanced",
-                "name": "QA",
-                "frequency": "Weekly",
-                "cost": 0.00,
-                "cost_per_lead": "0.00"
-            }
-        ]*/
 
         // Fetch from API
         $result = $this->select(
@@ -404,7 +281,7 @@ class N8nClient
                 'cost_json',
                 'Active' // 1
             ],
-            ['Active' => 1, 'id' => 1],
+            ['Active' => 1, 'sales_generated_id' => ($data['sales_generated_id'] && $data['coupon_code']) ? $data['sales_generated_id'] : '4c26d41a-6c83-4e44-9b17-7a243b2aeb17'],
             [
                 'page' => 1,
                 'limit' => 100,
@@ -422,6 +299,53 @@ class N8nClient
                 'success' => true,
                 'data' => $result['data'],
                 'cached' => false
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get pricing data with caching
+     *
+     * @param data 
+     * @return array
+     */
+    public function validateCoupon($data)
+    {
+
+        // Fetch from API
+        $result = $this->select(
+            'Website_Pricing',
+            [
+                'sales_generated_id',
+                'coupon_code',
+                'Active' // 1
+            ],
+            ['Active' => 1, 'coupon_code' => $data('coupon_code')],
+            [
+                'page' => 1,
+                'limit' => 100,
+                'sort' => ['column' => 'id', 'direction' => 'DESC']
+            ]
+        );
+
+        if ($result['success'] && !empty($result['data'])) {
+            // Cache the result
+            /*if ($this->cache) {
+                $this->cache->set($cacheKey, $result['data'], $cacheTtl);
+            }*/
+
+            return [
+                'success' => true,
+                'data' => $result['data'],
+                'cached' => false
+            ];
+        }else{
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'Invalid coupon code'
             ];
         }
 

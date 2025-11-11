@@ -41,7 +41,7 @@
                 utilityBillExtension: null,
                 phoneCountPricingTotal: 0,
                 couponCode: '', // Coupon code for discounted pricing
-                salesGeneratedId: '4c26d41a-6c83-4e44-9b17-7a243b2aeb17' // Default pricing ID
+                salesGeneratedId: '' // Default pricing ID
             };
 
             this.steps = [
@@ -264,11 +264,11 @@
          * Load pricing data from n8n API
          * @param {string} salesGeneratedId - The sales_generated_id to fetch pricing for
          */
-        async loadPricing(salesGeneratedId = null) {
+        async loadPricing(salesGeneratedId = null, couponCode = null) {
             try {
                 const pricingId = salesGeneratedId || this.state.salesGeneratedId;
                 console.log('[loadPricing] Fetching pricing from n8n for sales_generated_id:', pricingId);
-                const response = await this.apiCall('get_pricing', { sales_generated_id: pricingId });
+                const response = await this.apiCall('get_pricing', { sales_generated_id: pricingId, coupon_code: couponCode });
 
                 // Handle the response structure: response.data is an array with cost_json inside
                 const costData = response.success && response.data && response.data[0] && response.data[0].cost_json;
@@ -815,48 +815,6 @@
             });
         }
 
-        /**
-         * Apply coupon code and reload pricing
-         */
-        async applyCoupon() {
-            const couponInput = document.getElementById('aipwCouponCode');
-            const messageDiv = document.getElementById('aipwCouponMessage');
-            const couponCode = couponInput.value.trim();
-
-            if (!couponCode) {
-                messageDiv.innerHTML = '<span style="color: red;">Please enter a coupon code</span>';
-                return;
-            }
-
-            try {
-                messageDiv.innerHTML = '<span style="color: #666;">Validating coupon...</span>';
-
-                // Call API to validate coupon and get sales_generated_id
-                const response = await this.apiCall('validate_coupon', { coupon_code: couponCode });
-
-                if (response.success && response.data && response.data.sales_generated_id) {
-                    // Update state with new pricing ID and coupon code
-                    this.state.salesGeneratedId = response.data.sales_generated_id;
-                    this.state.couponCode = couponCode;
-                    this.saveState();
-
-                    // Reload pricing with new sales_generated_id
-                    await this.loadPricing(response.data.sales_generated_id);
-
-                    // Recalculate pricing
-                    this.calculatePricing();
-
-                    messageDiv.innerHTML = '<span style="color: green;">✓ Coupon applied successfully!</span>';
-                    couponInput.disabled = true;
-                    document.getElementById('aipwApplyCoupon').disabled = true;
-                } else {
-                    messageDiv.innerHTML = '<span style="color: red;">Invalid coupon code</span>';
-                }
-            } catch (error) {
-                console.error('Coupon validation error:', error);
-                messageDiv.innerHTML = '<span style="color: red;">Error validating coupon</span>';
-            }
-        }
 
         /**
          * Check if payment button should be enabled
@@ -2543,7 +2501,7 @@
 
 
                 // Complete the order
-                await this.completeOrder();
+                //await this.completeOrder();
 
             } catch (error) {
                 console.error('[submitPortingLOA] Error:', error);
@@ -2675,7 +2633,7 @@
                         phone_number_type: this.state.phoneNumberType,
                         agent_style: this.state.agentStyle,
                         agent_style_pricing: agentStylePricing, // Include pricing details for backend,
-                        numbers_to_port: this.state.setupType === 'byo' ? this.state.portingPhoneNumbers : []
+                        numbers_to_port: this.state.setupType === 'byo' ? this.state.phoneNumbers : []
                     } : null
                 };
 
@@ -2694,6 +2652,10 @@
                     this.clearState();
 
                     this.showSuccess();
+
+                    this.saveState();
+
+                    this.renderPortingLOA();
 
                 } else {
                     console.error('Order completion failed:', response);
