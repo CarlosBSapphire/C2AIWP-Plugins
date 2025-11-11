@@ -39,13 +39,15 @@
                 utilityBillFilename: null,
                 utilityBillMimeType: null,
                 utilityBillExtension: null,
-                phoneCountPricingTotal: 0
+                phoneCountPricingTotal: 0,
+                couponCode: '', // Coupon code for discounted pricing
+                salesGeneratedId: '4c26d41a-6c83-4e44-9b17-7a243b2aeb17' // Default pricing ID
             };
 
             this.steps = [
                 { id: 1, name: 'Products', handler: this.renderProductSelection.bind(this) },
-                { id: 2, name: 'Setup', handler: this.renderCallSetup.bind(this) },
-                { id: 3, name: 'Configuration', handler: this.renderConfiguration.bind(this) },
+                { id: 2, name: 'Setup Inbound/Outbound Calls', handler: this.renderCallSetup.bind(this) },
+                { id: 3, name: 'Configure Numbers', handler: this.renderConfiguration.bind(this) },
                 { id: 4, name: 'Payment', handler: this.renderPaymentForm.bind(this) },
                 { id: 5, name: 'Porting LOA', handler: this.renderPortingLOA.bind(this) }
             ];
@@ -186,6 +188,49 @@
         }
 
         /**
+         * Apply coupon code and reload pricing
+         */
+        async applyCoupon() {
+            const couponInput = document.getElementById('aipwCouponCode');
+            const messageDiv = document.getElementById('aipwCouponMessage');
+            const couponCode = couponInput.value.trim();
+
+            if (!couponCode) {
+                messageDiv.innerHTML = '<span style="color: red;">Please enter a coupon code</span>';
+                return;
+            }
+
+            try {
+                messageDiv.innerHTML = '<span style="color: #666;">Validating coupon...</span>';
+
+                // Call API to validate coupon and get sales_generated_id
+                const response = await this.apiCall('validate_coupon', { coupon_code: couponCode });
+
+                if (response.success && response.data && response.data.sales_generated_id) {
+                    // Update state with new pricing ID and coupon code
+                    this.state.salesGeneratedId = response.data.sales_generated_id;
+                    this.state.couponCode = couponCode;
+                    this.saveState();
+
+                    // Reload pricing with new sales_generated_id
+                    await this.loadPricing(response.data.sales_generated_id);
+
+                    // Recalculate pricing
+                    this.calculatePricing();
+
+                    messageDiv.innerHTML = '<span style="color: green;">✓ Coupon applied successfully!</span>';
+                    couponInput.disabled = true;
+                    document.getElementById('aipwApplyCoupon').disabled = true;
+                } else {
+                    messageDiv.innerHTML = '<span style="color: red;">Invalid coupon code</span>';
+                }
+            } catch (error) {
+                console.error('Coupon validation error:', error);
+                messageDiv.innerHTML = '<span style="color: red;">Error validating coupon</span>';
+            }
+        }
+
+        /**
          * Attach event listeners
          */
         attachEventListeners() {
@@ -217,11 +262,13 @@
 
         /**
          * Load pricing data from n8n API
+         * @param {string} salesGeneratedId - The sales_generated_id to fetch pricing for
          */
-        async loadPricing() {
+        async loadPricing(salesGeneratedId = null) {
             try {
-                console.log('[loadPricing] Fetching pricing from n8n...');
-                const response = await this.apiCall('get_pricing', {});
+                const pricingId = salesGeneratedId || this.state.salesGeneratedId;
+                console.log('[loadPricing] Fetching pricing from n8n for sales_generated_id:', pricingId);
+                const response = await this.apiCall('get_pricing', { sales_generated_id: pricingId });
 
                 // Handle the response structure: response.data is an array with cost_json inside
                 const costData = response.success && response.data && response.data[0] && response.data[0].cost_json;
@@ -649,6 +696,16 @@
                     </div>
                 </div>
 
+                <div class="aipw-coupon-section" style="margin: 30px 0;">
+                    <h3 class="aipw-form-section-title" style="margin-bottom: 15px;">Have a Coupon Code?</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="aipwCouponCode" placeholder="Enter coupon code"
+                               style="flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                        <button id="aipwApplyCoupon" class="aipw-btn aipw-btn-primary" style="white-space: nowrap;">Apply Coupon</button>
+                    </div>
+                    <div id="aipwCouponMessage" style="margin-top: 10px; font-size: 14px;"></div>
+                </div>
+
                 <div class="aipw-terms-agreement">
                     <div class="aipw-terms-checkbox">
                         <input type="checkbox" id="aipwTermsCheckbox">
@@ -748,6 +805,11 @@
                 });
             });
 
+            // Coupon code application
+            document.getElementById('aipwApplyCoupon').addEventListener('click', async () => {
+                await this.applyCoupon();
+            });
+
             // Terms checkbox
             document.getElementById('aipwTermsCheckbox').addEventListener('change', (e) => {
                 this.state.termsAccepted = e.target.checked;
@@ -765,6 +827,49 @@
                     this.renderStep(4); // Go to Payment (skip Setup & Configuration)
                 }
             });
+        }
+
+        /**
+         * Apply coupon code and reload pricing
+         */
+        async applyCoupon() {
+            const couponInput = document.getElementById('aipwCouponCode');
+            const messageDiv = document.getElementById('aipwCouponMessage');
+            const couponCode = couponInput.value.trim();
+
+            if (!couponCode) {
+                messageDiv.innerHTML = '<span style="color: red;">Please enter a coupon code</span>';
+                return;
+            }
+
+            try {
+                messageDiv.innerHTML = '<span style="color: #666;">Validating coupon...</span>';
+
+                // Call API to validate coupon and get sales_generated_id
+                const response = await this.apiCall('validate_coupon', { coupon_code: couponCode });
+
+                if (response.success && response.data && response.data.sales_generated_id) {
+                    // Update state with new pricing ID and coupon code
+                    this.state.salesGeneratedId = response.data.sales_generated_id;
+                    this.state.couponCode = couponCode;
+                    this.saveState();
+
+                    // Reload pricing with new sales_generated_id
+                    await this.loadPricing(response.data.sales_generated_id);
+
+                    // Recalculate pricing
+                    this.calculatePricing();
+
+                    messageDiv.innerHTML = '<span style="color: green;">✓ Coupon applied successfully!</span>';
+                    couponInput.disabled = true;
+                    document.getElementById('aipwApplyCoupon').disabled = true;
+                } else {
+                    messageDiv.innerHTML = '<span style="color: red;">Invalid coupon code</span>';
+                }
+            } catch (error) {
+                console.error('Coupon validation error:', error);
+                messageDiv.innerHTML = '<span style="color: red;">Error validating coupon</span>';
+            }
         }
 
         /**
