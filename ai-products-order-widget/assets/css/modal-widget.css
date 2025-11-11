@@ -337,7 +337,7 @@
 .aipw-pricing-weekly {
     font-size: 18px;
     font-weight: bold;
-    color: var(--secondary);
+    color: var(--menu-text);
 }
 
 .aipw-product-checkbox {
