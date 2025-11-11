@@ -199,10 +199,11 @@
     padding-bottom: 40px;
     position: relative;
     border: 2px solid var(--border);
-    height: 100%;
     width: 100%;
     max-width: 1200px;
-    bottom: 10px;
+    min-height: 100%;
+    height: auto;
+    bottom: auto;
 }
 
 /* Progress Bar */

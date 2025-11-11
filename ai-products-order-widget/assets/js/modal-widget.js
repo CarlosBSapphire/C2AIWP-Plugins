@@ -1431,29 +1431,28 @@
 
                     <div class="aipw-form-section">
                         <div class="aipw-form-section-title">Payment Method</div>
-                        <div class="aipw-coupon-section" style="margin: 30px 0;">
-                            <h3 class="aipw-form-section-title" style="margin-bottom: 15px;">Have a Coupon Code?</h3>
-                            <div style="display: flex; gap: 10px;">
-                                <input type="text" id="aipwCouponCode" placeholder="Enter coupon code"
-                                    style="flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
-                                <button id="aipwApplyCoupon" class="aipw-btn aipw-btn-primary" style="white-space: nowrap;">Apply Coupon</button>
-                            </div>
-                            <div id="aipwCouponMessage" style="margin-top: 10px; font-size: 14px;"></div>
-                        </div>
-
-                        <div class="aipw-form-group full-width">
-                            <label class="aipw-form-label">Name on Card</label>
-                            <input type="text" class="aipw-form-input" name="card_name" required>
-                        </div>
-
-                        <div class="aipw-form-group full-width">
-                            <label class="aipw-form-label">Card Information</label>
-                            <div id="aipw-card-element" class="aipw-stripe-element"></div>
-                            <div id="aipw-card-errors" class="aipw-stripe-errors" role="alert"></div>
-                        </div>
                     </div>
 
-                    
+                    <div class="aipw-coupon-section full-width" style="margin: 30px 0;">
+                        <h3 class="aipw-form-section-title" style="margin-bottom: 15px;">Have a Coupon Code?</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="aipwCouponCode" placeholder="Enter coupon code"
+                                style="flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                            <button id="aipwApplyCoupon" class="aipw-btn aipw-btn-primary" style="white-space: nowrap;">Apply Coupon</button>
+                        </div>
+                        <div id="aipwCouponMessage" style="margin-top: 10px; font-size: 14px;"></div>
+                    </div>
+
+                    <div class="aipw-form-group full-width">
+                        <label class="aipw-form-label">Name on Card</label>
+                        <input type="text" class="aipw-form-input" name="card_name" required>
+                    </div>
+
+                    <div class="aipw-form-group full-width">
+                        <label class="aipw-form-label">Card Information</label>
+                        <div id="aipw-card-element" class="aipw-stripe-element"></div>
+                        <div id="aipw-card-errors" class="aipw-stripe-errors" role="alert"></div>
+                    </div>
                 </form>
             `;
 
