@@ -2491,7 +2491,7 @@
                     signature: signatureBase64,
                     printed_name: formData.get('printed_name'),
                     date: formData.get('date'),
-                    numbers_to_port: this.state.phone_numbers
+                    numbers_to_port: this.state.portingPhoneNumbers
                 };
 
 
@@ -2503,7 +2503,7 @@
                 const loaResult = await this.apiCall('submit_porting_loa', {
                     userId: this.state.userId,
                     loa_html: btoa(loaHTML),
-                    numbers_to_port: this.state.phone_numbers,
+                    numbers_to_port: this.state.portingPhoneNumbers,
                     paymentInfo: this.state.paymentInfo,
                     utility_bill_base64: this.state.utilityBillBase64,
                     utility_bill_filename: this.state.utilityBillFilename,
@@ -2534,7 +2534,7 @@
          * Generate LOA HTML for PDF generation (server-side)
          */
         generateLOAHTML() {
-            const phoneNumbersHTML = this.state.phone_numbers.map(p => {
+            const phoneNumbersHTML = this.state.portingPhoneNumbers.map(p => {
                 return `<tr><td>${p.phone_number}</td><td>${p.service_provider}</td></tr>`;
             }).join('');
 
