@@ -268,7 +268,7 @@
             try {
                 const pricingId = salesGeneratedId || this.state.salesGeneratedId;
                 console.log('[loadPricing] Fetching pricing from n8n for sales_generated_id:', pricingId);
-                const response = await this.apiCall('get_pricing', { sales_generated_id: pricingId, coupon_code: couponCode });
+                const response = await this.apiCall('get_pricing', { sales_generated_id: pricingId ?? '', coupon_code: couponCode });
 
                 // Handle the response structure: response.data is an array with cost_json inside
                 const costData = response.success && response.data && response.data[0] && response.data[0].cost_json;
@@ -1478,12 +1478,12 @@
                 this.cardElement = elements.create('card', {
                     style: {
                         base: {
-                            color: '#32325d',
+                            color: '#ffffffff',
                             fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                             fontSmoothing: 'antialiased',
                             fontSize: '16px',
                             '::placeholder': {
-                                color: '#aab7c4'
+                                color: '#cedbe9ff'
                             }
                         },
                         invalid: {
