@@ -281,7 +281,7 @@ class N8nClient
                 'cost_json',
                 'Active' // 1
             ],
-            ['Active' => 1, 'sales_generated_id' => ($data['sales_generated_id'] && $data['coupon_code']) ? $data['sales_generated_id'] : '4c26d41a-6c83-4e44-9b17-7a243b2aeb17'],
+            ['Active' => 1, 'sales_generated_id' => $data['sales_generated_id'] ?? '4c26d41a-6c83-4e44-9b17-7a243b2aeb17'],
             [
                 'page' => 1,
                 'limit' => 100,
@@ -322,7 +322,7 @@ class N8nClient
                 'coupon_code',
                 'Active' // 1
             ],
-            ['Active' => 1, 'coupon_code' => $data('coupon_code')],
+            ['Active' => 1, 'coupon_code' => $data['coupon_code']],
             [
                 'page' => 1,
                 'limit' => 100,
