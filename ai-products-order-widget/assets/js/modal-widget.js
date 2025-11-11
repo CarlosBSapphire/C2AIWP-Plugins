@@ -26,7 +26,7 @@
                 selectedProducts: [],
                 selectedAddons: [],
                 setupType: null,
-                numberCount: 1,
+                numberCount: 0,
                 assignmentType: null,
                 phoneNumberType: null,
                 agentStyle: null,
@@ -271,6 +271,8 @@
 
                             if (!this.pricing.agentQuality[styleKey]) {
                                 this.pricing.agentQuality[styleKey] = {
+                                    name: styleKey,
+                                    description: item.description || '',
                                     phone_per_minute: 0,
                                     phone_per_minute_overage: 0,
                                     call_threshold: 0
@@ -281,6 +283,11 @@
                             this.pricing.agentQuality[styleKey].phone_per_minute = phone_per_minute;
                             this.pricing.agentQuality[styleKey].phone_per_minute_overage = phone_per_minute_overage;
                             this.pricing.agentQuality[styleKey].call_threshold = call_threshold;
+
+                            // Update description if provided
+                            if (item.description) {
+                                this.pricing.agentQuality[styleKey].description = item.description;
+                            }
 
                             console.log(`[loadPricing] ${styleKey} calls: ${phone_per_minute} cents/min`);
                         }
