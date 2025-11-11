@@ -328,9 +328,9 @@ class AI_Products_Order_Widget
      *
      * @return array
      */
-    public function get_pricing()
+    public function get_pricing($data)
     {
-        return $this->orderProcessor->getPricing();
+        return $this->orderProcessor->getPricing($data);
     }
 
     /**

@@ -293,9 +293,9 @@ class OrderProcessor
      *
      * @return array
      */
-    public function getPricing()
+    public function getPricing($data)
     {
-        return $this->n8nClient->getPricing();
+        return $this->n8nClient->getPricing($data);
     }
 
     /**
