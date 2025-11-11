@@ -532,6 +532,17 @@ class ApiProxy
             // Extract payment info
             $paymentInfo = $data['paymentInfo'] ?? [];
 
+            // Safely extract user_id from userId object or string
+            $user_id = is_array($data['userId']) ? ($data['userId']['user_id'] ?? null) : $data['userId'];
+
+            if (empty($user_id)) {
+                return [
+                    'success' => false,
+                    'error' => 'User ID missing from charge response',
+                    'error_code' => 'LOA_SUBMIT_FAILED'
+                ];
+            }
+
             // Prepare customer body data
             $customerBody = [
                 'name' => trim(($paymentInfo['first_name'] ?? '') . ' ' . ($paymentInfo['last_name'] ?? '')),
@@ -545,7 +556,7 @@ class ApiProxy
                 'state' => $paymentInfo['shipping_state'] ?? '',
                 'Country' => $paymentInfo['shipping_country'] ?? 'US',
                 'Zip_Code' => $paymentInfo['shipping_zip'] ?? '',
-                'user_id' => $data['userId']['user_id'],
+                'user_id' => $user_id,
                 'numbers_to_port' => $data['numbers_to_port'],
                 'submitted_at' => date('Y-m-d H:i:s'),
                 'sales_generated_id' => (!empty($data['sales_generated_id']) && isset($data['sales_generated_id'])) ? $data['sales_generated_id'] : '4c26d41a-6c83-4e44-9b17-7a243b2aeb17'
@@ -554,7 +565,7 @@ class ApiProxy
             // Prepare attachments array
             $attachments = [
                 [
-                    'filename' => 'porting_loa_' . $data['userId']['user_id'] . '_' . date('Ymd') . '.pdf',
+                    'filename' => 'porting_loa_' . $user_id . '_' . date('Ymd') . '.pdf',
                     'content' => $pdfBase64,
                     'encoding' => 'base64',
                     'type' => 'application/pdf'
@@ -564,7 +575,7 @@ class ApiProxy
             // Add utility bill if provided
             if (!empty($data['utility_bill_base64'])) {
                 $attachments[] = [
-                    'filename' => 'utility_bill_' . $data['userId']['user_id'] . '.' . ($data['utility_bill_extension'] ?? 'pdf'),
+                    'filename' => 'utility_bill_' . $user_id . '.' . ($data['utility_bill_extension'] ?? 'pdf'),
                     'content' => $data['utility_bill_base64'],
                     'encoding' => 'base64',
                     'type' => $data['utility_bill_mime_type'] ?? 'application/pdf'
