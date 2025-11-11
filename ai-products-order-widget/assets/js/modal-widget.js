@@ -692,7 +692,7 @@
                         <div class="aipw-addon-item" data-addon="Transcriptions & Recordings">
                             <div class="aipw-addon-checkbox"></div>
                             <div class="aipw-addon-name">Transcriptions & Recordings</div>
-                            ${this.getProductPricingHTML('transcription_and_recordings')}
+                            ${this.getAddonPricingHTML('Transcriptions & Recordings')}
                         </div>
                     </div>
                 </div>
@@ -2858,26 +2858,13 @@
          * Get addon pricing HTML for display in product card
          */
         getAddonPricingHTML(addon) {
-            if (addon === 'transcription_and_recordings') {
-                // Call pricing is usage-based and depends on agent style
-                const transcription_and_recordings = this.pricing.addons['transcription_and_recordings'] || {};
-
-                return `
-                    <div class="aipw-addon-pricing">
-                        <div class="aipw-addon-pricing-tier" style="font-size: 12px; margin-bottom: 2px;">
-                            ${this.formatCurrency(transcription_and_recordings || 0)}/week
-                        </div>
-                    </div>
-                `;
-            }
-
             const addon_pricing = this.pricing.addons[addon];
 
             if (!addon_pricing) {
                 return '<div class="aipw-product-pricing">Pricing loading...</div>';
             }
 
-            // Return pricing HTML for other addons
+            // Return pricing HTML for addons
             return `
                 <div class="aipw-addon-pricing">
                     <div class="aipw-addon-pricing-tier" style="font-size: 12px; margin-bottom: 2px;">
