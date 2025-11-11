@@ -258,7 +258,7 @@ class AI_Products_Order_Widget
         $agent_levels = $this->orderProcessor->getAgentLevels();
 
         // Get pricing data
-        $pricing_result = $this->orderProcessor->getPricing();
+        //$pricing_result = $this->orderProcessor->getPricing();
         $pricing = $pricing_result['data'] ?? [];
 
         // Include template file (simple trigger button for modal)
