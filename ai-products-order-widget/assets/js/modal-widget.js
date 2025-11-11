@@ -1653,10 +1653,12 @@
             // Setup selection handler
             document.querySelectorAll('.aipw-config-card').forEach(card => {
                 card.addEventListener('click', () => {
+                    console.log('[renderCallSetup] Setup card clicked:', card.dataset.setup);
                     document.querySelectorAll('.aipw-config-card').forEach(c => c.classList.remove('selected'));
                     card.classList.add('selected');
                     this.state.setupType = card.dataset.setup;
 
+                    console.log('[renderCallSetup] About to call showAgentQualitySection');
                     // Show Agent Quality section after setup type is selected
                     this.showAgentQualitySection();
 
