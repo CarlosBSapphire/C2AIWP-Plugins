@@ -795,10 +795,6 @@
                 });
             });
 
-            // Coupon code application
-            document.getElementById('aipwApplyCoupon').addEventListener('click', async () => {
-                await this.applyCoupon();
-            });
 
             // Terms checkbox
             document.getElementById('aipwTermsCheckbox').addEventListener('change', (e) => {
@@ -1469,6 +1465,10 @@
             document.getElementById('aipwUseSameAddress').addEventListener('change', (e) => {
                 document.getElementById('aipwBillingAddress').style.display =
                     e.target.checked ? 'none' : 'grid';
+            });
+            // Coupon code application
+            document.getElementById('aipwApplyCoupon').addEventListener('click', async () => {
+                await this.applyCoupon();
             });
 
             // Initialize Stripe Elements
