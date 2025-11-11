@@ -302,7 +302,7 @@ class ApiProxy
         $get_current_pricing = $this->n8nClient->select('Website_Pricing', $columns, $filters);
 
 
-        foreach (json_decode($get_current_pricing['cost_json']) as $price_obj) {
+        foreach (json_decode($get_current_pricing['data']['cost_json']) as $price_obj) {
 
             if ($product_count == 1) {
                 if ($price_obj['type'] == "1 Service") {
