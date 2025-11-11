@@ -166,7 +166,7 @@ class ApiProxy
         $get_current_pricing = $this->n8nClient->select('Website_Pricing', $columns, $filters);
 
         // Validate pricing data was returned
-        if (!$get_current_pricing['success'] || empty($get_current_pricing['data']['cost_json'])) {
+        if (!$get_current_pricing['success'] || empty($get_current_pricing['data'])) {
             return [
                 'success' => false,
                 'error' => 'Unable to retrieve pricing information',
@@ -174,22 +174,33 @@ class ApiProxy
             ];
         }
 
+        // The n8n endpoint returns an array with one object containing cost_json
+        $pricing_data = is_array($get_current_pricing['data']) ? $get_current_pricing['data'][0] : $get_current_pricing['data'];
+
+        if (empty($pricing_data['cost_json'])) {
+            return [
+                'success' => false,
+                'error' => 'Pricing data not found',
+                'error_code' => 'PRICING_NOT_FOUND'
+            ];
+        }
+
         $total_to_charge = 0;
         //$weekly_charge = 0;
 
-        foreach (json_decode($get_current_pricing['data']['cost_json']) as $price_obj) {
-
+        // cost_json is already an array, no need to json_decode
+        foreach ($pricing_data['cost_json'] as $price_obj) {
             if ($product_count == 1) {
-                if ($price_obj->type == "1 Service") {
-                    $total_to_charge = $price_obj->cost * 100;
+                if ($price_obj['type'] == "1 Service") {
+                    $total_to_charge = $price_obj['cost'] * 100;
                 }
             } elseif ($product_count == 2) {
-                if ($price_obj->type == "2 Services") {
-                    $total_to_charge = $price_obj->cost * 100;
+                if ($price_obj['type'] == "2 Services") {
+                    $total_to_charge = $price_obj['cost'] * 100;
                 }
             } elseif ($product_count >= 3) {
-                if ($price_obj->type == "3+ Services") {
-                    $total_to_charge = $price_obj->cost * 100;
+                if ($price_obj['type'] == "3+ Services") {
+                    $total_to_charge = $price_obj['cost'] * 100;
                 }
             }
         }
@@ -310,8 +321,28 @@ class ApiProxy
 
         $get_current_pricing = $this->n8nClient->select('Website_Pricing', $columns, $filters);
 
+        // Validate pricing data was returned
+        if (!$get_current_pricing['success'] || empty($get_current_pricing['data'])) {
+            return [
+                'success' => false,
+                'error' => 'Unable to retrieve pricing information',
+                'error_code' => 'PRICING_NOT_FOUND'
+            ];
+        }
 
-        foreach (json_decode($get_current_pricing['data']['cost_json']) as $price_obj) {
+        // The n8n endpoint returns an array with one object containing cost_json
+        $pricing_data = is_array($get_current_pricing['data']) ? $get_current_pricing['data'][0] : $get_current_pricing['data'];
+
+        if (empty($pricing_data['cost_json'])) {
+            return [
+                'success' => false,
+                'error' => 'Pricing data not found',
+                'error_code' => 'PRICING_NOT_FOUND'
+            ];
+        }
+
+        // cost_json is already an array, no need to json_decode
+        foreach ($pricing_data['cost_json'] as $price_obj) {
 
             if ($product_count == 1) {
                 if ($price_obj['type'] == "1 Service") {
