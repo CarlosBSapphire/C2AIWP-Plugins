@@ -302,6 +302,12 @@
     color: var(--menu-text);
 }
 
+.aipw-pricing-details {
+    font-size: 14px;
+    color: var(--menu-text);
+    margin-bottom: 15px;
+}
+
 .aipw-product-description {
     font-size: 14px;
     color: var(--menu-text);

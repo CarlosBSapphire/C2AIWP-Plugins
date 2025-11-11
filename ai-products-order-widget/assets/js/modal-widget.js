@@ -47,8 +47,7 @@
                 { id: 2, name: 'Payment', handler: this.renderPaymentForm.bind(this) },
                 { id: 3, name: 'Setup', handler: this.renderCallSetup.bind(this) },
                 { id: 4, name: 'Configuration', handler: this.renderConfiguration.bind(this) },
-                { id: 5, name: 'Agent Style', handler: this.renderAgentStyle.bind(this) },
-                { id: 6, name: 'Porting LOA', handler: this.renderPortingLOA.bind(this) }
+                { id: 5, name: 'Porting LOA', handler: this.renderPortingLOA.bind(this) }
             ];
 
             // Pricing - will be loaded from n8n API
@@ -1628,6 +1627,15 @@
                         <div class="aipw-config-description">Forward to existing number</div>
                     </div>
                 </div>
+
+                <!-- Agent Quality Section -->
+                <div id="aipwAgentQualitySection" style="display: none; margin-top: 40px; padding-top: 40px; border-top: 2px solid var(--border);">
+                    <h2 class="aipw-form-section-title">Agent Quality</h2>
+                    <p class="aipw-modal-subtitle" style="margin-bottom: 20px;">Choose the quality level for your AI agent</p>
+                    <div class="aipw-agent-styles" id="aipwAgentQualityOptions">
+                        <!-- Agent quality cards will be inserted here -->
+                    </div>
+                </div>
             `;
 
             footer.innerHTML = `
@@ -1641,7 +1649,12 @@
                     document.querySelectorAll('.aipw-config-card').forEach(c => c.classList.remove('selected'));
                     card.classList.add('selected');
                     this.state.setupType = card.dataset.setup;
-                    document.getElementById('aipwSetupNextBtn').disabled = false;
+
+                    // Show Agent Quality section after setup type is selected
+                    this.showAgentQualitySection();
+
+                    // Enable next button only if agent quality is also selected
+                    this.updateSetupNextButton();
 
                     // Save state to localStorage
                     this.saveState();
@@ -1657,6 +1670,79 @@
         }
 
         /**
+         * Show Agent Quality section within Setup step
+         */
+        showAgentQualitySection() {
+            const section = document.getElementById('aipwAgentQualitySection');
+            const optionsContainer = document.getElementById('aipwAgentQualityOptions');
+
+            if (!section || !optionsContainer) return;
+
+            // Show the section
+            section.style.display = 'block';
+
+            // Populate agent quality options from pricing data
+            const agentStyles = this.pricing.agentStyles || {};
+            let agentStylesHTML = '';
+
+            for (const [key, style] of Object.entries(agentStyles)) {
+                const setupCost = style.setup || 0;
+                const weeklyCost = style.weekly || 0;
+
+                agentStylesHTML += `
+                    <div class="aipw-agent-card" data-style="${key}">
+                        <div class="aipw-agent-name">${style.name || key}</div>
+                        <div class="aipw-agent-description">${style.description || ''}</div>
+                        <div class="aipw-product-pricing">
+                            <div class="aipw-pricing-setup">Setup: $${setupCost.toFixed(2)}</div>
+                            <div class="aipw-pricing-weekly">$${weeklyCost.toFixed(2)}/week</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            optionsContainer.innerHTML = agentStylesHTML;
+
+            // Add click handlers for agent quality cards
+            document.querySelectorAll('.aipw-agent-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.aipw-agent-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    this.state.agentStyle = card.dataset.style;
+
+                    // Update next button state
+                    this.updateSetupNextButton();
+
+                    // Save state and recalculate pricing
+                    this.saveState();
+                    this.calculatePricing();
+                });
+            });
+
+            // Restore saved agent style selection
+            if (this.state.agentStyle) {
+                const savedCard = document.querySelector(`.aipw-agent-card[data-style="${this.state.agentStyle}"]`);
+                if (savedCard) {
+                    savedCard.classList.add('selected');
+                }
+            }
+        }
+
+        /**
+         * Update Setup Next button state based on selections
+         */
+        updateSetupNextButton() {
+            const nextBtn = document.getElementById('aipwSetupNextBtn');
+            if (!nextBtn) return;
+
+            // Enable next button if setup type is selected AND agent quality is selected
+            const setupSelected = !!this.state.setupType;
+            const agentQualitySelected = !!this.state.agentStyle;
+
+            nextBtn.disabled = !(setupSelected && agentQualitySelected);
+        }
+
+        /**
          * Restore call setup state from saved data
          */
         restoreCallSetupState() {
@@ -1664,7 +1750,12 @@
                 const card = document.querySelector(`.aipw-config-card[data-setup="${this.state.setupType}"]`);
                 if (card) {
                     card.classList.add('selected');
-                    document.getElementById('aipwSetupNextBtn').disabled = false;
+
+                    // Show Agent Quality section if setup type was previously selected
+                    this.showAgentQualitySection();
+
+                    // Update next button state
+                    this.updateSetupNextButton();
                 }
             }
         }
@@ -1759,7 +1850,12 @@
             });
 
             document.getElementById('aipwConfigNextBtn').addEventListener('click', () => {
-                this.renderStep(5);
+                // Check if BYO porting is selected - if so, show LOA form
+                if (this.state.setupType === 'byo') {
+                    this.renderStep(5); // Show LOA form (Porting LOA is now step 5)
+                } else {
+                    this.completeOrder(); // Complete order directly
+                }
             });
 
             // Restore saved selection
@@ -1795,94 +1891,7 @@
         }
 
         /**
-         * Step 5: Agent Style Selection
-         */
-        renderAgentStyle() {
-            const header = document.getElementById('aipwModalHeader');
-            const body = document.getElementById('aipwModalBody');
-            const footer = document.getElementById('aipwModalFooter');
-
-            header.innerHTML = `
-                <h1 class="aipw-modal-title">Inbound and Outbound Calls: Select Agent Style</h1>
-                <p class="aipw-modal-subtitle">Which level of AI support best fits where your business is today?</p>
-            `;
-
-            // Get pricing for each agent style
-            const quickPricing = this.pricing.agentStyles['Quick'] || {};
-            const advancedPricing = this.pricing.agentStyles['Advanced'] || {};
-            const conversationalPricing = this.pricing.agentStyles['Conversational'] || {};
-
-            body.innerHTML = `
-                <div class="aipw-agent-styles">
-                    <div class="aipw-agent-card" data-agent="quick">
-                        <div class="aipw-config-radio"></div>
-                        <div class="aipw-agent-name">Quick</div>
-                        <div class="aipw-agent-description">Streamlines common requests and workflows</div>
-                        <div class="aipw-agent-pricing">${this.formatCurrency(quickPricing.phone_per_minute || 0)}/min</div>
-                    </div>
-
-                    <div class="aipw-agent-card" data-agent="advanced">
-                        <div class="aipw-config-radio"></div>
-                        <div class="aipw-agent-name">Advanced</div>
-                        <div class="aipw-agent-description">Adapts across channels with richer context</div>
-                        <div class="aipw-agent-pricing">${this.formatCurrency(advancedPricing.phone_per_minute || 0)}/min</div>
-                    </div>
-
-                    <div class="aipw-agent-card" data-agent="conversational">
-                        <div class="aipw-config-radio"></div>
-                        <div class="aipw-agent-name">Conversational</div>
-                        <div class="aipw-agent-description">Manages complex cases with full customer awareness</div>
-                        <div class="aipw-agent-pricing">${this.formatCurrency(conversationalPricing.phone_per_minute || 0)}/min</div>
-                    </div>
-                </div>
-            `;
-
-            footer.innerHTML = `
-                <button class="aipw-btn" onclick="aipwWidget.renderStep(4)">Back</button>
-                <button class="aipw-btn aipw-btn-primary" id="aipwCompleteBtn" disabled>Complete</button>
-            `;
-
-            // Agent selection handler
-            document.querySelectorAll('.aipw-agent-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    document.querySelectorAll('.aipw-agent-card').forEach(c => c.classList.remove('selected'));
-                    card.classList.add('selected');
-                    this.state.agentStyle = card.dataset.agent;
-                    document.getElementById('aipwCompleteBtn').disabled = false;
-
-                    // Save state to localStorage
-                    this.saveState();
-                });
-            });
-
-            document.getElementById('aipwCompleteBtn').addEventListener('click', () => {
-                // Check if BYO porting is selected - if so, show LOA form first
-                if (this.state.setupType === 'byo') {
-                    this.renderStep(6); // Show LOA form
-                } else {
-                    this.completeOrder(); // Complete order directly
-                }
-            });
-
-            // Restore saved selection
-            this.restoreAgentStyleState();
-        }
-
-        /**
-         * Restore agent style state from saved data
-         */
-        restoreAgentStyleState() {
-            if (this.state.agentStyle) {
-                const card = document.querySelector(`.aipw-agent-card[data-agent="${this.state.agentStyle}"]`);
-                if (card) {
-                    card.classList.add('selected');
-                    document.getElementById('aipwCompleteBtn').disabled = false;
-                }
-            }
-        }
-
-        /**
-         * Step 6: Porting LOA Form (BYO only)
+         * Step 5: Porting LOA Form (BYO only)
          */
         renderPortingLOA() {
             const header = document.getElementById('aipwModalHeader');
