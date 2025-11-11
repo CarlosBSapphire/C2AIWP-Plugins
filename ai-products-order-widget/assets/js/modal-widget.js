@@ -774,7 +774,10 @@
             const btn = document.getElementById('aipwPaymentBtn');
             const hasProducts = this.state.selectedProducts.length > 0;
             const hasTerms = this.state.termsAccepted;
+            const hasCalls = this.state.selectedProducts.includes('inbound_outbound_calls');
 
+            // Update button text based on whether calls are selected
+            btn.textContent = hasCalls ? 'Next' : 'Payment';
             btn.disabled = !(hasProducts && hasTerms);
         }
 
