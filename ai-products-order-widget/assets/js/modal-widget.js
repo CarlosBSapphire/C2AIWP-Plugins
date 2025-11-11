@@ -2044,13 +2044,13 @@
                     <div class="aipw-form-group">
                         <label class="aipw-form-label">First Name*</label>
                         <input type="text" class="aipw-form-input" name="first_name"
-                               value="${this.state.paymentInfo.first_name || ''}" required readonly>
+                               value="${this.state.paymentInfo.first_name || ''}" required>
                     </div>
 
                     <div class="aipw-form-group">
                         <label class="aipw-form-label">Last Name*</label>
                         <input type="text" class="aipw-form-input" name="last_name"
-                               value="${this.state.paymentInfo.last_name || ''}" required readonly>
+                               value="${this.state.paymentInfo.last_name || ''}" required>
                     </div>
 
                     <div class="aipw-form-group full-width">
@@ -2067,25 +2067,25 @@
                     <div class="aipw-form-group full-width">
                         <label class="aipw-form-label">Address*</label>
                         <input type="text" class="aipw-form-input" name="address"
-                               value="${this.state.paymentInfo.shipping_address || ''}" required readonly>
+                               value="${this.state.paymentInfo.shipping_address || ''}" required>
                     </div>
 
                     <div class="aipw-form-group">
                         <label class="aipw-form-label">City*</label>
                         <input type="text" class="aipw-form-input" name="city"
-                               value="${this.state.paymentInfo.shipping_city || ''}" required readonly>
+                               value="${this.state.paymentInfo.shipping_city || ''}" required>
                     </div>
 
                     <div class="aipw-form-group">
                         <label class="aipw-form-label">State*</label>
                         <input type="text" class="aipw-form-input" name="state"
-                               value="${this.state.paymentInfo.shipping_state || ''}" required readonly>
+                               value="${this.state.paymentInfo.shipping_state || ''}" required>
                     </div>
 
                     <div class="aipw-form-group">
                         <label class="aipw-form-label">ZIP/Postal Code*</label>
                         <input type="text" class="aipw-form-input" name="zip"
-                               value="${this.state.paymentInfo.shipping_zip || ''}" required readonly>
+                               value="${this.state.paymentInfo.shipping_zip || ''}" required>
                     </div>
 
                     <div class="aipw-form-section">
