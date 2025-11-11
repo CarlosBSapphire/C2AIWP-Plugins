@@ -692,6 +692,7 @@
                         <div class="aipw-addon-item" data-addon="Transcriptions & Recordings">
                             <div class="aipw-addon-checkbox"></div>
                             <div class="aipw-addon-name">Transcriptions & Recordings</div>
+                            ${this.getProductPricingHTML('transcription_and_recordings')}
                         </div>
                     </div>
                 </div>
@@ -1636,7 +1637,8 @@
                     billing_country: this.state.paymentInfo.billing_country,
                     total_to_charge: this.pricing.setup,
                     payment_info: this.state.paymentInfo,
-                    selected_products: this.state.selectedProducts
+                    products: this.state.selectedProducts,
+                    sales_generated_id: this.state.salesGeneratedId
                 });
                 if (chargeCustomer.success === false) {
                     console.log('Charge customer failed:', chargeCustomer);
@@ -1804,7 +1806,7 @@
                 card.addEventListener('click', () => {
                     document.querySelectorAll('.aipw-agent-card').forEach(c => c.classList.remove('selected'));
                     card.classList.add('selected');
-                    this.state.agentStyle = card.dataset.style;
+                    this.state.agentQuality = card.dataset.style;
 
                     // Update next button state
                     this.updateSetupNextButton();
@@ -1815,9 +1817,9 @@
                 });
             });
 
-            // Restore saved agent style selection
-            if (this.state.agentStyle) {
-                const savedCard = document.querySelector(`.aipw-agent-card[data-style="${this.state.agentStyle}"]`);
+            // Restore saved agent quality selection
+            if (this.state.agentQuality) {
+                const savedCard = document.querySelector(`.aipw-agent-card[data-style="${this.state.agentQuality}"]`);
                 if (savedCard) {
                     savedCard.classList.add('selected');
                 }
@@ -1833,7 +1835,7 @@
 
             // Enable next button if setup type is selected AND agent quality is selected
             const setupSelected = !!this.state.setupType;
-            const agentQualitySelected = !!this.state.agentStyle;
+            const agentQualitySelected = !!this.state.agentQuality;
 
             nextBtn.disabled = !(setupSelected && agentQualitySelected);
         }
@@ -2489,7 +2491,8 @@
                     utility_bill_base64: this.state.utilityBillBase64,
                     utility_bill_filename: this.state.utilityBillFilename,
                     utility_bill_mime_type: this.state.utilityBillMimeType,
-                    utility_bill_extension: this.state.utilityBillExtension
+                    utility_bill_extension: this.state.utilityBillExtension,
+                    sales_generated_id: this.state.salesGeneratedId
                 });
 
                 if (!loaResult.success) {
@@ -2603,12 +2606,12 @@
             this.showLoading('Completing your order...');
 
             try {
-                // Get agent style pricing if calls were selected
-                let agentStylePricing = null;
-                if (this.state.selectedProducts.includes('inbound_outbound_calls') && this.state.agentStyle) {
+                // Get agent quality pricing if calls were selected
+                let agentQualityPricing = null;
+                if (this.state.selectedProducts.includes('inbound_outbound_calls') && this.state.agentQuality) {
                     // Capitalize first letter to match pricing key (Quick, Advanced, Conversational)
-                    const styleKey = this.state.agentStyle.charAt(0).toUpperCase() + this.state.agentStyle.slice(1);
-                    agentStylePricing = this.pricing.agentQuality[styleKey] || null;
+                    const styleKey = this.state.agentQuality.charAt(0).toUpperCase() + this.state.agentQuality.slice(1);
+                    agentQualityPricing = this.pricing.agentQuality[styleKey] || null;
                 }
 
                 // Prepare complete order payload
@@ -2617,10 +2620,13 @@
                     products: this.state.selectedProducts,
                     addons: this.state.selectedAddons,
 
-                    // Pricing
+                    // Pricing (client-side calculated, will be validated server-side)
                     setup_total: this.pricing.setup,
                     weekly_cost: this.pricing.weekly,
-                    total_to_charge: this.pricing.total,
+                    total_to_charge: this.pricing.setup,
+
+                    // Sales generated ID for backend pricing validation
+                    sales_generated_id: this.state.salesGeneratedId,
 
                     // Payment info
                     payment: this.state.paymentInfo,
@@ -2631,9 +2637,9 @@
                         number_count: this.state.numberCount,
                         assignment_type: this.state.assignmentType,
                         phone_number_type: this.state.phoneNumberType,
-                        agent_style: this.state.agentStyle,
-                        agent_style_pricing: agentStylePricing, // Include pricing details for backend,
-                        numbers_to_port: this.state.setupType === 'byo' ? this.state.phoneNumbers : []
+                        agent_quality: this.state.agentQuality,
+                        agent_quality_pricing: agentQualityPricing,
+                        numbers_to_port: this.state.setupType === 'byo' ? this.state.portingPhoneNumbers : []
                     } : null
                 };
 
@@ -2846,6 +2852,39 @@
             pricingHTML += `</div>`;
 
             return pricingHTML;
+        }
+
+        /**
+         * Get addon pricing HTML for display in product card
+         */
+        getAddonPricingHTML(addon) {
+            if (addon === 'transcription_and_recordings') {
+                // Call pricing is usage-based and depends on agent style
+                const transcription_and_recordings = this.pricing.addons['transcription_and_recordings'] || {};
+
+                return `
+                    <div class="aipw-addon-pricing">
+                        <div class="aipw-addon-pricing-tier" style="font-size: 12px; margin-bottom: 2px;">
+                            ${this.formatCurrency(transcription_and_recordings || 0)}/week
+                        </div>
+                    </div>
+                `;
+            }
+
+            const addon_pricing = this.pricing.addons[addon];
+
+            if (!addon_pricing) {
+                return '<div class="aipw-product-pricing">Pricing loading...</div>';
+            }
+
+            // Return pricing HTML for other addons
+            return `
+                <div class="aipw-addon-pricing">
+                    <div class="aipw-addon-pricing-tier" style="font-size: 12px; margin-bottom: 2px;">
+                        ${this.formatCurrency(addon_pricing.weekly || 0)}/week
+                    </div>
+                </div>
+            `;
         }
 
         /**

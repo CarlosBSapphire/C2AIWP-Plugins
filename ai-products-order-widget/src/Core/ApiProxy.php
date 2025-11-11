@@ -1,7 +1,9 @@
 <?php
 
 namespace AIPW\Core;
-require_once $_SERVER['DOCUMENT_ROOT'].'/wp-content/mu-plugins/ai-products-order-widget/vendor/autoload.php';
+
+require_once $_SERVER['DOCUMENT_ROOT'] . '/wp-content/mu-plugins/ai-products-order-widget/vendor/autoload.php';
+
 use AIPW\Services\N8nClient;
 use AIPW\Services\PortingLOAGenerator;
 use Dompdf\Dompdf;
@@ -126,13 +128,15 @@ class ApiProxy
     {
         // Validate required fields
         $required = [
-            'first_name', 
-            'last_name', 
-            'email', 
-            'phone_number', 
-            'stripe_token', 
-            'card_token', 
-            'total_to_charge'
+            'first_name',
+            'last_name',
+            'email',
+            'phone_number',
+            'stripe_token',
+            'card_token',
+            'total_to_charge',
+            'products',
+            'sales_generated_id'
         ];
         foreach ($required as $field) {
             if (empty($data[$field])) {
@@ -144,7 +148,7 @@ class ApiProxy
             }
         }
 
-        if($data['total_to_charge'] <= 0){
+        if ($data['total_to_charge'] <= 0) {
             return [
                 'success' => false,
                 'error' => "Total to charge must be greater than zero.",
@@ -152,22 +156,63 @@ class ApiProxy
             ];
         }
 
+        $columns = [
+            'cost_json'
+        ];
+
+        $filters = ['sales_generated_id' => $data['sales_generated_id'], 'Active' => 1];
+
+        $product_count = count($data['products']);
+
+        $get_current_pricing = $this->n8nClient->select('Website_Pricing', $columns, $filters);
+
+        $total_to_charge = 0;
+        //$weekly_charge = 0;
+
+        foreach (json_decode($get_current_pricing['cost_json']) as $price_obj) {
+
+            if ($product_count == 1) {
+                if ($price_obj['type'] == "1 Service") {
+                    $total_to_charge = $price_obj['cost'] * 100;
+                }
+            } elseif ($product_count == 2) {
+                if ($price_obj['type'] == "2 Services") {
+                    $total_to_charge = $price_obj['cost'] * 100;
+                }
+            } elseif ($product_count >= 3) {
+                if ($price_obj['type'] == "3+ Services") {
+                    $total_to_charge = $price_obj['cost'] * 100;
+                }
+            }
+        }
+
+        //add backend weekly charge lookup
+        if ($total_to_charge != $data['total_to_charge']) {
+            return [
+                'success' => false,
+                'error' => "Invalid Pricing Package.",
+                'error_code' => 'INVALID_AMOUNT'
+            ];
+        }
+
         // Call n8n charge-customer endpoint
         $chargeData = [
-                'name' => trim(($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? '')),
-                'first_name' => $data['first_name'] ?? '',
-                'last_name' => $data['last_name'] ?? '',
-                'email' => $data['email'] ?? '',
-                'phone_number' => $data['phone_number'] ?? '',
-                'address_line_1' => $data['shipping_address'] ?? '',
-                'address_line_2' => '',
-                'city' => $data['shipping_city'] ?? '',
-                'state' => $data['shipping_state'] ?? '',
-                'Country' => $data['shipping_country'] ?? 'US',
-                'Zip_Code' => $data['shipping_zip'] ?? '',
-                'stripe_token' => $data['stripe_token'],
-                'card_token' => $data['card_token'],
-                'total_to_charge' => $data['total_to_charge']
+            'name' => trim(($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? '')),
+            'first_name' => $data['first_name'] ?? '',
+            'last_name' => $data['last_name'] ?? '',
+            'email' => $data['email'] ?? '',
+            'phone_number' => $data['phone_number'] ?? '',
+            'address_line_1' => $data['shipping_address'] ?? '',
+            'address_line_2' => '',
+            'city' => $data['shipping_city'] ?? '',
+            'state' => $data['shipping_state'] ?? '',
+            'Country' => $data['shipping_country'] ?? 'US',
+            'Zip_Code' => $data['shipping_zip'] ?? '',
+            'stripe_token' => $data['stripe_token'],
+            'card_token' => $data['card_token'],
+            'total_to_charge' => $total_to_charge,
+            //'weekly_charge' => $weekly_charge,
+            'sales_generated_id' => $data['sales_generated_id']
         ];
 
         $result = $this->n8nClient->chargeCustomer($chargeData);
@@ -205,8 +250,9 @@ class ApiProxy
             'addons' => $data['addons'] ?? [],
 
             // Pricing
-            'setup_total' => $setupTotal,
-            'weekly_cost' => $data['weekly_cost'] ?? 0,
+            'user_setup_total' => $setupTotal,
+            'user_weekly_cost' => $data['weekly_cost'] ?? 0,
+            'user_by_minute_cost' => $data['by_minute_cost'] ?? 0,
 
             // Payment info (includes Stripe token and charge ID)
             'payment' => $payment,
@@ -223,6 +269,96 @@ class ApiProxy
             'products_count' => count($orderPayload['products']),
             'has_call_setup' => !empty($orderPayload['call_setup'])
         ]);
+
+        if ($data['total_to_charge'] <= 0) {
+            return [
+                'success' => false,
+                'error' => "Total to charge must be greater than zero.",
+                'error_code' => 'INVALID_AMOUNT'
+            ];
+        }
+
+        $total_to_charge = 0;
+        $weekly_charge = 0;
+        $by_minute_charge = 0;
+        $number_price = 0; // Initialize to prevent undefined variable
+
+        // Safely extract call setup data if it exists
+        $agent_quality_pricing = isset($data['call_setup']) ? ($data['call_setup']['agent_quality_pricing'] ?? null) : null;
+        $agent_quality = isset($data['call_setup']) ? ($data['call_setup']['agent_quality'] ?? null) : null;
+        $phone_number_type = isset($data['call_setup']) ? ($data['call_setup']['phone_number_type'] ?? null) : null;
+        $number_count = isset($data['call_setup']) ? ($data['call_setup']['number_count'] ?? 0) : 0;
+        $has_email_service = in_array('email_agents', $data['products']);
+        $has_chat_service = in_array('chat_agents', $data['products']);
+     
+
+        $columns = [
+            'cost_json'
+        ];
+
+        $filters = ['sales_generated_id' => $data['sales_generated_id'], 'Active' => 1];
+
+        $product_count = count($data['products']);
+
+        $get_current_pricing = $this->n8nClient->select('Website_Pricing', $columns, $filters);
+
+
+        foreach (json_decode($get_current_pricing['cost_json']) as $price_obj) {
+
+            if ($product_count == 1) {
+                if ($price_obj['type'] == "1 Service") {
+                    $total_to_charge = $price_obj['cost'];
+                }
+            } elseif ($product_count == 2) {
+                if ($price_obj['type'] == "2 Services") {
+                    $total_to_charge = $price_obj['cost'];
+                }
+            } elseif ($product_count >= 3) {
+                if ($price_obj['type'] == "3+ Services") {
+                    $total_to_charge = $price_obj['cost'];
+                }
+            }
+
+            if($price_obj['type'] == 'Price Per Number'){
+                $number_price = $number_count * $price_obj['cost_per_number'];
+            }
+
+            if($price_obj['type'] == 'Quick' && $price_obj['name'] == 'Inbound Calls'){
+                if($agent_quality == 'Quick'){
+                    $by_minute_charge += $price_obj['phone_per_minute'];
+                }
+            }
+
+            if($price_obj['type'] == 'Advanced' && $price_obj['name'] == 'Inbound Calls'){
+                if($agent_quality == 'Advanced'){
+                    $by_minute_charge += $price_obj['phone_per_minute'];
+                }
+            }
+
+            if($price_obj['type'] == 'Conversational' && $price_obj['name'] == 'Inbound Calls'){
+                if($agent_quality == 'Conversational'){
+                    $by_minute_charge += $price_obj['phone_per_minute'];
+                }
+            }
+
+            if($price_obj['name'] == 'Email Agents'){
+                if($has_email_service == true){
+                    $weekly_charge += $price_obj['cost'];
+                }
+            }
+
+            if($price_obj['name'] == 'Chat Agents'){
+                if($has_chat_service == true){
+                    $weekly_charge += $price_obj['cost'];
+                }
+            }
+        } 
+
+        $total_to_charge = $number_price + $total_to_charge;
+
+        $orderPayload['by_minute_charge'] = $by_minute_charge;
+        $orderPayload['weekly_cost'] = $weekly_charge;
+        $orderPayload['setup_total'] = $total_to_charge;
 
         $result = $this->n8nClient->submitOrder($orderPayload);
 
@@ -356,7 +492,7 @@ class ApiProxy
 
             // Extract payment info
             $paymentInfo = $data['paymentInfo'] ?? [];
-            
+
             // Prepare customer body data
             $customerBody = [
                 'name' => trim(($paymentInfo['first_name'] ?? '') . ' ' . ($paymentInfo['last_name'] ?? '')),
@@ -370,9 +506,10 @@ class ApiProxy
                 'state' => $paymentInfo['shipping_state'] ?? '',
                 'Country' => $paymentInfo['shipping_country'] ?? 'US',
                 'Zip_Code' => $paymentInfo['shipping_zip'] ?? '',
-                'user_id' => $data['userId'],
+                'user_id' => $data['userId']['user_id'],
                 'numbers_to_port' => $data['numbers_to_port'],
-                'submitted_at' => date('Y-m-d H:i:s')
+                'submitted_at' => date('Y-m-d H:i:s'),
+                'sales_generated_id' => $data['sales_generated_id']
             ];
 
             // Prepare attachments array
@@ -432,8 +569,6 @@ class ApiProxy
                 ],
                 'error' => null
             ];
-
-
         } catch (\Exception $e) {
             $this->log('error', '[handleSubmitPortingLoa] Exception', [
                 'error' => $e->getMessage(),
