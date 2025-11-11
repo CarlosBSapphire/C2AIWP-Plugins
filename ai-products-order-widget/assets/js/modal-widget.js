@@ -1686,14 +1686,16 @@
             let agentQualityHTML = '';
 
             for (const [key, style] of Object.entries(agentQuality)) {
+                const phonePerMinute = style.phone_per_minute || 0;
+                const phonePerMinuteOverage = style.phone_per_minute_overage || 0;
 
                 agentQualityHTML += `
                     <div class="aipw-agent-card" data-style="${key}">
                         <div class="aipw-agent-name">${style.name || key}</div>
                         <div class="aipw-agent-description">${style.description || ''}</div>
                         <div class="aipw-product-pricing">
-                            <div class="aipw-pricing-weekly">Per Minute: $${this.pricing.phone_per_minute.toFixed(2)}/minute</div>
-                            <div class="aipw-pricing-weekly">Per Overage: $${this.pricing.phone_per_minute_overage.toFixed(2)}/minute</div>
+                            <div class="aipw-pricing-setup">Per Minute: $${phonePerMinute.toFixed(2)}</div>
+                            <div class="aipw-pricing-weekly">Overage: $${phonePerMinuteOverage.toFixed(2)}/min</div>
                         </div>
                     </div>
                 `;
