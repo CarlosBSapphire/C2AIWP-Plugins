@@ -228,14 +228,24 @@
                 // Call API to validate coupon and get sales_generated_id
                 const response = await this.apiCall('validate_coupon', { coupon_code: couponCode });
 
-                if (response.success && response.data && response.data.sales_generated_id) {
+                console.log('[applyCoupon] Validation response:', response);
+
+                if (response.success && response.data && response.data[0]) {
+                    const pricingData = response.data[0];
+                    const salesGeneratedId = pricingData.sales_generated_id;
+
+                    if (!salesGeneratedId) {
+                        messageDiv.innerHTML = '<span style="color: red;">Invalid coupon response</span>';
+                        return;
+                    }
+
                     // Update state with new pricing ID and coupon code
-                    this.state.salesGeneratedId = response.data.sales_generated_id;
+                    this.state.salesGeneratedId = salesGeneratedId;
                     this.state.couponCode = couponCode;
                     this.saveState();
 
                     // Reload pricing with new sales_generated_id
-                    await this.loadPricing(response.data.sales_generated_id);
+                    await this.loadPricing(salesGeneratedId);
 
                     // Recalculate pricing
                     this.calculatePricing();
@@ -244,7 +254,8 @@
                     couponInput.disabled = true;
                     document.getElementById('aipwApplyCoupon').disabled = true;
                 } else {
-                    messageDiv.innerHTML = '<span style="color: red;">Invalid coupon code</span>';
+                    const errorMsg = response.error || 'Invalid coupon code';
+                    messageDiv.innerHTML = `<span style="color: red;">${errorMsg}</span>`;
                 }
             } catch (error) {
                 console.error('Coupon validation error:', error);
@@ -1527,7 +1538,8 @@
                     e.target.checked ? 'none' : 'grid';
             });
             // Coupon code application
-            document.getElementById('aipwApplyCoupon').addEventListener('click', async () => {
+            document.getElementById('aipwApplyCoupon').addEventListener('click', async (e) => {
+                e.preventDefault(); // Prevent form submission/page refresh
                 await this.applyCoupon();
             });
 
