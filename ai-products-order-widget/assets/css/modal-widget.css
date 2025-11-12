@@ -827,35 +827,33 @@
 @media (max-width: 768px) {
     .aipw-modal-overlay.active {
         flex-direction: column;
-        align-items: center;
+        align-items: stretch; /* make modal and summary full width */
         justify-content: flex-start;
-        padding: 10px;
+        padding: 0;
     }
 
     .aipw-modal {
-        margin-right: 0; /* remove right offset */
-        max-width: 100%;
         width: 100%;
-        min-height: auto;
-        border: 2px solid var(--border);
+        max-width: 100%;
+        padding: 20px;
+        margin: 0;
+        margin-bottom: 100px; /* space for summary */
         box-sizing: border-box;
-        margin-bottom: 100px; /* space for sticky summary */
     }
 
     .aipw-summary {
-        position: fixed;       /* STICKY to bottom */
+        position: absolute; /* instead of fixed */
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 100px;         /* smaller height for mobile */
+        height: 100px; /* adjust as needed */
         padding: 10px 20px;
-        margin: 0;
+        background: var(--bg);
         border-top: 2px solid var(--border);
         border-left: none;
-        background: var(--bg);
-        z-index: 1000000;
         box-sizing: border-box;
         overflow-y: auto;
+        z-index: 10; /* above modal content */
     }
 }
 
