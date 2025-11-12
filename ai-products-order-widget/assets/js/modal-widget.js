@@ -172,13 +172,13 @@
                         </div>
 
                         <div class="aipw-modal-header" id="aipwModalHeader"></div>
-                        <div class="aipw-modal-body" id="aipwModalBody"></div>
+                            <div class="aipw-modal-body" id="aipwModalBody"></div>
                         <div class="aipw-modal-footer" id="aipwModalFooter"></div>
 
                         <div class="aipw-summary" id="aipwSummary">
-                        <div class="aipw-summary-title">Summary</div>
-                        <div id="aipwSummaryContent"></div>
-                    </div>
+                            <div class="aipw-summary-title">Summary</div>
+                            <div id="aipwSummaryContent"></div>
+                        </div>
                     </div>
 
                     
