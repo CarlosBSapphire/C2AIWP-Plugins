@@ -821,6 +821,39 @@
     }
 }
 
+/* ================================
+   📱 Responsive Layout: Stack modal & summary
+================================ */
+@media (max-width: 768px) {
+    .aipw-modal-overlay.active {
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 10px;
+    }
+
+    .aipw-modal {
+        margin-right: 0; /* remove right offset */
+        max-width: 100%;
+        width: 100%;
+        min-height: auto;
+        border: 2px solid var(--border);
+        box-sizing: border-box;
+    }
+
+    .aipw-summary {
+        position: static; /* no longer fixed */
+        width: 100%;
+        height: auto;
+        border-left: none;
+        border-top: 2px solid var(--border);
+        background: var(--bg);
+        padding: 20px;
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+}
+
 /* Loading State */
 .aipw-loading {
     text-align: center;
