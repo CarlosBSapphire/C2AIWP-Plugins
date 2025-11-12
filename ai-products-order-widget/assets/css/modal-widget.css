@@ -857,7 +857,7 @@ position: fixed;
         overflow-y: auto; /* content scrolls */
         padding: 20px;
         margin: 0;
-        background: var(--nav-active-background);
+        background: var(--bg-plugin-gradient);
         border: none;
         border-radius: 0;
         display: flex;
