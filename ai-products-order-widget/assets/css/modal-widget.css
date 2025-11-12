@@ -300,7 +300,7 @@
 }
 
 .aipw-product-card:hover {
-    background: var(--input-active-border);
+    /* background: var(--input-active-border); */
     box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
 }
 
