@@ -824,8 +824,11 @@
 /* ================================
    📱 Responsive Layout: Stack modal & summary
 ================================ */
+/* ================================
+   Mobile Layout: Full-width Summary
+================================ */
 @media (max-width: 768px) {
-    /* Overlay fills viewport */
+    /* Modal overlay stacks content vertically */
     .aipw-modal-overlay.active {
         display: flex;
         flex-direction: column;
@@ -844,7 +847,7 @@
     .aipw-modal {
         width: 100%;
         max-width: 100%;
-        flex: 1 1 auto; /* takes remaining height */
+        flex: 1 1 auto; /* take remaining height */
         box-sizing: border-box;
         overflow-y: auto; /* content scrolls */
         padding: 20px;
@@ -856,20 +859,26 @@
         flex-direction: column;
     }
 
-    /* Summary sticks to bottom */
+    /* Full-width summary at bottom */
     .aipw-summary {
-        position: sticky; /* sticks within overlay */
+        position: sticky;  /* sticks within overlay */
         bottom: 0;
         left: 0;
         width: 100%;
+        max-width: 100%;
         background: var(--bg);
         border-top: 2px solid var(--border);
+        padding: 15px 20px;
         box-sizing: border-box;
         z-index: 10;
-        padding: 15px 20px;
-        max-height: 50%; /* allow summary to take up to half the screen */
-        min-height: 120px; /* always at least readable */
-        overflow-y: auto; /* scroll if content exceeds height */
+        max-height: 50%;  /* summary can take up to half the screen */
+        min-height: 120px; /* always readable */
+        overflow-y: auto;  /* scroll if content exceeds height */
+    }
+
+    /* Make modal content leave room for summary */
+    .aipw-modal {
+        padding-bottom: 150px; /* avoid content being hidden behind summary */
     }
 }
 
