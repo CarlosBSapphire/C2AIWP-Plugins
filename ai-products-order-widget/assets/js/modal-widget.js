@@ -174,12 +174,14 @@
                         <div class="aipw-modal-header" id="aipwModalHeader"></div>
                         <div class="aipw-modal-body" id="aipwModalBody"></div>
                         <div class="aipw-modal-footer" id="aipwModalFooter"></div>
-                    </div>
 
-                    <div class="aipw-summary" id="aipwSummary">
+                        <div class="aipw-summary" id="aipwSummary">
                         <div class="aipw-summary-title">Summary</div>
                         <div id="aipwSummaryContent"></div>
                     </div>
+                    </div>
+
+
                 </div>
             `;
 
@@ -608,31 +610,31 @@
                     <div class="aipw-summary-section">
                         <div class="aipw-summary-section-title">Addon(s)</div>
                         ${this.state.selectedAddons.map(a => {
-                            // Get addon pricing
-                            let price = 0;
-                            let unit = '/week';
+                    // Get addon pricing
+                    let price = 0;
+                    let unit = '/week';
 
-                            if (a === 'Phone Numbers') {
-                                price = this.pricing.phoneNumberWeeklyCost || 0;
-                                unit = '/number/week';
-                            } else if (this.pricing.addons[a]) {
-                                price = this.pricing.addons[a].weekly || 0;
-                            } else if (a === 'Lead Verification') {
-                                unit = '/lead';
-                            }
+                    if (a === 'Phone Numbers') {
+                        price = this.pricing.phoneNumberWeeklyCost || 0;
+                        unit = '/number/week';
+                    } else if (this.pricing.addons[a]) {
+                        price = this.pricing.addons[a].weekly || 0;
+                    } else if (a === 'Lead Verification') {
+                        unit = '/lead';
+                    }
 
-                            // Special badge for Transcriptions & Recordings
-                            const freeBadge = a === 'Transcriptions & Recordings'
-                                ? '<span style="margin-left: 8px; padding: 2px 8px; background: #4CAF50; color: white; font-size: 11px; border-radius: 4px; font-weight: 600;">90 Days Free</span>'
-                                : '';
+                    // Special badge for Transcriptions & Recordings
+                    const freeBadge = a === 'Transcriptions & Recordings'
+                        ? '<span style="margin-left: 8px; padding: 2px 8px; background: #4CAF50; color: white; font-size: 11px; border-radius: 4px; font-weight: 600;">90 Days Free</span>'
+                        : '';
 
-                            return `
+                    return `
                                 <div class="aipw-summary-item" style="display: flex; justify-content: space-between; align-items: center;">
                                     <span>${a}${freeBadge}</span>
                                     <span style="margin-left: 10px; font-weight: 500; white-space: nowrap;">${this.formatCurrency(price)}${unit}</span>
                                 </div>
                             `;
-                        }).join('')}
+                }).join('')}
                     </div>
                 `;
             }
