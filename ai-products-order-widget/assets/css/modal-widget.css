@@ -840,21 +840,6 @@
         overflow: hidden; /* overlay itself does not scroll */
     }
 
-    /* Summary sticks to bottom */
-    .aipw-summary {
-        position: sticky; /* sticks within overlay */
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: var(--bg);
-        border-top: 2px solid var(--border);
-        box-sizing: border-box;
-        z-index: 10;
-        padding: 10px 20px;
-        max-height: 40%; /* optional max height for very tall summaries */
-        overflow-y: auto; /* scroll if content exceeds max-height */
-    }
-
     /* Modal scrolls above summary */
     .aipw-modal {
         width: 100%;
@@ -865,10 +850,26 @@
         padding: 20px;
         margin: 0;
         background: var(--nav-active-background);
-        border: none; /* remove desktop borders for mobile */
-        border-radius: 0; /* full width */
+        border: none;
+        border-radius: 0;
         display: flex;
         flex-direction: column;
+    }
+
+    /* Summary sticks to bottom */
+    .aipw-summary {
+        position: sticky; /* sticks within overlay */
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: var(--bg);
+        border-top: 2px solid var(--border);
+        box-sizing: border-box;
+        z-index: 10;
+        padding: 15px 20px;
+        max-height: 50%; /* allow summary to take up to half the screen */
+        min-height: 120px; /* always at least readable */
+        overflow-y: auto; /* scroll if content exceeds height */
     }
 }
 
