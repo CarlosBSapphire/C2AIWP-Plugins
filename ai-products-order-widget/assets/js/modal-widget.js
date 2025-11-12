@@ -621,9 +621,14 @@
                                 unit = '/lead';
                             }
 
+                            // Special badge for Transcriptions & Recordings
+                            const freeBadge = a === 'Transcriptions & Recordings'
+                                ? '<span style="margin-left: 8px; padding: 2px 8px; background: #4CAF50; color: white; font-size: 11px; border-radius: 4px; font-weight: 600;">90 Days Free</span>'
+                                : '';
+
                             return `
                                 <div class="aipw-summary-item" style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span>${a}</span>
+                                    <span>${a}${freeBadge}</span>
                                     <span style="margin-left: 10px; font-weight: 500; white-space: nowrap;">${this.formatCurrency(price)}${unit}</span>
                                 </div>
                             `;
