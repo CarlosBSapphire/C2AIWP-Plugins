@@ -2,86 +2,86 @@
 /* Version: 3.0.0 - Root level styling */
 
 :root {
-         /* Backgrounds */
-        --bg: #141421;
-        /* panel gradient background */
-        --bg-plugin-gradient: linear-gradient(to bottom, #1a1a2e, #141421);
-        /* panels / cards */
-        --bg-c2ai-border-gradient: linear-gradient(to bottom right, #008387, 70%, #00124a);
-        /* c2ai border; requires a ::before and absolute postioning with a zindex of -1 at 0 top, left, bottom, right and content:'';  */
-        --panel-shadow: 0rem 0.2rem 0.2rem rgba(0, 0, 0, 0.3);
-        --modal-footer-shadow: 0rem 0rem 1rem rgba(0, 53, 111, 0.8);
-        --modal-header-shadow: 0rem 0rem 1rem rgba(0, 53, 111, 0.8);
+    /* Backgrounds */
+    --bg: #141421;
+    /* panel gradient background */
+    --bg-plugin-gradient: linear-gradient(to bottom, #1a1a2e, #141421);
+    /* panels / cards */
+    --bg-c2ai-border-gradient: linear-gradient(to bottom right, #008387, 70%, #00124a);
+    /* c2ai border; requires a ::before and absolute postioning with a zindex of -1 at 0 top, left, bottom, right and content:'';  */
+    --panel-shadow: 0rem 0.2rem 0.2rem rgba(0, 0, 0, 0.3);
+    --modal-footer-shadow: 0rem 0rem 1rem rgba(0, 53, 111, 0.8);
+    --modal-header-shadow: 0rem 0rem 1rem rgba(0, 53, 111, 0.8);
 
-        /* Text */
-        --text: #ffffff;
-        /* primary text */
-        --text-muted: #9ca3af;
-        /* secondary text */
-        --text-placeholders: #545a82;
-        /* input hints, placeholders */
-        --pending-text: #ffb70b;
-        /* warning text */
-        --menu-text: #ffffff;
-        /* menu text */
+    /* Text */
+    --text: #ffffff;
+    /* primary text */
+    --text-muted: #9ca3af;
+    /* secondary text */
+    --text-placeholders: #545a82;
+    /* input hints, placeholders */
+    --pending-text: #ffb70b;
+    /* warning text */
+    --menu-text: #ffffff;
+    /* menu text */
 
-        /* Borders / Dividers */
-        --border: #2e3045;
+    /* Borders / Dividers */
+    --border: #2e3045;
 
-        /* Primary Accent */
-        --primary: #00356f;
-        /* main CTA (blue button) */
+    /* Primary Accent */
+    --primary: #00356f;
+    /* main CTA (blue button) */
 
-        /* Secondary Accent */
-        --secondary: #008387;
+    /* Secondary Accent */
+    --secondary: #008387;
 
-        /* Secondary Accent */
-        --offset: #f15722;
+    /* Secondary Accent */
+    --offset: #f15722;
 
-        /* Nav Button Highlights */
-        --nav-active-background: #0a1330;
-        /* active nav item highlight main */
-        --nav-active-left-trim: #0467d2;
-        /* active nav item highlight left border trim */
+    /* Nav Button Highlights */
+    --nav-active-background: #0a1330;
+    /* active nav item highlight main */
+    --nav-active-left-trim: #0467d2;
+    /* active nav item highlight left border trim */
 
-        /* Status Colors */
-        --success: #008387;
-        /* success */
-        --failed: #dc3545;
-        /* failed */
-        --info: #3b82f6;
-        /* links / highlights */
-        --active: #00356f;
-        /* active elements */
-        --inactive: #2e3045;
-        /* inactive elements */
-        --pending: #008387;
-        /* pending */
+    /* Status Colors */
+    --success: #008387;
+    /* success */
+    --failed: #dc3545;
+    /* failed */
+    --info: #3b82f6;
+    /* links / highlights */
+    --active: #00356f;
+    /* active elements */
+    --inactive: #2e3045;
+    /* inactive elements */
+    --pending: #008387;
+    /* pending */
 
-        /* Buttons & Inputs */
-        --primary-btn-bg: #00356f;
-        --primary-btn-onhover: #008387;
-        --secondary-btn-bg: #0a1330;
-        --secondary-btn-onhover-border: #0467d2;
-        --input-bg: #2e3045;
-        --input-active-bg: #0a1330;
-        --input-active-border: #0467d2;
-        --active-box-shadow: 0 0 0 0.2rem #0467d280;
-        --dropdown-item-hover: #545a82;
+    /* Buttons & Inputs */
+    --primary-btn-bg: #00356f;
+    --primary-btn-onhover: #008387;
+    --secondary-btn-bg: #0a1330;
+    --secondary-btn-onhover-border: #0467d2;
+    --input-bg: #2e3045;
+    --input-active-bg: #0a1330;
+    --input-active-border: #0467d2;
+    --active-box-shadow: 0 0 0 0.2rem #0467d280;
+    --dropdown-item-hover: #545a82;
 
-        /* Chart Colors */
-        --grid-color: #2e3045;
+    /* Chart Colors */
+    --grid-color: #2e3045;
 
-        /* SVG Icon Filters */
-        --svg-icon-filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(128deg) brightness(102%) contrast(101%);
-        --svg-icon-menu-filter: brightness(0) saturate(100%) invert(92%) sepia(100%) saturate(2%) hue-rotate(111deg) brightness(106%) contrast(100%);
-        --svg-icon-secondary-hover-filter: brightness(0) saturate(100%) invert(26%) sepia(47%) saturate(4084%) hue-rotate(165deg) brightness(95%) contrast(106%);
-    }
+    /* SVG Icon Filters */
+    --svg-icon-filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(128deg) brightness(102%) contrast(101%);
+    --svg-icon-menu-filter: brightness(0) saturate(100%) invert(92%) sepia(100%) saturate(2%) hue-rotate(111deg) brightness(106%) contrast(100%);
+    --svg-icon-secondary-hover-filter: brightness(0) saturate(100%) invert(26%) sepia(47%) saturate(4084%) hue-rotate(165deg) brightness(95%) contrast(106%);
+}
 
 /* SECTION DARK Mode */
-@media (prefers-color-scheme: dark){
+@media (prefers-color-scheme: dark) {
     :root {
-         /* Backgrounds */
+        /* Backgrounds */
         --bg: #141421;
         /* panel gradient background */
         --bg-plugin-gradient: linear-gradient(to bottom, #1a1a2e, #141421);
@@ -161,6 +161,7 @@
         --svg-icon-secondary-hover-filter: brightness(0) saturate(100%) invert(26%) sepia(47%) saturate(4084%) hue-rotate(165deg) brightness(95%) contrast(106%);
     }
 }
+
 /* !SECTION */
 
 /* ========================================
@@ -176,7 +177,7 @@
     bottom: 10px;
     background: var(--bg);
     z-index: 999999;
-    display: none; 
+    display: none;
     overflow-y: auto;
     padding: 20px;
     /*height: 100%;
@@ -200,10 +201,15 @@
     position: relative;
     border: 2px solid var(--border);
     width: 100%;
-    max-width: 1200px;
+    /* max-width: 1200px; */
     min-height: 100%;
     height: auto;
     bottom: auto;
+    /* Added fix: prevent overlap with fixed summary */
+    margin-right: 320px;
+    /* matches summary width + spacing */
+    max-width: calc(100% - 320px);
+    box-sizing: border-box;
 }
 
 /* Progress Bar */
@@ -770,6 +776,25 @@
 }
 
 /* Responsive */
+@media (max-width: 1155px) {
+    .aipw-products-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 1001px) {
+    .aipw-addons-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Responsive */
+@media (max-width: 938px) {
+    .aipw-products-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 768px) {
     .aipw-products-grid {
         grid-template-columns: 1fr;
@@ -788,11 +813,54 @@
         grid-template-columns: 1fr;
     }
 
-    .aipw-summary {
+    /* .aipw-summary {
         position: static;
         width: 100%;
         height: auto;
         margin-top: 20px;
+    } */
+}
+
+/* ================================
+   📱 Responsive Layout: Stack modal & summary
+================================ */
+@media (max-width: 768px) {
+    .aipw-modal-overlay.active {
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        padding: 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden; /* overlay itself doesn't scroll */
+    }
+
+    /* Make only the modal scrollable */
+    .aipw-modal {
+        width: 100%;
+        max-width: 100%;
+        padding: 20px;
+        margin: 0;
+        box-sizing: border-box;
+        overflow-y: auto;   /* scrollable content */
+        flex: 1;            /* take remaining space */
+        margin-bottom: 100px; /* prevent last content from hiding behind summary */
+    }
+
+    .aipw-summary {
+        position: absolute; /* pinned inside overlay */
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100px;      /* adjust as needed */
+        padding: 10px 20px;
+        background: var(--bg);
+        border-top: 2px solid var(--border);
+        box-sizing: border-box;
+        z-index: 10;
     }
 }
 
@@ -813,8 +881,13 @@
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Success Message */
