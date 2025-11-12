@@ -39,6 +39,9 @@ class N8nClient
     public string $TICKET_GENERATOR_EMAIL_ADDRESS;
     public string $TWILIO_CANCEL_PORT_IN_REQUEST;
     public string $CREATE_WEBSITE_PRICING_RECORDS;
+    public string $DECREMENT_AVAILABLE_USES;
+
+    public string $DEFAULT_PRICING_ID;
 
 
     /**
@@ -126,6 +129,8 @@ class N8nClient
 
         $this->TWILIO_CANCEL_PORT_IN_REQUEST = $this->N8N_BASE_URL . '';
         $this->CREATE_WEBSITE_PRICING_RECORDS = $this->N8N_BASE_URL . '';
+        $this->DECREMENT_AVAILABLE_USES = $this->N8N_BASE_URL.'';
+        $this->DEFAULT_PRICING_ID = '4c26d41a-6c83-4e44-9b17-7a243b2aeb17';
     }
 
     /**
@@ -273,6 +278,67 @@ class N8nClient
             'error' => $result['error'] ?? null
         ]);
 
+        // If charge successful and not default pricing, decrement available_uses
+        if ($result['success'] && isset($chargeData['sales_generated_id'])) {
+            $salesGeneratedId = $chargeData['sales_generated_id'];
+        
+
+            // Skip decrement for default pricing
+            if ($salesGeneratedId !== $this->DEFAULT_PRICING_ID) {
+                $this->log('[chargeCustomer] Decrementing available uses for custom pricing', 'info', [
+                    'sales_generated_id' => $salesGeneratedId
+                ]);
+
+                $decrementResult = $this->decrementAvailableUses($salesGeneratedId);
+
+                if (!$decrementResult['success']) {
+                    $this->log('[chargeCustomer] Failed to decrement available uses', 'warning', [
+                        'sales_generated_id' => $salesGeneratedId,
+                        'error' => $decrementResult['error'] ?? 'Unknown error'
+                    ]);
+                    // Note: We don't fail the charge if decrement fails, just log it
+                }
+            } else {
+                $this->log('[chargeCustomer] Skipping decrement for default pricing', 'info');
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Decrement available uses for a pricing record
+     *
+     * @param string $sales_generated_id
+     * @return array ['success' => bool, 'data' => array|null, 'error' => string|null]
+     */
+    public function decrementAvailableUses($sales_generated_id)
+    {
+        $this->log('[decrementAvailableUses] Decrementing uses', 'info', [
+            'sales_generated_id' => $sales_generated_id
+        ]);
+
+
+        $payload = [
+            'sales_generated_id' => $sales_generated_id,
+            'decrement_by' => 1
+        ];
+
+        // TODO: Uncomment when endpoint is ready
+        // $result = $this->request($this->DECREMENT_AVAILABLE_USES, 'POST', $payload);
+
+        // Temporary placeholder response
+        $result = [
+            'success' => true,
+            'data' => ['message' => 'Decrement endpoint not yet implemented'],
+            'error' => null
+        ];
+
+        $this->log('[decrementAvailableUses] Response', 'info', [
+            'success' => $result['success'] ?? false,
+            'error' => $result['error'] ?? null
+        ]);
+
         return $result;
     }
 
@@ -291,29 +357,42 @@ class N8nClient
             [
                 'cost_json',
                 'Active', // 1
-                'coupon_code'
+                'coupon_code',
+                'available_uses'
             ],
-            ['Active' => 1, 'sales_generated_id' => (isset($data['sales_generated_id']) && !empty($data['sales_generated_id'])) ? $data['sales_generated_id'] : '4c26d41a-6c83-4e44-9b17-7a243b2aeb17'],
+            [
+                'Active' => 1,
+                'sales_generated_id' => (isset($data['sales_generated_id']) && !empty($data['sales_generated_id'])) ? $data['sales_generated_id'] : '4c26d41a-6c83-4e44-9b17-7a243b2aeb17',
+                '$or' => [
+                    [
+                        'expiration_date_before' => date('c')
+                    ],
+                    [
+                        'expiration_date_isnull' => true
+                    ]
+                ]
+            ],
             [
                 'page' => 1,
-                'limit' => 100,
-                'sort' => ['column' => 'id', 'direction' => 'ASC']
+                'limit' => 1,
+                'sort' => ['column' => 'id', 'direction' => 'DESC']
             ]
         );
 
         if ($result['success'] && !empty($result['data'])) {
-            // Cache the result
-            /*if ($this->cache) {
-                $this->cache->set($cacheKey, $result['data'], $cacheTtl);
-            }*/
-
-            return [
-                'success' => true,
-                'data' => $result['data'],
-                'cached' => false
-            ];
+            // Check available_uses: must be null OR greater than 0
+            if (isset($result['data'][0]['available_uses']) &&
+                $result['data'][0]['available_uses'] !== null &&
+                $result['data'][0]['available_uses'] <= 0) {
+                // This pricing record has no available uses left
+                return [
+                    'success' => false,
+                    'data' => null,
+                    'error' => 'This pricing code has no remaining uses'
+                ];
+            }
         }
-
+        
         return $result;
     }
 
@@ -378,9 +457,21 @@ class N8nClient
             [
                 'sales_generated_id',
                 'coupon_code',
-                'Active' // 1
+                'Active', // 1
+                'available_uses'
             ],
-            ['Active' => 1, 'coupon_code' => $data['coupon_code']],
+            ['Active' => 1, 
+            'coupon_code' => $data['coupon_code'],
+            '$or' => [
+                    [
+                        'expiration_date_before' => date('c')
+                    ],
+                    [
+                        'expiration_date_isnull' => true
+                    ]
+                ]
+
+        ],
             [
                 'page' => 1,
                 'limit' => 100,
@@ -389,10 +480,43 @@ class N8nClient
         );
 
         if ($result['success'] && !empty($result['data'])) {
-            // Cache the result
-            /*if ($this->cache) {
-                $this->cache->set($cacheKey, $result['data'], $cacheTtl);
-            }*/
+            $pricingData = $result['data'][0];
+           
+            $salesGeneratedId = $pricingData['sales_generated_id'] ?? null;
+
+            // Check if this is default pricing (skip available_uses check)
+            if ($salesGeneratedId === $this->DEFAULT_PRICING_ID) {
+                $this->log('[validateCoupon] Default pricing - skipping available_uses check', 'info');
+
+                return [
+                    'success' => true,
+                    'data' => $result['data'],
+                    'cached' => false
+                ];
+            }
+
+            // For custom pricing, check available_uses
+            $availableUses = $pricingData['available_uses'] ?? null;
+
+            // If available_uses is NOT null and is <= 0, reject the coupon
+            if ($availableUses !== null && $availableUses <= 0) {
+                $this->log('[validateCoupon] Coupon has no remaining uses', 'warning', [
+                    'sales_generated_id' => $salesGeneratedId,
+                    'available_uses' => $availableUses
+                ]);
+
+                return [
+                    'success' => false,
+                    'data' => null,
+                    'error' => 'This coupon has no remaining uses'
+                ];
+            }
+
+            // Coupon is valid (either unlimited uses or has remaining uses)
+            $this->log('[validateCoupon] Coupon validated successfully', 'info', [
+                'sales_generated_id' => $salesGeneratedId,
+                'available_uses' => $availableUses ?? 'unlimited'
+            ]);
 
             return [
                 'success' => true,
@@ -406,8 +530,6 @@ class N8nClient
                 'error' => 'Invalid coupon code'
             ];
         }
-
-        return $result;
     }
 
     /**
@@ -768,7 +890,7 @@ class N8nClient
         }
 
         //check valid json
-        $decoded_json = json_decode($data['cost_json'],true);
+        $decoded_json = json_decode($data['cost_json'], true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             return [
                 'success' => false,
