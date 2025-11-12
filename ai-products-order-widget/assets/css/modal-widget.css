@@ -602,11 +602,11 @@
 }
 
 .aipw-config-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
 }
 
 .aipw-config-card.selected {
-    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
+    box-shadow: 0 4px 16px rgba(0, 53, 111, 1.4);
 }
 
 .aipw-config-radio {
