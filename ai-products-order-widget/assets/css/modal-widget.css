@@ -598,7 +598,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
-    background: var(--input-bg);
+    border-radius: 0.625rem;
 }
 
 .aipw-config-card:hover {
