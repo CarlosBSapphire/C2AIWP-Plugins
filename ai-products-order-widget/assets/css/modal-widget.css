@@ -174,7 +174,7 @@
     top: 0px;
     left: 0px;
     right: 0px;
-    bottom: 10px;
+    bottom: 0px;
     background: var(--bg);
     z-index: 999999;
     display: none;
@@ -257,7 +257,6 @@
 /* Modal Header */
 .aipw-modal-header {
     margin-bottom: 30px;
-    box-shadow: var(--modal-header-shadow);
     padding-bottom: 20px;
 }
 
@@ -301,13 +300,13 @@
 }
 
 .aipw-product-card:hover {
-    background: var(--input-active-border);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    /* background: var(--input-active-border); */
+    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
 }
 
 .aipw-product-card.selected {
-    background: var(--secondary);
-    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
+    background: var(--bg-plugin-gradient);
+    box-shadow: var(--active-box-shadow)
 }
 
 .aipw-product-icon {
@@ -592,7 +591,8 @@
 }
 
 .aipw-config-card {
-    border: 2px solid var(--border);
+    background: var(--bg-plugin-gradient);
+    box-shadow: var(--panel-shadow);
     padding: 30px;
     text-align: center;
     cursor: pointer;
