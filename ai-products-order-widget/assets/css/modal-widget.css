@@ -194,6 +194,7 @@
 .aipw-modal {
     background: var(--bg-plugin-gradient);
     color: var(--text);
+    margin-top: 1rem;
     padding-left: 40px;
     padding-right: 40px;
     padding-top: 30px;
