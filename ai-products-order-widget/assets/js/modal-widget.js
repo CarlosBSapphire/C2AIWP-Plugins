@@ -615,14 +615,22 @@
                                 unit = '/lead';
                             }
 
-                            // Special badge for Transcriptions & Recordings
-                            const freeBadge = a === 'Transcriptions & Recordings'
-                                ? '<span style="margin-left: 2px; padding: 1px 8px; background: #4CAF50; color: white; font-size: 10px; border-radius: 4px; font-weight: 600;">90 Days Free</span>'
-                                : '';
+                            // Special layout for Transcriptions & Recordings
+                            if (a === 'Transcriptions & Recordings') {
+                                return `
+                                    <div class="aipw-summary-item" style="display: flex; flex-direction: column; gap: 4px;">
+                                        <span>${a}</span>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span style="font-weight: 500; white-space: nowrap;">${this.formatCurrency(price)}${unit}</span>
+                                            <span style="padding: 2px 8px; background: #4CAF50; color: white; font-size: 11px; border-radius: 4px; font-weight: 600;">90 Days Free</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }
 
                             return `
                                 <div class="aipw-summary-item" style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span>${a}${freeBadge}</span>
+                                    <span>${a}</span>
                                     <span style="margin-left: 10px; font-weight: 500; white-space: nowrap;">${this.formatCurrency(price)}${unit}</span>
                                 </div>
                             `;
