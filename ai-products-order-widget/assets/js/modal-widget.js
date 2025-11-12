@@ -2916,12 +2916,18 @@
                 }
             }
 
+            // Add 90 Days Free badge for Transcriptions & Recordings
+            const freeBadge = addon === 'Transcriptions & Recordings'
+                ? '<div style="margin-top: 4px; padding: 2px 8px; background: #4CAF50; color: white; font-size: 11px; border-radius: 4px; font-weight: 600; text-align: center;">90 Days Free</div>'
+                : '';
+
             // Return pricing HTML for addons
             return `
                 <div class="aipw-addon-pricing">
                     <div class="aipw-addon-pricing-tier" style="font-size: 14px;">
                         ${this.formatCurrency(price)}${unit}
                     </div>
+                    ${freeBadge}
                 </div>
             `;
         }
