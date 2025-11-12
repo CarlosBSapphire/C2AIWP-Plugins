@@ -22,7 +22,11 @@ class N8nClient
     private bool $isTest = true;
 
 
+    public bool $isSelfHosted = false;
+    public string $C2AI_N8N_BASE_URL = 'https://workflows.customer2.ai/webhook/';
     public string $N8N_BASE_URL = 'https://n8n.workflows.organizedchaos.cc/webhook/';
+    
+
 
 
     /* Twilio Porting Endpoints */
@@ -85,6 +89,13 @@ class N8nClient
         $this->logger = $logger;
         $this->cache = $cache;
         $this->helperFunctions = $helperFunctions;
+
+        if(!$this->isSelfHosted){
+            $this->N8N_BASE_URL = $this->N8N_BASE_URL;
+        }else{
+            $this->N8N_BASE_URL = $this->C2AI_N8N_BASE_URL;
+        }
+         
 
         /* Dynamic Select Endpoint for selecting table data */
         $this->ENDPOINT_SELECT = $this->N8N_BASE_URL . 'da176ae9-496c-4f08-baf5-6a78a6a42adb';
