@@ -452,7 +452,6 @@
     width: 300px;
     height: 100vh;
     background: var(--bg);
-    /* border-left: 2px solid var(--border); */
     padding: 20px;
     overflow-y: auto;
     border-radius: 0.625rem;
@@ -835,6 +834,7 @@
    Mobile Layout: Full-width Summary
 ================================ */
 @media (max-width: 768px) {
+
     /* Modal overlay stacks content vertically */
     .aipw-modal-overlay.active {
         display: flex;
@@ -847,16 +847,19 @@
         right: 0;
         bottom: 0;
         padding: 0;
-        overflow: hidden; /* overlay itself does not scroll */
+        overflow: hidden;
+        /* overlay itself does not scroll */
     }
 
     /* Modal scrolls above summary */
     .aipw-modal {
         width: 100%;
         max-width: 100%;
-        flex: 1 1 auto; /* take remaining height */
+        flex: 1 1 auto;
+        /* take remaining height */
         box-sizing: border-box;
-        overflow-y: auto; /* content scrolls */
+        overflow-y: auto;
+        /* content scrolls */
         padding: 20px;
         margin: 0;
         background: var(--bg-plugin-gradient);

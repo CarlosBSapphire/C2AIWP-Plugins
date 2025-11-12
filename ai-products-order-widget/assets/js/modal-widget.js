@@ -529,7 +529,7 @@
             // Step 2: Calculate weekly costs for selected products
             this.state.selectedProducts.forEach(productKey => {
                 if (productKey === 'inbound_outbound_calls') {
-                    
+
                 }
                 else if (productKey === 'emails') {
                     const emailPricing = this.pricing.products['emails'];
@@ -644,22 +644,22 @@
                     <div class="aipw-summary-section">
                         <div class="aipw-summary-section-title">Addon(s)</div>
                         ${this.state.selectedAddons.map(a => {
-                            // Get addon pricing
-                            let price = 0;
-                            let unit = '/week';
+                    // Get addon pricing
+                    let price = 0;
+                    let unit = '/week';
 
-                            if (a === 'Phone Numbers') {
-                                price = this.pricing.phoneNumberWeeklyCost || 0;
-                                unit = '/number/week';
-                            } else if (this.pricing.addons[a]) {
-                                price = this.pricing.addons[a].weekly || 0;
-                            } else if (a === 'Lead Verification') {
-                                unit = '/lead';
-                            }
+                    if (a === 'Phone Numbers') {
+                        price = this.pricing.phoneNumberWeeklyCost || 0;
+                        unit = '/number/week';
+                    } else if (this.pricing.addons[a]) {
+                        price = this.pricing.addons[a].weekly || 0;
+                    } else if (a === 'Lead Verification') {
+                        unit = '/lead';
+                    }
 
-                            // Special layout for Transcriptions & Recordings
-                            if (a === 'Transcriptions & Recordings') {
-                                return `
+                    // Special layout for Transcriptions & Recordings
+                    if (a === 'Transcriptions & Recordings') {
+                        return `
                                     <div class="aipw-summary-item" style="display: flex; flex-direction: column; gap: 4px;">
                                         <span>${a}</span>
                                         <div style="display: flex; align-items: center; gap: 8px;">
@@ -668,15 +668,15 @@
                                         </div>
                                     </div>
                                 `;
-                            }
+                    }
 
-                            return `
+                    return `
                                 <div class="aipw-summary-item" style="display: flex; justify-content: space-between; align-items: center;">
                                     <span>${a}</span>
                                     <span style="margin-left: 10px; font-weight: 500; white-space: nowrap;">${this.formatCurrency(price)}${unit}</span>
                                 </div>
                             `;
-                        }).join('')}
+                }).join('')}
                     </div>
                 `;
             }
@@ -1680,7 +1680,7 @@
 
                 // Store payment info for later
                 this.state.paymentInfo = Object.fromEntries(formData);
-                
+
 
                 // Handle billing address - if checkbox is checked or billing is empty, use shipping
                 const useSameAddress = document.getElementById('aipwUseSameAddress')?.checked ?? true;
