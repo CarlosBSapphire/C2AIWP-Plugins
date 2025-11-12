@@ -200,10 +200,14 @@
     position: relative;
     border: 2px solid var(--border);
     width: 100%;
-    max-width: 1200px;
+    /* max-width: 1200px; */
     min-height: 100%;
     height: auto;
     bottom: auto;
+        /* Added fix: prevent overlap with fixed summary */
+    margin-right: 320px; /* matches summary width + spacing */
+    max-width: calc(100% - 320px);
+    box-sizing: border-box;
 }
 
 /* Progress Bar */
