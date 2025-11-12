@@ -876,10 +876,6 @@
         overflow-y: auto;  /* scroll if content exceeds height */
     }
 
-    /* Make modal content leave room for summary */
-    .aipw-modal {
-        padding-bottom: 150px; /* avoid content being hidden behind summary */
-    }
 }
 
 /* Loading State */
