@@ -825,11 +825,13 @@
    📱 Responsive Layout: Stack modal & summary
 ================================ */
 @media (max-width: 768px) {
+    /* Stack modal and summary */
     .aipw-modal-overlay.active {
         flex-direction: column;
-        align-items: stretch; /* make modal and summary full width */
+        align-items: stretch;
         justify-content: flex-start;
         padding: 0;
+        overflow: visible; /* allow sticky to work */
     }
 
     .aipw-modal {
@@ -837,23 +839,20 @@
         max-width: 100%;
         padding: 20px;
         margin: 0;
-        margin-bottom: 100px; /* space for summary */
+        margin-bottom: 0; /* no need for extra space */
         box-sizing: border-box;
     }
 
     .aipw-summary {
-        position: absolute; /* instead of fixed */
-        bottom: 0;
-        left: 0;
+        position: sticky; /* stays visible while scrolling within overlay */
+        bottom: 0;         /* pinned to bottom */
         width: 100%;
-        height: 100px; /* adjust as needed */
+        height: 80px;      /* adjust as needed */
         padding: 10px 20px;
         background: var(--bg);
         border-top: 2px solid var(--border);
-        border-left: none;
         box-sizing: border-box;
-        overflow-y: auto;
-        z-index: 10; /* above modal content */
+        z-index: 10;
     }
 }
 
