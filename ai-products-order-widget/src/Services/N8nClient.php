@@ -319,6 +319,52 @@ class N8nClient
     /**
      * Get pricing data with caching
      *
+     * @param array data
+     * @return array
+     */
+    public function getAllPricingOptions()
+    {
+
+
+
+        // Fetch from API
+        $result = $this->select(
+            'Website_Pricing',
+            [
+                'cost_json',
+                'Active',
+                'name',
+                'sales_generated_id',
+                'date_created',
+                'coupon_code'
+            ],
+            [],
+            [
+                'page' => 1,
+                'limit' => 100,
+                'sort' => ['column' => 'date_created', 'direction' => 'DESC']
+            ]
+        );
+
+        if ($result['success'] && !empty($result['data'])) {
+            // Cache the result
+            /*if ($this->cache) {
+                $this->cache->set($cacheKey, $result['data'], $cacheTtl);
+            }*/
+
+            return [
+                'success' => true,
+                'data' => $result['data'],
+                'cached' => false
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get pricing data with caching
+     *
      * @param data 
      * @return array
      */

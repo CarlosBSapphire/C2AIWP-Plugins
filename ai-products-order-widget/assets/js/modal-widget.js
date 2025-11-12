@@ -67,6 +67,9 @@
             this.stripe = null;
             this.cardElement = null;
 
+            // Pricing loaded flag
+            this.pricingLoaded = false;
+
             this.init();
         }
 
@@ -244,9 +247,27 @@
         /**
          * Open modal
          */
-        openModal() {
+        async openModal() {
             this.modal.classList.add('active');
             document.body.style.overflow = 'hidden';
+
+            // Wait for pricing to load if not already loaded
+            if (!this.pricingLoaded) {
+                this.showPricingLoadingIndicator();
+
+                // Wait for pricing with timeout
+                const timeout = 10000; // 10 seconds
+                const startTime = Date.now();
+
+                while (!this.pricingLoaded && (Date.now() - startTime) < timeout) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+
+                if (!this.pricingLoaded) {
+                    this.showPricingLoadError();
+                    return;
+                }
+            }
 
             // Render the saved step (or step 1 if no saved state)
             const stepToRender = this.state.currentStep || 1;
@@ -416,15 +437,22 @@
 
                     // Calculate initial totals based on default selections
                     this.calculatePricing();
+
+                    // Mark pricing as loaded
+                    this.pricingLoaded = true;
                 } else {
                     console.error('[loadPricing] Failed to load pricing:', response);
                     // Use fallback pricing
                     this.useFallbackPricing();
+                    // Mark pricing as loaded even with fallback
+                    this.pricingLoaded = true;
                 }
             } catch (error) {
                 console.error('[loadPricing] Error loading pricing:', error);
                 // Use fallback pricing
                 this.useFallbackPricing();
+                // Mark pricing as loaded even with fallback
+                this.pricingLoaded = true;
             }
         }
 
@@ -2672,6 +2700,34 @@
                 <div class="aipw-loading">
                     <div class="aipw-spinner"></div>
                     <p>${message}</p>
+                </div>
+            `;
+        }
+
+        /**
+         * Show pricing loading indicator
+         */
+        showPricingLoadingIndicator() {
+            const body = document.getElementById('aipwModalBody');
+            body.innerHTML = `
+                <div class="aipw-loading">
+                    <div class="aipw-spinner"></div>
+                    <p>Loading pricing information...</p>
+                </div>
+            `;
+        }
+
+        /**
+         * Show pricing load error
+         */
+        showPricingLoadError() {
+            const body = document.getElementById('aipwModalBody');
+            body.innerHTML = `
+                <div class="aipw-error">
+                    <div class="aipw-error-icon">⚠</div>
+                    <h2>Failed to Load Pricing</h2>
+                    <p>Unable to load pricing information. Please refresh the page and try again.</p>
+                    <button class="aipw-btn aipw-btn-primary" onclick="location.reload()">Refresh Page</button>
                 </div>
             `;
         }
