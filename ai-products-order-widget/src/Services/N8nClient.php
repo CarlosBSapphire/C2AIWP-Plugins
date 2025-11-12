@@ -129,7 +129,7 @@ class N8nClient
 
         $this->TWILIO_CANCEL_PORT_IN_REQUEST = $this->N8N_BASE_URL . '';
         $this->CREATE_WEBSITE_PRICING_RECORDS = $this->N8N_BASE_URL . '';
-        $this->DECREMENT_AVAILABLE_USES = $this->N8N_BASE_URL.'';
+        $this->DECREMENT_AVAILABLE_USES = $this->N8N_BASE_URL . '';
         $this->DEFAULT_PRICING_ID = '4c26d41a-6c83-4e44-9b17-7a243b2aeb17';
     }
 
@@ -142,7 +142,7 @@ class N8nClient
      * @param array $options ['page' => int, 'limit' => int, 'sort' => array]
      * @return array ['success' => bool, 'data' => array|null, 'error' => string|null]
      */
-    public function select($table_name, $columns, $filters = [], $options = [])
+    public function select($table_name, $columns, $filters = [], $or_statement = [], $options = [])
     {
         // Validate field access, aka they cannot request passwords
         $validation = SecurityValidator::validateFieldAccess($table_name, $columns);
@@ -169,6 +169,7 @@ class N8nClient
                 'table_name' => $table_name,
                 'columns' => $columns,
                 'filters' => $filters,
+                '$or' => $or_statement,
                 'page' => $options['page'] ?? 1,
                 'limit' => $options['limit'] ?? 50,
                 'sort' => $options['sort'] ?? []
@@ -281,7 +282,7 @@ class N8nClient
         // If charge successful and not default pricing, decrement available_uses
         if ($result['success'] && isset($chargeData['sales_generated_id'])) {
             $salesGeneratedId = $chargeData['sales_generated_id'];
-        
+
 
             // Skip decrement for default pricing
             if ($salesGeneratedId !== $this->DEFAULT_PRICING_ID) {
@@ -363,13 +364,13 @@ class N8nClient
             [
                 'Active' => 1,
                 'sales_generated_id' => (isset($data['sales_generated_id']) && !empty($data['sales_generated_id'])) ? $data['sales_generated_id'] : $this->DEFAULT_PRICING_ID,
-                '$or' => [
-                    [
-                        'expiration_date_before' => date('c')
-                    ],
-                    [
-                        'expiration_date_isnull' => true
-                    ]
+            ],
+            [
+                [
+                    'expiration_date_before' => date('c')
+                ],
+                [
+                    'expiration_date_isnull' => true
                 ]
             ],
             [
@@ -381,9 +382,11 @@ class N8nClient
 
         if ($result['success'] && !empty($result['data'])) {
             // Check available_uses: must be null OR greater than 0
-            if (isset($result['data'][0]['available_uses']) &&
+            if (
+                isset($result['data'][0]['available_uses']) &&
                 $result['data'][0]['available_uses'] !== null &&
-                $result['data'][0]['available_uses'] <= 0) {
+                $result['data'][0]['available_uses'] <= 0
+            ) {
                 // This pricing record has no available uses left
                 return [
                     'success' => false,
@@ -392,7 +395,7 @@ class N8nClient
                 ];
             }
         }
-        
+
         return $result;
     }
 
@@ -460,18 +463,18 @@ class N8nClient
                 'Active', // 1
                 'available_uses'
             ],
-            ['Active' => 1, 
-            'coupon_code' => $data['coupon_code'],
-            '$or' => [
+            [
+                'Active' => 1,
+                'coupon_code' => $data['coupon_code'],
+            ],
+            [
                     [
                         'expiration_date_before' => date('c')
                     ],
                     [
                         'expiration_date_isnull' => true
                     ]
-                ]
-
-        ],
+            ],
             [
                 'page' => 1,
                 'limit' => 100,
@@ -481,7 +484,7 @@ class N8nClient
 
         if ($result['success'] && !empty($result['data'])) {
             $pricingData = $result['data'][0];
-           
+
             $salesGeneratedId = $pricingData['sales_generated_id'] ?? null;
 
             // Check if this is default pricing (skip available_uses check)
