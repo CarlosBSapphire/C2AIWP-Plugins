@@ -823,6 +823,7 @@
 
 /* ================================
    📱 Responsive Layout: Stack modal & summary
+   with summary sticky at bottom
 ================================ */
 @media (max-width: 768px) {
     .aipw-modal-overlay.active {
@@ -830,6 +831,7 @@
         align-items: center;
         justify-content: flex-start;
         padding: 10px;
+        position: relative;
     }
 
     .aipw-modal {
@@ -839,18 +841,21 @@
         min-height: auto;
         border: 2px solid var(--border);
         box-sizing: border-box;
+        padding-bottom: 100px; /* add space so modal content doesn't hide behind sticky summary */
     }
 
     .aipw-summary {
-        position: static; /* no longer fixed */
+        position: sticky; /* stick to bottom of viewport */
+        bottom: 0;
         width: 100%;
         height: auto;
         border-left: none;
         border-top: 2px solid var(--border);
         background: var(--bg);
         padding: 20px;
-        margin-top: 20px;
+        margin-top: 0;
         box-sizing: border-box;
+        z-index: 1000;
     }
 }
 
