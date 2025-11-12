@@ -306,7 +306,7 @@
 
 .aipw-product-card.selected {
     background: var(--bg-plugin-gradient);
-    box-shadow: var(--active-box-shadow)
+    box-shadow: 0 4px 16px rgba(0, 53, 111, 0.4);
 }
 
 .aipw-product-icon {
