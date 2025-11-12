@@ -290,12 +290,13 @@
 
 .aipw-product-card {
     border-style: none;
-    border-radius: 16px;
+    border-radius: 1rem;
     padding: 30px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: var(--primary-btn-bg);
+    /* background: var(--primary-btn-bg); */
+    background: var(--bg-plugin-gradient);
     box-shadow: var(--panel-shadow);
 }
 
@@ -795,8 +796,19 @@
 }
 
 /* Responsive */
+@media (max-width: 955px) {
+    .aipw-config-options {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Responsive */
 @media (max-width: 938px) {
     .aipw-products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .aipw-config-options {
         grid-template-columns: 1fr;
     }
 }
@@ -818,20 +830,10 @@
     .aipw-payment-form {
         grid-template-columns: 1fr;
     }
-
-    /* .aipw-summary {
-        position: static;
-        width: 100%;
-        height: auto;
-        margin-top: 20px;
-    } */
 }
 
 /* ================================
-   📱 Responsive Layout: Stack modal & summary
-================================ */
-/* ================================
-   Mobile Layout: Full-width Summary
+    Responsive Layout: Stack modal & summary
 ================================ */
 @media (max-width: 768px) {
 
