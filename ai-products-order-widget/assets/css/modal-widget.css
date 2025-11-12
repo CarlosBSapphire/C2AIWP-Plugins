@@ -813,12 +813,12 @@
         grid-template-columns: 1fr;
     }
 
-    .aipw-summary {
+    /* .aipw-summary {
         position: static;
         width: 100%;
         height: auto;
         margin-top: 20px;
-    }
+    } */
 }
 
 /* ================================
