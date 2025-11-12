@@ -854,7 +854,7 @@ class N8nClient
             $payload
         );
 
-        return $response; // Missing this line!
+        return $response;
     }
 
     /**

@@ -87,7 +87,6 @@
                 const savedState = localStorage.getItem('aipw_widget_state');
                 if (savedState) {
                     const parsed = JSON.parse(savedState);
-                    console.log('[loadState] Restored state from localStorage:', parsed);
                     // Normalize phone_numbers to portingPhoneNumbers for backward compatibility
                     if (parsed.phone_numbers && !parsed.portingPhoneNumbers) {
                         parsed.portingPhoneNumbers = parsed.phone_numbers;
@@ -139,7 +138,8 @@
                 };
 
                 localStorage.setItem('aipw_widget_state', JSON.stringify(stateToSave));
-                console.log('[saveState] State saved to localStorage ', stateToSave);
+                // Don't log sensitive data in production
+                // console.log('[saveState] State saved to localStorage ', stateToSave);
             } catch (error) {
                 console.error('[saveState] Error saving state to localStorage:', error);
             }
@@ -151,7 +151,6 @@
         clearState() {
             try {
                 localStorage.removeItem('aipw_widget_state');
-                console.log('[clearState] State cleared from localStorage');
             } catch (error) {
                 console.error('[clearState] Error clearing state from localStorage:', error);
             }
@@ -267,14 +266,12 @@
         async loadPricing(salesGeneratedId = null, couponCode = null) {
             try {
                 const pricingId = salesGeneratedId || this.state.salesGeneratedId;
-                console.log('[loadPricing] Fetching pricing from n8n for sales_generated_id:', pricingId);
                 const response = await this.apiCall('get_pricing', { sales_generated_id: pricingId ?? '', coupon_code: couponCode });
 
                 // Handle the response structure: response.data is an array with cost_json inside
                 const costData = response.success && response.data && response.data[0] && response.data[0].cost_json;
 
                 if (costData) {
-                    console.log('[loadPricing] Pricing data received:', response.data[0]);
 
                     // Parse rates - they come as numbers or dollar strings like "$99.00" or "$0.45"
                     // Convert to cents (integer) for calculations
@@ -304,7 +301,6 @@
                                 this.pricing.setupFees['3+'] = cost;
                             }
 
-                            console.log(`[loadPricing] Setup fee for ${type}: ${cost} cents`);
                         }
 
                         // Handle Inbound/Outbound Calls (agent style pricing)
@@ -336,7 +332,6 @@
                                 this.pricing.agentQuality[styleKey].description = item.description;
                             }
 
-                            console.log(`[loadPricing] ${styleKey} calls: ${phone_per_minute} cents/min`);
                         }
 
                         // Handle Email Agents
@@ -353,7 +348,6 @@
                                 frequency: frequency
                             };
 
-                            console.log(`[loadPricing] Email Agents (${type}): ${cost} cents/week`);
                         }
 
                         // Handle Chat Agents
@@ -370,7 +364,6 @@
                                 frequency: frequency
                             };
 
-                            console.log(`[loadPricing] Chat Agents (${type}): ${cost} cents/week`);
                         }
 
                         // Handle Addons
@@ -391,7 +384,6 @@
                                 type: type
                             };
 
-                            console.log(`[loadPricing] Addon ${addonKey}: ${cost} cents/week`);
                         }
 
                         // Handle QA (Quality Assurance) - separate from Addons type
@@ -409,24 +401,16 @@
                                 type: type
                             };
 
-                            console.log(`[loadPricing] ${qaKey}: ${cost} cents/week, ${cost_per_lead} cents/lead`);
                         }
                         // Handle Phone Number pricing
                         else if (type === 'Price Per Number' && frequency === 'Weekly') {
                             const cost_per_number = parseRate(item.cost_per_number);
-                            console.log(`[loadPricing] Phone Number: ${cost_per_number} cents per number/week`);
 
                             this.pricing.phoneNumberWeeklyCost = cost_per_number;
                         }
                     });
 
-                    console.log('[loadPricing] Parsed pricing:', {
-                        setupFees: this.pricing.setupFees,
-                        agentQuality: this.pricing.agentQuality,
-                        products: this.pricing.products,
-                        addons: this.pricing.addons,
-                        phoneNumberWeeklyCost: this.pricing.phoneNumberWeeklyCost
-                    });
+        
 
                     // Calculate initial totals based on default selections
                     this.calculatePricing();
@@ -458,12 +442,6 @@
             let setupTotal = 0;
             let weeklyTotal = 0;
 
-            console.log('[calculatePricing] Starting calculation with:', {
-                selectedProducts: this.state.selectedProducts,
-                selectedAddons: this.state.selectedAddons,
-                agentQuality: this.state.agentQuality,
-                phoneCountPricingTotal: this.state.numberCount * this.pricing.phoneNumberWeeklyCost || 0
-            });
 
             // Step 1: Calculate setup fee based on number of selected services
             const serviceCount = this.state.selectedProducts.length;
@@ -476,28 +454,21 @@
                 setupTotal = this.pricing.setupFees['3+'] || 0;
             }
 
-            console.log(`[calculatePricing] Setup fee for ${serviceCount} service(s): ${setupTotal} cents`);
-
             // Step 2: Calculate weekly costs for selected products
             this.state.selectedProducts.forEach(productKey => {
                 if (productKey === 'inbound_outbound_calls') {
-                    // Call pricing depends on agent style (selected in step 5)
-                    // We'll just note that calls are selected; actual per-minute rate comes from agentStyle
-                    console.log('[calculatePricing] Calls selected (pricing depends on agent style)');
-                    // No weekly base fee for calls - it's all usage-based
+                    
                 }
                 else if (productKey === 'emails') {
                     const emailPricing = this.pricing.products['emails'];
                     if (emailPricing) {
                         weeklyTotal += emailPricing.weekly || 0;
-                        console.log(`[calculatePricing] Email weekly: ${emailPricing.weekly} cents`);
                     }
                 }
                 else if (productKey === 'chatbot') {
                     const chatPricing = this.pricing.products['chatbot'];
                     if (chatPricing) {
                         weeklyTotal += chatPricing.weekly || 0;
-                        console.log(`[calculatePricing] Chat weekly: ${chatPricing.weekly} cents`);
                     }
                 }
             });
@@ -507,7 +478,6 @@
                 const addon = this.pricing.addons[addonKey];
                 if (addon) {
                     weeklyTotal += addon.weekly || 0;
-                    console.log(`[calculatePricing] Addon '${addonKey}' weekly: ${addon.weekly} cents`);
                 }
             });
 
@@ -518,12 +488,6 @@
             this.pricing.weekly = weeklyTotal;
             this.pricing.total = setupTotal + weeklyTotal;
 
-            console.log('[calculatePricing] Final totals:', {
-                setup: setupTotal,
-                weekly: weeklyTotal,
-                setupDollars: (setupTotal / 100).toFixed(2),
-                weeklyDollars: (weeklyTotal / 100).toFixed(2)
-            });
 
             // Update summary display
             this.updateSummary();
@@ -1554,9 +1518,6 @@
                 // Mount card element
                 const mountResult = this.cardElement.mount('#aipw-card-element');
 
-                // Log mount result for debugging
-                console.log('Stripe Element mounted:', mountResult);
-
                 // Handle real-time validation errors
                 this.cardElement.on('change', (event) => {
                     const displayError = document.getElementById('aipw-card-errors');
@@ -1567,17 +1528,14 @@
                             displayError.textContent = '';
                         }
                     }
-                    console.log('Card change event:', event);
                 });
 
                 // Handle ready event
                 this.cardElement.on('ready', () => {
-                    console.log('Stripe Element ready for input');
                 });
 
             } catch (error) {
                 console.error('Error initializing Stripe:', error);
-                alert('Failed to initialize payment form. Please refresh the page.');
             }
         }
 
@@ -1587,7 +1545,6 @@
         async submitPayment() {
             const form = document.getElementById('aipwPaymentForm');
             const formData = new FormData(form);
-            console.log('Submitting payment with form data:', this.state);
 
             if (!form.checkValidity()) {
                 form.reportValidity();
@@ -1596,17 +1553,15 @@
 
             // Verify Stripe and card element are initialized
             if (!this.stripe || !this.cardElement) {
-                alert('Payment system not initialized. Please refresh the page.');
+                console.error('Payment system not initialized. Please refresh the page.');
                 return;
             }
 
             try {
-                console.log('Creating Stripe token...');
 
                 // Create Stripe token BEFORE showing loading (to avoid unmounting the element)
                 const result = await this.stripe.createToken(this.cardElement);
 
-                console.log('Stripe token result:', result);
 
                 if (result.error) {
                     // Show error to user
@@ -1614,45 +1569,38 @@
                     if (errorElement) {
                         errorElement.textContent = result.error.message;
                     } else {
-                        alert('Card error: ' + result.error.message);
+                        console.error('Card error: ' + result.error.message);
                     }
                     console.error('Stripe error:', result.error);
                     return;
                 }
 
                 if (!result.token) {
-                    alert('Failed to create payment token. Please try again.');
                     console.error('No token returned from Stripe');
                     return;
                 }
 
-                console.log('Token created successfully:', result.token.id);
 
                 // Create PaymentMethod BEFORE showing loading (to avoid unmounting the element)
-                console.log('Creating Stripe PaymentMethod...');
                 const pmResult = await this.stripe.createPaymentMethod({
                     type: "card",
                     card: this.cardElement
                 });
-                console.log('PaymentMethod result:', pmResult);
 
                 if (pmResult.error) {
                     console.error('PaymentMethod creation error:', pmResult.error);
-                    alert('Payment method creation failed: ' + pmResult.error.message);
                     return;
                 }
 
                 if (!pmResult.paymentMethod || !pmResult.paymentMethod.id) {
                     console.error('No PaymentMethod ID returned');
-                    alert('Failed to create payment method. Please try again.');
                     return;
                 }
 
 
                 // Store payment info for later
                 this.state.paymentInfo = Object.fromEntries(formData);
-                this.state.paymentInfo.stripe_token = result.token.id;
-                this.state.paymentInfo.card_token = pmResult.paymentMethod.id;
+                
 
                 // Handle billing address - if checkbox is checked or billing is empty, use shipping
                 const useSameAddress = document.getElementById('aipwUseSameAddress')?.checked ?? true;
@@ -1662,16 +1610,14 @@
                     this.state.paymentInfo.billing_state = this.state.paymentInfo.shipping_state;
                     this.state.paymentInfo.billing_zip = this.state.paymentInfo.shipping_zip;
                     this.state.paymentInfo.billing_country = this.state.paymentInfo.shipping_country;
-                    console.log('Billing address set to shipping address');
                 }
 
-                console.log('Payment info stored:', this.state.paymentInfo);
-
+                // Log payment info without sensitive tokens
+                const { card_token, stripe_token, ...safePaymentInfo } = this.state.paymentInfo;
 
                 // Save state to localStorage (payment info without sensitive card data)
                 this.saveState();
                 this.calculatePricing();
-                console.log('this.pricing: ', this.pricing);
 
 
                 //user created here
@@ -1680,8 +1626,8 @@
                     last_name: this.state.paymentInfo.last_name,
                     email: this.state.paymentInfo.email,
                     phone_number: this.state.paymentInfo.phone_number,
-                    card_token: this.state.paymentInfo.card_token,
-                    stripe_token: this.state.paymentInfo.stripe_token,
+                    card_token: pmResult.paymentMethod.id,
+                    stripe_token: result.token.id,
                     shipping_address: this.state.paymentInfo.shipping_address,
                     shipping_city: this.state.paymentInfo.shipping_city,
                     shipping_state: this.state.paymentInfo.shipping_state,
@@ -1698,10 +1644,8 @@
                     sales_generated_id: this.state.salesGeneratedId
                 });
                 if (chargeCustomer.success === false) {
-                    console.log('Charge customer failed:', chargeCustomer);
                     throw new Error(chargeCustomer.message || 'Payment failed');
                 } else {
-                    console.log('Customer charged successfully:', chargeCustomer);
                 }
 
                 // Show success message
@@ -1710,9 +1654,7 @@
                 // Wait briefly to show success message
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
-                console.log("Selected products: ", this.state.selectedProducts)
 
-                console.log("User ID after charge: ", chargeCustomer);
                 this.state.userId = chargeCustomer.data;
                 this.saveState();
 
@@ -1725,7 +1667,6 @@
                 }
             } catch (error) {
                 console.error('Payment error:', error);
-                alert('Payment error: ' + error.message);
                 this.renderStep(4); // Back to Payment
             }
         }
@@ -1782,12 +1723,10 @@
             // Setup selection handler
             document.querySelectorAll('.aipw-config-card').forEach(card => {
                 card.addEventListener('click', () => {
-                    console.log('[renderCallSetup] Setup card clicked:', card.dataset.setup);
                     document.querySelectorAll('.aipw-config-card').forEach(c => c.classList.remove('selected'));
                     card.classList.add('selected');
                     this.state.setupType = card.dataset.setup;
 
-                    console.log('[renderCallSetup] About to call showAgentQualitySection');
                     // Show Agent Quality section after setup type is selected
                     this.showAgentQualitySection();
 
@@ -1811,14 +1750,9 @@
          * Show Agent Quality section within Setup step
          */
         showAgentQualitySection() {
-            console.log('[showAgentQualitySection] Called');
             const section = document.getElementById('aipwAgentQualitySection');
             const optionsContainer = document.getElementById('aipwAgentQualityOptions');
 
-            console.log('[showAgentQualitySection] Elements found:', {
-                section: !!section,
-                optionsContainer: !!optionsContainer
-            });
 
             if (!section || !optionsContainer) {
                 console.warn('[showAgentQualitySection] Elements not found, returning early');
@@ -1830,8 +1764,6 @@
 
             // Populate agent quality options from pricing data
             const agentQuality = this.pricing.agentQuality || {};
-            console.log('[showAgentQualitySection] agentQuality data:', agentQuality);
-            console.log('[showAgentQualitySection] agentQuality keys:', Object.keys(agentQuality));
 
             let agentQualityHTML = '';
 
@@ -1851,12 +1783,8 @@
                 `;
             }
 
-            console.log('[showAgentQualitySection] Generated HTML length:', agentQualityHTML.length);
-            console.log('[showAgentQualitySection] Generated HTML preview:', agentQualityHTML.substring(0, 200));
 
             optionsContainer.innerHTML = agentQualityHTML;
-
-            console.log('[showAgentQualitySection] Section should now be visible');
 
             // Add click handlers for agent quality cards
             document.querySelectorAll('.aipw-agent-card').forEach(card => {
@@ -2000,8 +1928,6 @@
 
                 this.saveState();
                 this.calculatePricing();
-                console.log('numberCount updated:', this.state.numberCount);
-                console.log('pricing updated:', this.state.phoneCountPricingTotal);
             });
 
             document.getElementById('aipwConfigNextBtn').addEventListener('click', () => {
@@ -2561,14 +2487,11 @@
 
                 console.log('[submitPortingLOA] LOA submitted successfully');
 
-
-
                 // Complete the order
                 //await this.completeOrder();
 
             } catch (error) {
                 console.error('[submitPortingLOA] Error:', error);
-                alert('Error processing porting request: ' + error.message);
                 this.renderStep(6); // Stay on LOA form
             }
         }
@@ -2661,7 +2584,6 @@
          * Complete the order
          */
         async completeOrder() {
-            console.log('=== ORDER COMPLETION STARTED ===');
 
             this.showLoading('Completing your order...');
 
@@ -2703,16 +2625,15 @@
                     } : null
                 };
 
-                console.log('Order data prepared:', JSON.stringify(orderData, null, 2));
+                // Log order data without sensitive payment tokens
+                const { payment, ...safeOrderData } = orderData;
+                console.log('Order data prepared:', JSON.stringify(safeOrderData, null, 2));
 
                 // Send to n8n webhook via ApiProxy
-                console.log('Calling complete_order API...');
                 const response = await this.apiCall('complete_order', orderData);
 
-                console.log('Complete order response:', response);
 
                 if (response.success) {
-                    console.log('Order completed successfully!');
 
                     // Clear cached state on successful order completion
                     this.clearState();
@@ -2736,10 +2657,8 @@
             } catch (error) {
                 console.error('Exception during order completion:', error);
                 console.error('Error stack:', error.stack);
-                alert('Error: ' + error.message);
             }
 
-            console.log('=== ORDER COMPLETION ENDED ===');
         }
 
         /**
@@ -2769,6 +2688,12 @@
                     </p>
                 </div>
             `;
+
+            // Hide the navigation buttons
+            const footer = document.getElementById('aipwModalFooter');
+            if (footer) {
+                footer.style.display = 'none';
+            }
         }
 
         /**
@@ -2806,9 +2731,6 @@
                 data: data
             };
 
-            console.log('[apiCall] Request body:', requestBody);
-            console.log('[apiCall] API endpoint:', this.config.apiProxy);
-
             try {
                 const response = await fetch(this.config.apiProxy, {
                     method: 'POST',
@@ -2818,8 +2740,6 @@
                     body: JSON.stringify(requestBody)
                 });
 
-                console.log(`[apiCall] Response status: ${response.status} ${response.statusText}`);
-
                 if (!response.ok) {
                     console.error('[apiCall] Response not OK:', response);
                     const errorText = await response.text();
@@ -2828,7 +2748,6 @@
                 }
 
                 const jsonResponse = await response.json();
-                console.log(`[apiCall] ${action} response:`, jsonResponse);
 
                 return jsonResponse;
             } catch (error) {
@@ -2968,9 +2887,7 @@
 
         if (navType === 'reload') {
             // Page was hard-refreshed (Ctrl+R, F5, etc.)
-            console.log('Page was hard reloaded, clearing widget state');
             localStorage.removeItem('aipw_widget_state');
-            console.log('Widget state cleared from localStorage');
         }
     });
 
