@@ -617,7 +617,7 @@
 
                             // Special badge for Transcriptions & Recordings
                             const freeBadge = a === 'Transcriptions & Recordings'
-                                ? '<span style="margin-left: 8px; padding: 2px 8px; background: #4CAF50; color: white; font-size: 9px; border-radius: 4px; font-weight: 600;">90 Days Free</span>'
+                                ? '<span style="margin-left: 2px; padding: 1px 8px; background: #4CAF50; color: white; font-size: 10px; border-radius: 4px; font-weight: 600;">90 Days Free</span>'
                                 : '';
 
                             return `
