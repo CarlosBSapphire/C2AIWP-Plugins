@@ -628,9 +628,8 @@
 
                             return `
                                 <div class="aipw-summary-item" style="display: flex; justify-content: space-between; align-items: center;">
-    
+                                    <span>${a}${freeBadge}</span>
                                     <span style="margin-left: 10px; font-weight: 500; white-space: nowrap;">${this.formatCurrency(price)}${unit}</span>
-                                    <p><span>${a}${freeBadge}</span></p>
                                 </div>
                             `;
                         }).join('')}
