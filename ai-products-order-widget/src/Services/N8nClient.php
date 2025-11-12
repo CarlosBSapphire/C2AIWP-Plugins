@@ -367,7 +367,7 @@ class N8nClient
             ],
             [
                 [
-                    'expiration_date_before' => date('c')
+                    'expiration_date_after' => date('c')
                 ],
                 [
                     'expiration_date_isnull' => true
@@ -469,7 +469,7 @@ class N8nClient
             ],
             [
                     [
-                        'expiration_date_before' => date('c')
+                        'expiration_date_after' => date('c')
                     ],
                     [
                         'expiration_date_isnull' => true
