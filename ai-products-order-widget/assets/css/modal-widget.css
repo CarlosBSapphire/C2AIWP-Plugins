@@ -193,6 +193,7 @@
 /* Modal Container */
 .aipw-modal {
     background: var(--bg-plugin-gradient);
+    box-shadow: var(--panel-shadow);
     color: var(--text);
     margin-top: 1rem;
     padding-left: 40px;
@@ -444,7 +445,7 @@
 
 /* Summary Sidebar */
 .aipw-summary {
-position: fixed;
+    position: fixed;
     margin-top: 1rem;
     top: 0;
     right: 0;
@@ -457,6 +458,7 @@ position: fixed;
     border-radius: 0.625rem;
     margin-right: 1rem;
     background: var(--bg-plugin-gradient);
+    box-shadow: var(--panel-shadow);
 }
 
 .aipw-summary-title {
@@ -858,6 +860,7 @@ position: fixed;
         padding: 20px;
         margin: 0;
         background: var(--bg-plugin-gradient);
+        box-shadow: var(--panel-shadow);
         border: none;
         border-radius: 0;
         display: flex;
@@ -872,6 +875,7 @@ position: fixed;
         width: 100%;
         max-width: 100%;
         background: var(--bg-plugin-gradient);
+        box-shadow: var(--panel-shadow);
         padding: 15px 20px;
         box-sizing: border-box;
         z-index: 10;
