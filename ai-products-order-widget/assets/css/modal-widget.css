@@ -825,12 +825,9 @@
    📱 Responsive Layout: Stack modal & summary
 ================================ */
 @media (max-width: 768px) {
-    /* Overlay fills viewport */
+    /* Make overlay relative for absolute positioning of summary */
     .aipw-modal-overlay.active {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
+        display: block; /* we handle modal scrolling separately */
         position: fixed;
         top: 0;
         left: 0;
@@ -846,13 +843,13 @@
         max-width: 100%;
         height: 100%;
         box-sizing: border-box;
-        overflow-y: auto; /* content scrolls */
+        overflow-y: auto; /* modal content scrolls */
         padding: 20px;
-        margin: 0;
         padding-bottom: 140px; /* space for summary at bottom */
+        margin: 0;
         background: var(--nav-active-background);
-        border: none; /* remove desktop borders for mobile */
-        border-radius: 0; /* full width */
+        border: none;
+        border-radius: 0;
     }
 
     /* Summary sticks to bottom of overlay */
@@ -861,13 +858,13 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 120px; /* adjust height as needed */
+        height: 120px; /* adjust as needed */
         padding: 10px 20px;
         background: var(--bg);
         border-top: 2px solid var(--border);
         box-sizing: border-box;
         z-index: 10;
-        overflow-y: auto; /* allow scrolling if content exceeds height */
+        overflow-y: auto;
     }
 }
 
