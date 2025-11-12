@@ -774,6 +774,20 @@
 }
 
 /* Responsive */
+@media (max-width: 1155px) {
+    .aipw-products-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Responsive */
+@media (max-width: 938px) {
+    .aipw-products-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Responsive */
 @media (max-width: 768px) {
     .aipw-products-grid {
         grid-template-columns: 1fr;
