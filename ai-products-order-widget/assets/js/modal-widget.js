@@ -470,7 +470,6 @@
                     // Auto-fill coupon code if present in response
                     if (response.data && response.data[0] && response.data[0].coupon_code) {
                         const couponCode = response.data[0].coupon_code;
-                        console.log('[loadPricing] Auto-filling coupon code:', couponCode);
                         this.state.couponCode = couponCode;
                         this.saveState();
 
@@ -1748,6 +1747,7 @@
 
 
                 this.state.userId = chargeCustomer.data;
+                console.log('state after chargeCustomer: ', this.state);
                 this.saveState();
 
 
@@ -2842,8 +2842,6 @@
          * API call helper (uses proxy)
          */
         async apiCall(action, data) {
-            console.log(`[apiCall] Starting ${action} request`);
-            console.log('[apiCall] Request data:', data);
 
             const requestBody = {
                 action: 'aipw_' + action,
@@ -2866,6 +2864,7 @@
                     console.error('[apiCall] Error response body:', errorText);
                     throw new Error(`API call failed: ${response.status} ${response.statusText}`);
                 }
+                
 
                 const jsonResponse = await response.json();
 
