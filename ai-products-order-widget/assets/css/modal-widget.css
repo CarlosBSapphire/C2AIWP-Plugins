@@ -602,12 +602,13 @@
 }
 
 .aipw-config-card:hover {
-    border-color: var(--primary);
+    background: var(--input-active-border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .aipw-config-card.selected {
-    border-color: var(--secondary);
     background: var(--secondary);
+    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
 }
 
 .aipw-config-radio {
