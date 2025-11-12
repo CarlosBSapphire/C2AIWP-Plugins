@@ -2011,6 +2011,10 @@
             header.innerHTML = `
                 <h1 class="aipw-modal-title">Porting Letter of Authorization</h1>
                 <p class="aipw-modal-subtitle">Please complete and sign the form to authorize porting your phone number(s)</p>
+                <p class="aipw-modal-sub-subtitle"><b>Legal authorization:</b></p>
+                <p class="aipw-modal-sub-subtitle">The LOA serves as a legally binding document that protects you from unauthorized transfers and prevents your old provider from blocking the porting process.</p>
+                <p class="aipw-modal-sub-subtitle"><b>Verification of ownership:</b> It proves you are the authorized owner of the phone number and allows your new carrier to act on your behalf.</p>
+                <p class="aipw-modal-sub-subtitle"><b>Information transfer:</b> It permits your new provider to access necessary billing and account information from your old provider to complete the switch</p>
             `;
 
             // Generate phone number input fields based on numberCount
