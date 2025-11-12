@@ -192,7 +192,7 @@
 
 /* Modal Container */
 .aipw-modal {
-    background: var(--nav-active-background);
+    background: var(--bg-plugin-gradient);
     color: var(--text);
     padding-left: 40px;
     padding-right: 40px;
@@ -200,11 +200,10 @@
     padding-bottom: 40px;
     position: relative;
     border-radius: 0.625rem;
-    border: 2px solid var(--border);
     width: 100%;
     /* max-width: 1200px; */
     min-height: 100%;
-    height: 100%;
+    height: auto;
     bottom: auto;
     /* Added fix: prevent overlap with fixed summary */
     margin-right: 320px;
