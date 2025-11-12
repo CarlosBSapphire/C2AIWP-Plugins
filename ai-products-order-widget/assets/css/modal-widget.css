@@ -825,49 +825,44 @@
    📱 Responsive Layout: Stack modal & summary
 ================================ */
 @media (max-width: 768px) {
-    /* Overlay fills viewport */
+    /* Overlay as flex column */
     .aipw-modal-overlay.active {
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
+        justify-content: flex-start; /* top-aligned */
+        align-items: stretch; /* full width */
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
         padding: 0;
-        overflow: hidden; /* overlay itself does not scroll */
+        background: var(--bg);
     }
 
-    /* Modal scrolls inside overlay */
+    /* Modal grows and scrolls */
     .aipw-modal {
+        flex-grow: 1; /* take all remaining space */
+        overflow-y: auto; /* scroll content if needed */
+        padding: 20px;
+        box-sizing: border-box;
         width: 100%;
         max-width: 100%;
-        height: 100%;
-        box-sizing: border-box;
-        overflow-y: auto; /* content scrolls */
-        padding: 20px;
-        margin: 0;
-        padding-bottom: 140px; /* space for summary at bottom */
+        border: none;
+        border-radius: 0;
         background: var(--nav-active-background);
-        border: none; /* remove desktop borders for mobile */
-        border-radius: 0; /* full width */
     }
 
-    /* Summary sticks to bottom of overlay */
+    /* Summary naturally at bottom */
     .aipw-summary {
-        position: absolute;
-        bottom: 0;
-        left: 0;
+        flex-shrink: 0; /* don’t shrink */
         width: 100%;
-        height: 120px; /* adjust height as needed */
+        height: auto; /* can expand if content grows */
         padding: 10px 20px;
         background: var(--bg);
         border-top: 2px solid var(--border);
         box-sizing: border-box;
-        z-index: 10;
-        overflow-y: auto; /* allow scrolling if content exceeds height */
+        overflow-y: auto; /* scroll if content exceeds height */
     }
 }
 
