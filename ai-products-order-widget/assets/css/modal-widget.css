@@ -833,24 +833,27 @@
     }
 
     .aipw-modal {
-        margin-right: 0; /* remove right offset */
+        margin-right: 0;
         max-width: 100%;
         width: 100%;
         min-height: auto;
-        border: 2px solid var(--border);
         box-sizing: border-box;
+        padding-bottom: 120px; /* space for summary at bottom */
     }
 
     .aipw-summary {
-        position: static; /* no longer fixed */
+        position: absolute; /* stick to bottom inside overlay */
+        bottom: 0;
+        left: 0;
         width: 100%;
         height: auto;
         border-left: none;
         border-top: 2px solid var(--border);
         background: var(--bg);
         padding: 20px;
-        margin-top: 20px;
+        margin-top: 0;
         box-sizing: border-box;
+        z-index: 1000;
     }
 }
 
