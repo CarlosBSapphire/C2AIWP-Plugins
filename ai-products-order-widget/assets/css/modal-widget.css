@@ -838,22 +838,30 @@
         width: 100%;
         min-height: auto;
         box-sizing: border-box;
-        padding-bottom: 120px; /* space for summary at bottom */
+        padding-bottom: 100px; /* space for fixed summary bar */
     }
 
     .aipw-summary {
-        position: absolute; /* stick to bottom inside overlay */
+        position: fixed;
         bottom: 0;
         left: 0;
         width: 100%;
-        height: auto;
+        height: 80px; /* small fixed bar height */
         border-left: none;
         border-top: 2px solid var(--border);
         background: var(--bg);
-        padding: 20px;
-        margin-top: 0;
+        padding: 15px 20px;
         box-sizing: border-box;
         z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    /* Optional: reduce font size for mobile summary */
+    .aipw-summary-title,
+    .aipw-summary-row {
+        font-size: 14px;
     }
 }
 
