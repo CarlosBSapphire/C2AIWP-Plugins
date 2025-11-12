@@ -585,14 +585,49 @@
                 `;
             }
 
+            // Agent Quality
+            if (this.state.agentQuality) {
+                const styleKey = this.state.agentQuality.charAt(0).toUpperCase() + this.state.agentQuality.slice(1);
+                const agentQualityPricing = this.pricing.agentQuality[styleKey] || {};
+                const pricePerMinute = agentQualityPricing.phone_per_minute || 0;
+
+                html += `
+                    <div class="aipw-summary-section">
+                        <div class="aipw-summary-section-title">Agent Quality</div>
+                        <div class="aipw-summary-item">
+                            <span>${styleKey}</span>
+                            <span style="margin-left: auto; font-weight: 500;">${this.formatCurrency(pricePerMinute)}/min</span>
+                        </div>
+                    </div>
+                `;
+            }
+
             // Addons
             if (this.state.selectedAddons.length > 0) {
                 html += `
                     <div class="aipw-summary-section">
                         <div class="aipw-summary-section-title">Addon(s)</div>
-                        ${this.state.selectedAddons.map(a => `
-                            <div class="aipw-summary-item">${a}</div>
-                        `).join('')}
+                        ${this.state.selectedAddons.map(a => {
+                            // Get addon pricing
+                            let price = 0;
+                            let unit = '/week';
+
+                            if (a === 'Phone Numbers') {
+                                price = this.pricing.phoneNumberWeeklyCost || 0;
+                                unit = '/number/week';
+                            } else if (this.pricing.addons[a]) {
+                                price = this.pricing.addons[a].weekly || 0;
+                            } else if (a === 'Lead Verification') {
+                                unit = '/lead';
+                            }
+
+                            return `
+                                <div class="aipw-summary-item" style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span>${a}</span>
+                                    <span style="margin-left: 10px; font-weight: 500; white-space: nowrap;">${this.formatCurrency(price)}${unit}</span>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                 `;
             }

@@ -3,6 +3,7 @@
 namespace AIPW\Services;
 
 use AIPW\Core\SecurityValidator;
+use AIPW\Services\HelpFunctions;
 
 /**
  * n8n API Client
@@ -37,6 +38,7 @@ class N8nClient
     public string $ENDPOINT_SUBMIT_PORTING_LOA;
     public string $TICKET_GENERATOR_EMAIL_ADDRESS;
     public string $TWILIO_CANCEL_PORT_IN_REQUEST;
+    public string $CREATE_WEBSITE_PRICING_RECORDS;
 
 
     /**
@@ -61,17 +63,25 @@ class N8nClient
     private $cache;
 
     /**
+     * n8n API client
+     *
+     * @var HelperFunctions
+     */
+    private $helperFunctions;
+
+    /**
      * Constructor
      *
      * @param callable $httpClient HTTP client function: function($url, $method, $data, $headers)
      * @param callable|null $logger Logger function: function($message, $level, $context)
      * @param object|null $cache Cache adapter with get/set/has methods
      */
-    public function __construct(callable $httpClient, callable $logger = null, $cache = null)
+    public function __construct(callable $httpClient, callable $logger = null, $cache = null, HelpFunctions $helperFunctions = null)
     {
         $this->httpClient = $httpClient;
         $this->logger = $logger;
         $this->cache = $cache;
+        $this->helperFunctions = $helperFunctions;
 
         /* Dynamic Select Endpoint for selecting table data */
         $this->ENDPOINT_SELECT = $this->N8N_BASE_URL . 'da176ae9-496c-4f08-baf5-6a78a6a42adb';
@@ -115,6 +125,7 @@ class N8nClient
         $this->TWILIO_GET_PORT_IN_REQUESTS = $this->N8N_BASE_URL . '';
 
         $this->TWILIO_CANCEL_PORT_IN_REQUEST = $this->N8N_BASE_URL . '';
+        $this->CREATE_WEBSITE_PRICING_RECORDS = $this->N8N_BASE_URL . '';
     }
 
     /**
@@ -341,7 +352,7 @@ class N8nClient
                 'data' => $result['data'],
                 'cached' => false
             ];
-        }else{
+        } else {
             return [
                 'success' => false,
                 'data' => null,
@@ -671,6 +682,179 @@ class N8nClient
             'errors' => $errors,
             'sanitized' => $sanitized
         ];
+    }
+
+    /**
+     * Create new Website_Pricing entry
+     *
+     * @param array ['cost_json'=> json, 'title' => string, 'active' => int_bool, 'coupon_code' => string]
+     * @return array ['success' => bool, 'data' => array|null, 'error' => string|null]
+     */
+
+    public function createNewPricingRecord($data)
+    {
+
+        $this->log('[createNewPricingRecord] Create new pricing record', 'info', [
+            'cost_json' => $data['cost_json'] ?? null,
+            'title' => $data['title'] ?? null,
+            'Active' => $data['active'] ?? null,
+            'coupon_code' => $data['coupon_code'] ?? null
+        ]);
+
+        if ($this->checkRequiredFields($data, ['cost_json', 'title', 'active']) === false) {
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'Missing required fields for adding a sales website pricing record'
+            ];
+        }
+
+        //generate uuid
+        $sales_generated_id = $this->helperFunctions->generateUUID();
+
+        if (!isset($data['cost_json']) || empty($data['cost_json'])) {
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'Pricing not set'
+            ];
+        }
+
+        //check valid json
+        $decoded_json = json_decode($data['cost_json'],true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'Invalid cost_json: ' . json_last_error_msg()
+            ];
+        }
+
+        // Define required pricing rules
+        $required_pricing_rules = [
+            'has_single_service_charge' => [
+                'name' => 'One Time Charge',
+                'type' => '1 Service',
+                'required_fields' => ['cost']
+            ],
+            'has_two_service_charge' => [
+                'name' => 'One Time Charge',
+                'type' => '2 Services',
+                'required_fields' => ['cost']
+            ],
+            'has_three_plus_service_charge' => [
+                'name' => 'One Time Charge',
+                'type' => '3+ Services',
+                'required_fields' => ['cost']
+            ],
+            'has_quick_inbound_calls_charge' => [
+                'name' => 'Inbound Calls',
+                'type' => 'Quick',
+                'required_fields' => ['phone_per_minute']
+            ],
+            'has_advanced_inbound_calls_charge' => [
+                'name' => 'Inbound Calls',
+                'type' => 'Advanced',
+                'required_fields' => ['phone_per_minute']
+            ],
+            'has_conversational_inbound_calls_charge' => [
+                'name' => 'Inbound Calls',
+                'type' => 'Conversational',
+                'required_fields' => ['phone_per_minute']
+            ],
+            'has_email_agents_charge' => [
+                'name' => 'Email Agents',
+                'type' => 'Basic',
+                'required_fields' => ['cost', 'email_threshold', 'email_cost_overage']
+            ],
+            'has_chat_agents_charge' => [
+                'name' => 'Chat Agents',
+                'type' => 'Basic',
+                'required_fields' => ['cost', 'chat_threshold', 'chat_cost_overage']
+            ],
+            'has_transcriptions_and_recordings_charge' => [
+                'name' => 'Transcription & Call Recordings',
+                'type' => 'Addons',
+                'required_fields' => ['cost']
+            ],
+            'has_basic_qa_charge' => [
+                'name' => 'QA',
+                'type' => 'Basic',
+                'required_fields' => ['cost']
+            ],
+            'has_advanced_qa_charge' => [
+                'name' => 'QA',
+                'type' => 'Advanced',
+                'required_fields' => ['cost']
+            ],
+            'has_phone_number_charge' => [
+                'name' => 'Phone Number',
+                'type' => 'Price Per Number',
+                'required_fields' => ['cost']
+            ]
+        ];
+
+        // Initialize all checks as false
+        $charge_checks = array_fill_keys(array_keys($required_pricing_rules), false);
+
+        // Validate each price object
+        foreach ($decoded_json as $price_obj) {
+            // Check for missing frequency
+            if (empty($price_obj['frequency'])) {
+                return [
+                    'success' => false,
+                    'data' => null,
+                    'error' => 'Missing Pricing Frequency ' . $price_obj['name'] . ' ' . $price_obj['type']
+                ];
+            }
+
+            // Match against required rules
+            foreach ($required_pricing_rules as $check_key => $rule) {
+                if ($price_obj['name'] === $rule['name'] && $price_obj['type'] === $rule['type']) {
+                    // Check if all required fields are present and not empty
+                    $all_fields_valid = true;
+                    foreach ($rule['required_fields'] as $field) {
+                        if (!isset($price_obj[$field]) || empty($price_obj[$field])) {
+                            $all_fields_valid = false;
+                            break;
+                        }
+                    }
+
+                    if ($all_fields_valid) {
+                        $charge_checks[$check_key] = true;
+                    }
+                }
+            }
+        }
+
+        // Verify all required checks passed
+        foreach ($charge_checks as $key => $passed) {
+            if (!$passed) {
+                return [
+                    'success' => false,
+                    'data' => null,
+                    'error' => 'Failed Pricing Check: ' . $key
+                ];
+            }
+        }
+
+
+
+        $payload = [
+            'Active' => $data['active'],
+            'sales_generated_id' => $sales_generated_id,
+            'cost_json' => $data['cost_json'],
+            'title' => $data['title'],
+            'coupon_code' => $data['coupon_code']
+        ];
+
+        $response = $this->request(
+            $this->CREATE_WEBSITE_PRICING_RECORDS,
+            'POST',
+            $payload
+        );
+
+        return $response; // Missing this line!
     }
 
     /**
