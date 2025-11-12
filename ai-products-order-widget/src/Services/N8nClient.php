@@ -290,7 +290,8 @@ class N8nClient
             'Website_Pricing',
             [
                 'cost_json',
-                'Active' // 1
+                'Active', // 1
+                'coupon_code'
             ],
             ['Active' => 1, 'sales_generated_id' => (isset($data['sales_generated_id']) && !empty($data['sales_generated_id'])) ? $data['sales_generated_id'] : '4c26d41a-6c83-4e44-9b17-7a243b2aeb17'],
             [

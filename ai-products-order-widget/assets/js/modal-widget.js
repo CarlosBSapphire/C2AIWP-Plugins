@@ -77,6 +77,14 @@
             this.createModal();
             this.attachEventListeners();
 
+            // Check for 'sgi' URL parameter (sales_generated_id)
+            const sgiParam = this.getUrlParameter('sgi');
+            if (sgiParam) {
+                console.log('[init] Found sgi parameter:', sgiParam);
+                this.state.salesGeneratedId = sgiParam;
+                this.saveState();
+            }
+
             // Load pricing data from n8n
             await this.loadPricing();
         }
@@ -157,6 +165,16 @@
             } catch (error) {
                 console.error('[clearState] Error clearing state from localStorage:', error);
             }
+        }
+
+        /**
+         * Get URL parameter by name
+         * @param {string} name - Parameter name
+         * @returns {string|null} Parameter value or null if not found
+         */
+        getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
         }
 
         /**
@@ -433,10 +451,34 @@
                         }
                     });
 
-        
+
 
                     // Calculate initial totals based on default selections
                     this.calculatePricing();
+
+                    // Auto-fill coupon code if present in response
+                    if (response.data && response.data[0] && response.data[0].coupon_code) {
+                        const couponCode = response.data[0].coupon_code;
+                        console.log('[loadPricing] Auto-filling coupon code:', couponCode);
+                        this.state.couponCode = couponCode;
+                        this.saveState();
+
+                        // Try to fill the coupon input field if it exists
+                        setTimeout(() => {
+                            const couponInput = document.getElementById('aipwCouponCode');
+                            const couponMessage = document.getElementById('aipwCouponMessage');
+                            const applyButton = document.getElementById('aipwApplyCoupon');
+
+                            if (couponInput) {
+                                couponInput.value = couponCode;
+                                couponInput.disabled = true;
+                                if (applyButton) applyButton.disabled = true;
+                                if (couponMessage) {
+                                    couponMessage.innerHTML = '<span style="color: green;">✓ Coupon pre-applied from link</span>';
+                                }
+                            }
+                        }, 100);
+                    }
 
                     // Mark pricing as loaded
                     this.pricingLoaded = true;
