@@ -825,44 +825,49 @@
    📱 Responsive Layout: Stack modal & summary
 ================================ */
 @media (max-width: 768px) {
-    /* Overlay as flex column */
+    /* Overlay fills viewport */
     .aipw-modal-overlay.active {
         display: flex;
         flex-direction: column;
-        justify-content: flex-start; /* top-aligned */
-        align-items: stretch; /* full width */
+        justify-content: flex-start;
+        align-items: center;
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
         padding: 0;
-        background: var(--bg);
+        overflow: hidden; /* overlay itself does not scroll */
     }
 
-    /* Modal grows and scrolls */
+    /* Modal scrolls inside overlay */
     .aipw-modal {
-        flex-grow: 1; /* take all remaining space */
-        overflow-y: auto; /* scroll content if needed */
-        padding: 20px;
-        box-sizing: border-box;
         width: 100%;
         max-width: 100%;
-        border: none;
-        border-radius: 0;
+        height: 100%;
+        box-sizing: border-box;
+        overflow-y: auto; /* content scrolls */
+        padding: 20px;
+        margin: 0;
+        padding-bottom: 140px; /* space for summary at bottom */
         background: var(--nav-active-background);
+        border: none; /* remove desktop borders for mobile */
+        border-radius: 0; /* full width */
     }
 
-    /* Summary naturally at bottom */
+    /* Summary sticks to bottom of overlay */
     .aipw-summary {
-        flex-shrink: 0; /* don’t shrink */
+        position: absolute;
+        bottom: 0;
+        left: 0;
         width: 100%;
-        height: auto; /* can expand if content grows */
+        height: 120px; /* adjust height as needed */
         padding: 10px 20px;
         background: var(--bg);
         border-top: 2px solid var(--border);
         box-sizing: border-box;
-        overflow-y: auto; /* scroll if content exceeds height */
+        z-index: 10;
+        overflow-y: auto; /* allow scrolling if content exceeds height */
     }
 }
 
