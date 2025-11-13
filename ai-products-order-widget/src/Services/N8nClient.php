@@ -590,7 +590,9 @@ class N8nClient
 
             $loaData = [
                 'user_id' => $orderData['payment']['user_id'] ?? null,
-                'numbers_to_port' => $orderData['call_setup']['numbers_to_port']
+                'client_user_id' => $orderData['payment']['user_id'] ?? null,
+                'numbers_to_port' => $orderData['call_setup']['numbers_to_port'],
+                'signed' => false  // This is called from "Do Later" button, so LOA is not signed yet
             ];
 
             $loaResult = $this->createPortingLoaRecord($loaData);
@@ -697,16 +699,18 @@ class N8nClient
     }
 
     /**
-     * Create a porting LOA record for deferred submission
+     * Create a porting LOA record for deferred or completed submission
      *
-     * @param array $data Data containing user_id and numbers_to_port
+     * @param array $data Data containing user_id, numbers_to_port, and signed status
      * @return array
      */
-    private function createPortingLoaRecord($data)
+    public function createPortingLoaRecord($data)
     {
-        $this->log('[createPortingLoaRecord] Creating pending LOA record', 'info', [
+        $this->log('[createPortingLoaRecord] Creating LOA record', 'info', [
             'user_id' => $data['user_id'] ?? null,
-            'phone_count' => isset($data['numbers_to_port']) ? count($data['numbers_to_port']) : 0
+            'client_user_id' => $data['client_user_id'] ?? null,
+            'phone_count' => isset($data['numbers_to_port']) ? count($data['numbers_to_port']) : 0,
+            'signed' => $data['signed'] ?? false
         ]);
 
         if ($this->checkRequiredFields($data, ['user_id', 'numbers_to_port']) === false) {
@@ -731,10 +735,11 @@ class N8nClient
 
         // Prepare payload for porting_loas table
         $payload = [
-            'title' => 'Pending LOA - User ' . ($data['user_id'] ?? 'Unknown'),
+            'title' => 'Porting LOA - User ' . ($data['user_id'] ?? 'Unknown'),
             'uuid' => $uuid,
+            'client_user_id' => $data['client_user_id'] ?? null,
             'phone_numbers_and_providers' => json_encode($data['numbers_to_port']),
-            'signed' => false
+            'signed' => $data['signed'] ?? false
         ];
 
         $this->log('[createPortingLoaRecord] Sending to webhook', 'info', [

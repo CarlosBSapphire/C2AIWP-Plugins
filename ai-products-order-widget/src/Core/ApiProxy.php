@@ -612,10 +612,32 @@ class ApiProxy
 
             $this->log('info', '[handleSubmitPortingLoa] LOA form submitted successfully');
 
+            // Create porting_loas record with signed=true
+            $loaRecordData = [
+                'user_id' => $user_id,
+                'client_user_id' => $user_id,
+                'numbers_to_port' => $data['numbers_to_port'],
+                'signed' => true  // LOA was signed and submitted
+            ];
+
+            $loaRecordResult = $this->n8nClient->createPortingLoaRecord($loaRecordData);
+
+            if ($loaRecordResult['success']) {
+                $this->log('info', '[handleSubmitPortingLoa] Porting LOA record created', [
+                    'uuid' => $loaRecordResult['data']['uuid'] ?? null
+                ]);
+            } else {
+                $this->log('warning', '[handleSubmitPortingLoa] Failed to create porting LOA record', [
+                    'error' => $loaRecordResult['error']
+                ]);
+                // Don't fail the entire submission if record creation fails
+            }
+
             return [
                 'success' => true,
                 'data' => [
-                    'message' => 'LOA form submitted successfully'
+                    'message' => 'LOA form submitted successfully',
+                    'loa_uuid' => $loaRecordResult['data']['uuid'] ?? null
                 ],
                 'error' => null
             ];
