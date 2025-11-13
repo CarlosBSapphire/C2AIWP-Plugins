@@ -2905,6 +2905,8 @@
                 data: data
             };
 
+            console.log("Action and data for apiCall ", action, data);
+
             try {
                 const response = await fetch(this.config.apiProxy, {
                     method: 'POST',
