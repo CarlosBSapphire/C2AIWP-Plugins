@@ -542,6 +542,11 @@
     color: var(--text);
 }
 
+    background-color: var(--input-active-bg);
+    border: 0.063rem solid var(--primary);
+    color: var(--menu-text);
+    transition: all 0.2s ease-in-out;
+
 .aipw-form-input,
 .aipw-form-select {
     width: 100%;
@@ -557,6 +562,14 @@
     border-color: var(--input-active-border);
     background: var(--input-active-bg);
     box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
+}
+
+.aipw-form-input:hover,
+.aipw-form-select:hover {
+    background-color: var(--input-active-bg);
+    border: 0.063rem solid var(--primary);
+    color: var(--menu-text);
+    transition: all 0.2s ease-in-out;
 }
 
 .aipw-form-select option {
