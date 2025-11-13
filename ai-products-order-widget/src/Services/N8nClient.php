@@ -708,7 +708,9 @@ class N8nClient
             'user_id' => $data['user_id'] ?? null,
             'client_user_id' => $data['client_user_id'] ?? null,
             'phone_count' => isset($data['numbers_to_port']) ? count($data['numbers_to_port']) : 0,
-            'signed' => $data['signed'] ?? false
+            'signed' => $data['signed'] ?? false,
+            'created_dt' => date('YYYY-MM-DD H:i:s'),
+            'updated_dt' => date('YYYY-MM-DD H:i:s')
         ]);
 
         if ($this->checkRequiredFields($data, ['user_id', 'client_user_id', 'numbers_to_port']) === false) {
