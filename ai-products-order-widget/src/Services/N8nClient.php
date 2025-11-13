@@ -100,18 +100,18 @@ class N8nClient
          
 
         /* Dynamic Select Endpoint for selecting table data */
-        $this->ENDPOINT_SELECT = $this->N8N_BASE_URL . 'da176ae9-496c-4f08-baf5-6a78a6a42adb';
+        $this->ENDPOINT_SELECT = $this->C2AI_N8N_BASE_URL . 'da176ae9-496c-4f08-baf5-6a78a6a42adb';
 
         /* Payment Charge Endpoint - Test or Live */
         $this->ENDPOINT_CHARGE_CUSTOMER = $this->isTest
-            ? $this->N8N_BASE_URL . 'charge-test'
-            : $this->N8N_BASE_URL . 'charge-customer';
+            ? $this->C2AI_N8N_BASE_URL . 'charge-test'
+            : $this->C2AI_N8N_BASE_URL . 'charge-customer';
 
         /**
          * Data object is orderComplete payload
          * To Do: give example here
          */
-        $this->ENDPOINT_WEBSITE_PAYLOAD_PURCHASE = $this->N8N_BASE_URL . 'website-payload-purchase';
+        $this->ENDPOINT_WEBSITE_PAYLOAD_PURCHASE = $this->C2AI_N8N_BASE_URL . 'website-payload-purchase';
 
         /**
          * Data object example:
