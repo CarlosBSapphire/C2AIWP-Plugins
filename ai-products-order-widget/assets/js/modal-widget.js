@@ -1747,7 +1747,6 @@
 
 
                 this.state.userId = chargeCustomer.data;
-                console.log('state after chargeCustomer: ', this.state);
                 this.saveState();
 
 
@@ -2210,6 +2209,7 @@
 
             footer.innerHTML = `
                 <button class="aipw-btn" onclick="aipwWidget.renderStep(5)">Back</button>
+                <button class="aipw-btn" id="aipwDoLater">Do Later</button>
                 <button class="aipw-btn aipw-btn-primary" id="aipwSubmitLOA">Submit LOA & Complete Order</button>
             `;
 
@@ -2347,6 +2347,10 @@
                 this.submitPortingLOA();
             });
 
+            // Do Later button
+            document.getElementById('aipwDoLater').addEventListener('click', () => {
+                this.handleDoLater();
+            });
 
             // Save phone numbers on blur
             const form = document.getElementById('aipwLOAForm');
@@ -2511,6 +2515,51 @@
                     providerInput.value = entry.service_provider || '';
                 }
             });
+        }
+
+        /**
+         * Handle "Do Later" button - Complete order without submitting LOA immediately
+         */
+        async handleDoLater() {
+            try {
+                // Show confirmation message
+                const confirmed = confirm(
+                    'You can submit your Letter of Authorization later. ' +
+                    'Your order will be completed, and you will receive instructions ' +
+                    'on how to complete the porting process.\n\n' +
+                    'Do you want to continue?'
+                );
+
+                if (!confirmed) {
+                    return;
+                }
+
+                console.log('[handleDoLater] User chose to complete LOA later');
+
+                // Show loading state
+                const doLaterBtn = document.getElementById('aipwDoLater');
+                doLaterBtn.disabled = true;
+                doLaterBtn.textContent = 'Processing...';
+
+                // Complete the order - the backend will create the porting_loas record
+                // when it detects BYO setup type in the call_setup data
+                await this.completeOrder();
+
+                // Note: No need to restore button state as completeOrder will navigate away or show success
+
+            } catch (error) {
+                console.error('[handleDoLater] Error:', error);
+
+                // Restore button state
+                const doLaterBtn = document.getElementById('aipwDoLater');
+                if (doLaterBtn) {
+                    doLaterBtn.disabled = false;
+                    doLaterBtn.textContent = 'Do Later';
+                }
+
+                // Show error message
+                alert('There was an error processing your request. Please try again or contact support.');
+            }
         }
 
         /**

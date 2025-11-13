@@ -44,6 +44,7 @@ class N8nClient
     public string $TWILIO_CANCEL_PORT_IN_REQUEST;
     public string $CREATE_WEBSITE_PRICING_RECORDS;
     public string $DECREMENT_AVAILABLE_USES;
+    public string $createPortingLoaRecord;
 
     public string $DEFAULT_PRICING_ID;
 
@@ -140,7 +141,8 @@ class N8nClient
 
         $this->TWILIO_CANCEL_PORT_IN_REQUEST = $this->N8N_BASE_URL . '';
         $this->CREATE_WEBSITE_PRICING_RECORDS = $this->N8N_BASE_URL . '';
-        $this->DECREMENT_AVAILABLE_USES = $this->N8N_BASE_URL . '';
+        $this->DECREMENT_AVAILABLE_USES = $this->C2AI_N8N_BASE_URL . '46b85497-3be7-4ba2-990e-2a074252559a';
+        $this->createPortingLoaRecord = $this->C2AI_N8N_BASE_URL . 'e9fd63be-35f8-4f23-808f-f75103f0c7a3';
         $this->DEFAULT_PRICING_ID = '4c26d41a-6c83-4e44-9b17-7a243b2aeb17';
     }
 
@@ -577,6 +579,35 @@ class N8nClient
             ];
         }
 
+        // Check if BYO setup type and create porting LOA record
+        if (isset($orderData['call_setup']['setup_type']) &&
+            $orderData['call_setup']['setup_type'] === 'byo' &&
+            !empty($orderData['call_setup']['numbers_to_port'])) {
+
+            $this->log('[submitOrder] BYO setup detected, creating porting LOA record', 'info', [
+                'phone_count' => count($orderData['call_setup']['numbers_to_port'])
+            ]);
+
+            $loaData = [
+                'user_id' => $orderData['payment']['user_id'] ?? null,
+                'numbers_to_port' => $orderData['call_setup']['numbers_to_port']
+            ];
+
+            $loaResult = $this->createPortingLoaRecord($loaData);
+
+            if (!$loaResult['success']) {
+                $this->log('[submitOrder] Failed to create porting LOA record', 'error', [
+                    'error' => $loaResult['error']
+                ]);
+                // Continue with order submission even if LOA record creation fails
+                // This is not a critical failure
+            } else {
+                $this->log('[submitOrder] Porting LOA record created successfully', 'info', [
+                    'uuid' => $loaResult['data']['uuid'] ?? null
+                ]);
+            }
+        }
+
         $response = $this->request(
             $this->ENDPOINT_WEBSITE_PAYLOAD_PURCHASE,
             'POST',
@@ -662,6 +693,78 @@ class N8nClient
             'success' => false,
             'data' => null,
             'error' => $response['error'] ?? 'Failed to submit porting LOA'
+        ];
+    }
+
+    /**
+     * Create a porting LOA record for deferred submission
+     *
+     * @param array $data Data containing user_id and numbers_to_port
+     * @return array
+     */
+    private function createPortingLoaRecord($data)
+    {
+        $this->log('[createPortingLoaRecord] Creating pending LOA record', 'info', [
+            'user_id' => $data['user_id'] ?? null,
+            'phone_count' => isset($data['numbers_to_port']) ? count($data['numbers_to_port']) : 0
+        ]);
+
+        if ($this->checkRequiredFields($data, ['user_id', 'numbers_to_port']) === false) {
+            $this->log('[createPortingLoaRecord] Missing required fields', 'error', [
+                'required_fields' => ['user_id', 'numbers_to_port'],
+                'provided_fields' => array_keys($data)
+            ]);
+
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'Missing required fields for creating porting LOA record'
+            ];
+        }
+
+        // Generate UUID for tracking
+        $uuid = $this->helperFunctions->generateUUID();
+
+        $this->log('[createPortingLoaRecord] Generated UUID', 'info', [
+            'uuid' => $uuid
+        ]);
+
+        // Prepare payload for porting_loas table
+        $payload = [
+            'title' => 'Pending LOA - User ' . ($data['user_id'] ?? 'Unknown'),
+            'uuid' => $uuid,
+            'phone_numbers_and_providers' => json_encode($data['numbers_to_port']),
+            'signed' => false
+        ];
+
+        $this->log('[createPortingLoaRecord] Sending to webhook', 'info', [
+            'endpoint' => $this->createPortingLoaRecord,
+            'phone_count' => count($data['numbers_to_port'])
+        ]);
+
+        $response = $this->request(
+            $this->createPortingLoaRecord,
+            'POST',
+            $payload
+        );
+
+        $this->log('[createPortingLoaRecord] Response received', 'info', [
+            'success' => $response['success'] ?? false,
+            'error' => $response['error'] ?? null
+        ]);
+
+        if (isset($response['success']) && $response['success']) {
+            return [
+                'success' => true,
+                'data' => array_merge($response['data'] ?? [], ['uuid' => $uuid]),
+                'error' => null
+            ];
+        }
+
+        return [
+            'success' => false,
+            'data' => null,
+            'error' => $response['error'] ?? 'Failed to create porting LOA record'
         ];
     }
 
