@@ -131,7 +131,7 @@ class AI_Products_Order_Widget
         };
 
         // Create HelpFunctions instance
-        $helperFunctions = new \AIPW\Services\HelpFunctions();
+        $helperFunctions = new \AIPW\Services\HelperFunctions();
 
         // Create n8n client with HelpFunctions
         $this->n8nClient = new N8nClient($httpClient, $loggerCallable, $this->cache, $helperFunctions);
