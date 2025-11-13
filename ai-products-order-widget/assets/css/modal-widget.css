@@ -539,34 +539,45 @@
     margin-bottom: 5px;
     font-weight: bold;
     font-size: 14px;
-    color: var(--text);
+    color: var(--text) !important;
 }
 
 .aipw-form-input,
 .aipw-form-select {
     width: 100%;
     padding: 12px;
-    border: 2px solid var(--border);
     font-size: 14px;
-    background: var(--input-bg);
-    color: var(--text);
+    background-color: var(--input-bg) !important;
+    color: var(--menu-text) !important;
 }
 
 .aipw-form-input:focus,
 .aipw-form-select:focus {
     outline: none;
-    border-color: var(--input-active-border);
-    background: var(--input-active-bg);
-    box-shadow: var(--active-box-shadow);
+    border-color: var(--input-active-border) !important;
+    background: var(--input-active-bg) !important;
+    box-shadow: 0 4px 16px rgba(0, 53, 111, 1.4);
+}
+
+.aipw-form-input:hover,
+.aipw-form-select:hover {
+    background-color: var(--input-active-bg) !important;
+    border: 0.063rem solid var(--primary) !important;
+    color: var(--menu-text) !important;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
 }
 
 .aipw-form-select option {
-    background: var(--input-bg);
-    color: var(--text);
+    background: var(--input-bg) !important;
+    color: var(--text) !important;
 }
 
 .aipw-form-select option:hover {
-    background: var(--dropdown-item-hover);
+    background-color: var(--input-active-bg) !important;
+    border: 0.063rem solid var(--primary) !important;
+    color: var(--menu-text) !important;
+    transition: all 0.2s ease-in-out;
 }
 
 .aipw-form-checkbox-group {
@@ -598,16 +609,15 @@
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
-    background: var(--input-bg);
+    border-radius: 0.625rem;
 }
 
 .aipw-config-card:hover {
-    border-color: var(--primary);
+    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
 }
 
 .aipw-config-card.selected {
-    border-color: var(--secondary);
-    background: var(--secondary);
+    box-shadow: 0 4px 16px rgba(0, 53, 111, 1.4);
 }
 
 .aipw-config-radio {
@@ -653,21 +663,43 @@
 }
 
 .aipw-agent-card {
-    border: 2px solid var(--border);
+    background: var(--bg-plugin-gradient);
+    box-shadow: var(--panel-shadow);
     padding: 20px;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
-    background: var(--input-bg);
+    border-radius: 0.625rem;
 }
 
 .aipw-agent-card:hover {
-    border-color: var(--primary);
+    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
 }
 
 .aipw-agent-card.selected {
-    border-color: var(--secondary);
-    background: var(--nav-active-background);
+    box-shadow: 0 4px 16px rgba(0, 53, 111, 1.4);
+}
+
+.aipw-agent-radio {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+}
+
+.aipw-agent-card.selected .aipw-agent-radio::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: var(--menu-text);
+    border-radius: 50%;
 }
 
 .aipw-agent-name {
@@ -684,7 +716,7 @@
 
 /* Buttons */
 .aipw-modal-footer {
-    margin-top: 5px;
+    margin-top: 15px;
     padding-top: 0px;
     display: flex;
     justify-content: space-between;
@@ -798,6 +830,10 @@
 /* Responsive */
 @media (max-width: 955px) {
     .aipw-config-options {
+        grid-template-columns: 1fr;
+    }
+
+    .aipw-agent-styles {
         grid-template-columns: 1fr;
     }
 }
