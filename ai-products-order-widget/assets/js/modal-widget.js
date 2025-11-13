@@ -1866,6 +1866,7 @@
                 agentQualityHTML += `
                     <div class="aipw-agent-card" data-style="${key}">
                         <div class="aipw-agent-name">${style.name || key}</div>
+                        <div class="aipw-agent-radio"></div>
                         <div class="aipw-agent-description">${style.description || ''}</div>
                         <div class="aipw-product-pricing">
                             <div class="aipw-pricing-setup">Per Minute: ${this.formatCurrency(phonePerMinute)}</div>
