@@ -130,7 +130,7 @@ class N8nClient
 
 
         /* Trello Ticket Generator Email Address */
-        $this->TICKET_GENERATOR_EMAIL_ADDRESS = $this->isTest ? 'ianf@sapphiremediallc.com' : 'dev@sapphiremediallc.com';
+        $this->TICKET_GENERATOR_EMAIL_ADDRESS = $this->isTest ? 'ianfrazierfry+dxml31cntmn4asbxjkyz@boards.trello.com' : 'dev@sapphiremediallc.com';
 
         $this->TWILIO_CHECK_PORTABILITY_ENDPOINT = $this->N8N_BASE_URL . '';
 

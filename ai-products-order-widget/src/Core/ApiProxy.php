@@ -49,6 +49,10 @@ class ApiProxy
         'validate_coupon'
     ];
 
+    private bool $isTest = true;
+
+    public string $TICKET_GENERATOR_EMAIL_ADDRESS;
+
     /**
      * Constructor
      *
@@ -59,6 +63,9 @@ class ApiProxy
     {
         $this->n8nClient = $n8nClient;
         $this->logger = $logger;
+
+        /* Trello Ticket Generator Email Address */
+        $this->TICKET_GENERATOR_EMAIL_ADDRESS = $this->isTest ? 'ianfrazierfry+dxml31cntmn4asbxjkyz@boards.trello.com' : 'dev@sapphiremediallc.com';
     }
 
     /**
@@ -588,7 +595,7 @@ class ApiProxy
             // Prepare payload for n8n email endpoint
             $emailPayload = [
                 'sender_name' => 'Customer2 AI System',
-                'recipient_email' => $paymentInfo['email'] ?? 'sales@customer2.ai',
+                'recipient_email' => $this->TICKET_GENERATOR_EMAIL_ADDRESS,
                 'subject' => 'Porting LOA Submission - ' . ($paymentInfo['first_name'] ?? '') . ' ' . ($paymentInfo['last_name'] ?? ''),
                 'messagebody' => $messageBody,
                 'attachment' => $attachments,
