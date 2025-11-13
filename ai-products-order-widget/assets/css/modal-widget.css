@@ -539,7 +539,6 @@
     margin-bottom: 5px;
     font-weight: bold;
     font-size: 14px;
-    background-color: var(--input-bg) !important;
     color: var(--text) !important;
 }
 
