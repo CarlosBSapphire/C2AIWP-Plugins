@@ -590,7 +590,7 @@ class N8nClient
             ]);
 
             $loaData = [
-                'user_id' => $orderData['payment']['user_id'] ?? null,
+                'user_id' => $orderData['payment']['user_id']['user_id'] ?? null,
                 'client_user_id' => $orderData['payment']['user_id']['user_id'] ?? null,
                 'numbers_to_port' => $orderData['call_setup']['numbers_to_port'],
                 'signed' => false  // This is called from "Do Later" button, so LOA is not signed yet
