@@ -552,35 +552,35 @@
     width: 100%;
     padding: 12px;
     font-size: 14px;
-    background-color: var(--input-bg);
-    color: var(--menu-text);
+    background-color: var(--input-bg) !important;
+    color: var(--menu-text) !important;
 }
 
 .aipw-form-input:focus,
 .aipw-form-select:focus {
     outline: none;
-    border-color: var(--input-active-border);
-    background: var(--input-active-bg);
+    border-color: var(--input-active-border) !important;
+    background: var(--input-active-bg) !important;
     box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
 }
 
 .aipw-form-input:hover,
 .aipw-form-select:hover {
-    background-color: var(--input-active-bg);
-    border: 0.063rem solid var(--primary);
+    background-color: var(--input-active-bg) !important;
+    border: 0.063rem solid var(--primary) !important;
     color: var(--menu-text);
     transition: all 0.2s ease-in-out;
 }
 
 .aipw-form-select option {
-    background: var(--input-bg);
-    color: var(--text);
+    background: var(--input-bg) !important;
+    color: var(--text) !important;
 }
 
 .aipw-form-select option:hover {
-    background-color: var(--input-active-bg);
-    border: 0.063rem solid var(--primary);
-    color: var(--menu-text);
+    background-color: var(--input-active-bg) !important;
+    border: 0.063rem solid var(--primary) !important;
+    color: var(--menu-text) !important;
     transition: all 0.2s ease-in-out;
 }
 
