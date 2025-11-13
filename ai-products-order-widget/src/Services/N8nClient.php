@@ -762,7 +762,7 @@ class N8nClient
         if (isset($response['success']) && $response['success']) {
             return [
                 'success' => true,
-                'data' => array_merge($response['data'] ?? [], ['uuid' => $uuid]),
+                'data' => $response['data'],
                 'error' => null
             ];
         }
