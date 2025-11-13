@@ -126,7 +126,7 @@ class N8nClient
          *   "attachment":""
          *  }
          */
-        $this->ENDPOINT_SUBMIT_PORTING_LOA = $this->N8N_BASE_URL . '59bc28f3-2fc6-42cd-8bc8-a8add1b5f6c4';
+        $this->ENDPOINT_SUBMIT_PORTING_LOA = $this->C2AI_N8N_BASE_URL . '59bc28f3-2fc6-42cd-8bc8-a8add1b5f6c4';
 
 
         /* Trello Ticket Generator Email Address */
