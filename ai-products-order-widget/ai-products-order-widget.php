@@ -130,8 +130,11 @@ class AI_Products_Order_Widget
             $this->logger->log($message, $level, $context);
         };
 
-        // Create n8n client
-        $this->n8nClient = new N8nClient($httpClient, $loggerCallable, $this->cache);
+        // Create HelpFunctions instance
+        $helperFunctions = new \AIPW\Services\HelpFunctions();
+
+        // Create n8n client with HelpFunctions
+        $this->n8nClient = new N8nClient($httpClient, $loggerCallable, $this->cache, $helperFunctions);
 
         // Create phone validator
         $this->phoneValidator = new PhoneValidator();

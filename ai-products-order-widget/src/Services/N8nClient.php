@@ -3,7 +3,7 @@
 namespace AIPW\Services;
 
 use AIPW\Core\SecurityValidator;
-use AIPW\Services\HelpFunctions;
+use AIPW\Services\HelperFunctions;
 
 /**
  * n8n API Client
@@ -85,12 +85,12 @@ class N8nClient
      * @param callable|null $logger Logger function: function($message, $level, $context)
      * @param object|null $cache Cache adapter with get/set/has methods
      */
-    public function __construct(callable $httpClient, callable $logger = null, $cache = null, HelpFunctions $helperFunctions = null)
+    public function __construct(callable $httpClient, callable $logger = null, $cache = null, HelperFunctions $helperFunctions = null)
     {
         $this->httpClient = $httpClient;
         $this->logger = $logger;
         $this->cache = $cache;
-        $this->helperFunctions = $helperFunctions;
+        $this->helperFunctions = $helperFunctions ?? new HelperFunctions;
 
         if(!$this->isSelfHosted){
             $this->N8N_BASE_URL = $this->N8N_BASE_URL;

@@ -2,7 +2,7 @@
 
 namespace AIPW\Services;
 
-class HelpFunctions
+class HelperFunctions
 {
     public function generateUUID() {
         return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
