@@ -539,13 +539,9 @@
     margin-bottom: 5px;
     font-weight: bold;
     font-size: 14px;
-    color: var(--text);
+    background-color: var(--input-bg) !important;
+    color: var(--text) !important;
 }
-
-    background-color: var(--input-active-bg);
-    border: 0.063rem solid var(--primary);
-    color: var(--menu-text);
-    transition: all 0.2s ease-in-out;
 
 .aipw-form-input,
 .aipw-form-select {
@@ -561,15 +557,16 @@
     outline: none;
     border-color: var(--input-active-border) !important;
     background: var(--input-active-bg) !important;
-    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
+    box-shadow: 0 4px 16px rgba(0, 53, 111, 1.4);
 }
 
 .aipw-form-input:hover,
 .aipw-form-select:hover {
     background-color: var(--input-active-bg) !important;
     border: 0.063rem solid var(--primary) !important;
-    color: var(--menu-text);
+    color: var(--menu-text) !important;
     transition: all 0.2s ease-in-out;
+    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
 }
 
 .aipw-form-select option {
