@@ -546,10 +546,9 @@
 .aipw-form-select {
     width: 100%;
     padding: 12px;
-    border: 2px solid var(--border);
     font-size: 14px;
-    background: var(--input-bg);
-    color: var(--text);
+    background-color: var(--input-bg);
+    color: var(--menu-text);
 }
 
 .aipw-form-input:focus,
@@ -557,7 +556,7 @@
     outline: none;
     border-color: var(--input-active-border);
     background: var(--input-active-bg);
-    box-shadow: var(--active-box-shadow);
+    box-shadow: 0 4px 16px rgba(0, 131, 135, 0.4);
 }
 
 .aipw-form-select option {
@@ -566,7 +565,10 @@
 }
 
 .aipw-form-select option:hover {
-    background: var(--dropdown-item-hover);
+    background-color: var(--input-active-bg);
+    border: 0.063rem solid var(--primary);
+    color: var(--menu-text);
+    transition: all 0.2s ease-in-out;
 }
 
 .aipw-form-checkbox-group {
