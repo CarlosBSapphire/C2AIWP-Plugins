@@ -2752,8 +2752,11 @@
                     // Sales generated ID for backend pricing validation
                     sales_generated_id: this.state.salesGeneratedId,
 
-                    // Payment info
-                    payment: this.state.paymentInfo,
+                    // Payment info (include userId from chargeCustomer)
+                    payment: {
+                        ...this.state.paymentInfo,
+                        user_id: this.state.userId
+                    },
 
                     // Call setup (if applicable)
                     call_setup: this.state.selectedProducts.includes('inbound_outbound_calls') ? {

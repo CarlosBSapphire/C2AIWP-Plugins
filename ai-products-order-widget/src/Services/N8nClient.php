@@ -24,6 +24,7 @@ class N8nClient
 
     public bool $isSelfHosted = false;
     public string $C2AI_N8N_BASE_URL = 'https://workflows.customer2.ai/webhook/';
+    public string $C2AI_N8N_BASE_URL_TEST = 'https://workflows.customer2.ai/webhook-test/';
     public string $N8N_BASE_URL = 'https://n8n.workflows.organizedchaos.cc/webhook/';
     
 
@@ -44,7 +45,7 @@ class N8nClient
     public string $TWILIO_CANCEL_PORT_IN_REQUEST;
     public string $CREATE_WEBSITE_PRICING_RECORDS;
     public string $DECREMENT_AVAILABLE_USES;
-    public string $createPortingLoaRecord;
+    public string $CREATE_PORTING_LOA_RECORD;
 
     public string $DEFAULT_PRICING_ID;
 
@@ -140,9 +141,9 @@ class N8nClient
         $this->TWILIO_GET_PORT_IN_REQUESTS = $this->N8N_BASE_URL . '';
 
         $this->TWILIO_CANCEL_PORT_IN_REQUEST = $this->N8N_BASE_URL . '';
-        $this->CREATE_WEBSITE_PRICING_RECORDS = $this->N8N_BASE_URL . '';
+        $this->CREATE_WEBSITE_PRICING_RECORDS = $this->C2AI_N8N_BASE_URL . 'c5c2b2a1-5d81-43a5-9de4-7216e7c29da6';
         $this->DECREMENT_AVAILABLE_USES = $this->C2AI_N8N_BASE_URL . '46b85497-3be7-4ba2-990e-2a074252559a';
-        $this->createPortingLoaRecord = $this->C2AI_N8N_BASE_URL . 'e9fd63be-35f8-4f23-808f-f75103f0c7a3';
+        $this->CREATE_PORTING_LOA_RECORD = $this->C2AI_N8N_BASE_URL . 'e9fd63be-35f8-4f23-808f-f75103f0c7a3';
         $this->DEFAULT_PRICING_ID = '4c26d41a-6c83-4e44-9b17-7a243b2aeb17';
     }
 
@@ -339,12 +340,12 @@ class N8nClient
         ];
 
         // TODO: Uncomment when endpoint is ready
-        // $result = $this->request($this->DECREMENT_AVAILABLE_USES, 'POST', $payload);
+        $result = $this->request($this->DECREMENT_AVAILABLE_USES, 'POST', $payload);
 
-        // Temporary placeholder response
+        if($result['success'] == false)
         $result = [
-            'success' => true,
-            'data' => ['message' => 'Decrement endpoint not yet implemented'],
+            'success' => false,
+            'data' => ['message' => $result['error']],
             'error' => null
         ];
 
@@ -713,16 +714,16 @@ class N8nClient
             'signed' => $data['signed'] ?? false
         ]);
 
-        if ($this->checkRequiredFields($data, ['user_id', 'numbers_to_port']) === false) {
+        if ($this->checkRequiredFields($data, ['user_id', 'client_user_id', 'numbers_to_port']) === false) {
             $this->log('[createPortingLoaRecord] Missing required fields', 'error', [
-                'required_fields' => ['user_id', 'numbers_to_port'],
+                'required_fields' => ['user_id', 'client_user_id', 'numbers_to_port'],
                 'provided_fields' => array_keys($data)
             ]);
 
             return [
                 'success' => false,
                 'data' => null,
-                'error' => 'Missing required fields for creating porting LOA record'
+                'error' => 'Missing required fields for creating porting LOA record (user_id, client_user_id, numbers_to_port required)'
             ];
         }
 
@@ -743,12 +744,12 @@ class N8nClient
         ];
 
         $this->log('[createPortingLoaRecord] Sending to webhook', 'info', [
-            'endpoint' => $this->createPortingLoaRecord,
+            'endpoint' => $this->CREATE_PORTING_LOA_RECORD,
             'phone_count' => count($data['numbers_to_port'])
         ]);
 
         $response = $this->request(
-            $this->createPortingLoaRecord,
+            $this->CREATE_PORTING_LOA_RECORD,
             'POST',
             $payload
         );
