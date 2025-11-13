@@ -2545,9 +2545,9 @@
                 doLaterBtn.disabled = true;
                 doLaterBtn.textContent = 'Processing...';
 
-                // Complete the order - the backend will create the porting_loas record
-                // when it detects BYO setup type in the call_setup data
-                await this.completeOrder();
+                // Complete the order with LOA unsigned - the backend will create the porting_loas record
+                // with signed=false when it detects BYO setup type in the call_setup data
+                await this.completeOrder(false);
 
                 // Note: No need to restore button state as completeOrder will navigate away or show success
 
@@ -2727,8 +2727,9 @@
 
         /**
          * Complete the order
+         * @param {boolean} loaSigned - Whether the LOA has been signed (default: true for backward compatibility)
          */
-        async completeOrder() {
+        async completeOrder(loaSigned = true) {
 
             this.showLoading('Completing your order...');
 
@@ -2769,7 +2770,8 @@
                         phone_number_type: this.state.phoneNumberType,
                         agent_quality: this.state.agentQuality,
                         agent_quality_pricing: agentQualityPricing,
-                        numbers_to_port: this.state.setupType === 'byo' ? this.state.portingPhoneNumbers : []
+                        numbers_to_port: this.state.setupType === 'byo' ? this.state.portingPhoneNumbers : [],
+                        loa_signed: loaSigned
                     } : null
                 };
 

@@ -444,10 +444,6 @@ class N8nClient
         );
 
         if ($result['success'] && !empty($result['data'])) {
-            // Cache the result
-            /*if ($this->cache) {
-                $this->cache->set($cacheKey, $result['data'], $cacheTtl);
-            }*/
 
             return [
                 'success' => true,
@@ -586,14 +582,15 @@ class N8nClient
             !empty($orderData['call_setup']['numbers_to_port'])) {
 
             $this->log('[submitOrder] BYO setup detected, creating porting LOA record', 'info', [
-                'phone_count' => count($orderData['call_setup']['numbers_to_port'])
+                'phone_count' => count($orderData['call_setup']['numbers_to_port']),
+                'loa_signed' => $orderData['call_setup']['loa_signed'] ?? false
             ]);
 
             $loaData = [
                 'user_id' => $orderData['payment']['user_id']['user_id'] ?? null,
                 'client_user_id' => $orderData['payment']['user_id']['user_id'] ?? null,
                 'numbers_to_port' => $orderData['call_setup']['numbers_to_port'],
-                'signed' => false  // This is called from "Do Later" button, so LOA is not signed yet
+                'signed' => $orderData['call_setup']['loa_signed'] ?? false
             ];
 
             $loaResult = $this->createPortingLoaRecord($loaData);
