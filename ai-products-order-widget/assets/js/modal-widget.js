@@ -2214,6 +2214,9 @@
                 <button class="aipw-btn aipw-btn-primary" id="aipwSubmitLOA">Submit LOA & Complete Order</button>
             `;
 
+            // Make sure footer is visible (it may have been hidden by showPaymentSuccess)
+            footer.style.display = 'flex';
+
             // Initialize signature pad
             this.initializeSignaturePad();
 
@@ -2865,7 +2868,7 @@
             // Hide the navigation buttons
             const footer = document.getElementById('aipwModalFooter');
             if (footer) {
-                footer.style.display = 'none';
+                footer.style.display = 'flex';
             }
         }
 
