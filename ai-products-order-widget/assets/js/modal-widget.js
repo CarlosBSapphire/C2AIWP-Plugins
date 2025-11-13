@@ -2632,8 +2632,8 @@
 
                 console.log('[submitPortingLOA] LOA submitted successfully');
 
-                // Complete the order
-                //await this.completeOrder();
+                // Complete the order - LOA is signed when submitted via this method
+                await this.completeOrder(true);
 
             } catch (error) {
                 console.error('[submitPortingLOA] Error:', error);
@@ -2792,7 +2792,9 @@
 
                     this.saveState();
 
-                    this.renderPortingLOA();
+                    // Don't render LOA form after order completion
+                    // LOA form should only be shown before completing the order
+                    // this.renderPortingLOA();
 
                 } else {
                     console.error('Order completion failed:', response);
