@@ -824,8 +824,8 @@ class N8nClient
             ];
         }
 
-        // Decode the phone_numbers_and_providers JSON string
-        if (!empty($loaData['phone_numbers_and_providers'])) {
+        // Decode the phone_numbers_and_providers JSON string if it's a string
+        if (!empty($loaData['phone_numbers_and_providers']) && is_string($loaData['phone_numbers_and_providers'])) {
             $loaData['phone_numbers_and_providers'] = json_decode($loaData['phone_numbers_and_providers'], true);
         }
 
