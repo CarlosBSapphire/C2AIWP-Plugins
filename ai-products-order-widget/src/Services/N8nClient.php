@@ -26,7 +26,7 @@ class N8nClient
     public string $C2AI_N8N_BASE_URL = 'https://workflows.customer2.ai/webhook/';
     public string $C2AI_N8N_BASE_URL_TEST = 'https://workflows.customer2.ai/webhook-test/';
     public string $N8N_BASE_URL = 'https://n8n.workflows.organizedchaos.cc/webhook/';
-    
+
 
 
 
@@ -50,7 +50,7 @@ class N8nClient
 
     public string $DEFAULT_PRICING_ID;
 
-    
+
 
 
     /**
@@ -95,12 +95,12 @@ class N8nClient
         $this->cache = $cache;
         $this->helperFunctions = $helperFunctions ?? new HelperFunctions;
 
-        if(!$this->isSelfHosted){
+        if (!$this->isSelfHosted) {
             $this->N8N_BASE_URL = $this->N8N_BASE_URL;
-        }else{
+        } else {
             $this->N8N_BASE_URL = $this->C2AI_N8N_BASE_URL;
         }
-         
+
 
         /* Dynamic Select Endpoint for selecting table data */
         $this->ENDPOINT_SELECT = $this->C2AI_N8N_BASE_URL . 'da176ae9-496c-4f08-baf5-6a78a6a42adb';
@@ -345,12 +345,12 @@ class N8nClient
         // TODO: Uncomment when endpoint is ready
         $result = $this->request($this->DECREMENT_AVAILABLE_USES, 'POST', $payload);
 
-        if($result['success'] == false)
-        $result = [
-            'success' => false,
-            'data' => ['message' => $result['error']],
-            'error' => null
-        ];
+        if ($result['success'] == false)
+            $result = [
+                'success' => false,
+                'data' => ['message' => $result['error']],
+                'error' => null
+            ];
 
         $this->log('[decrementAvailableUses] Response', 'info', [
             'success' => $result['success'] ?? false,
@@ -481,12 +481,12 @@ class N8nClient
                 'coupon_code' => $data['coupon_code'],
             ],
             [
-                    [
-                        'expiration_date_after' => date('c')
-                    ],
-                    [
-                        'expiration_date_isnull' => true
-                    ]
+                [
+                    'expiration_date_after' => date('c')
+                ],
+                [
+                    'expiration_date_isnull' => true
+                ]
             ],
             [
                 'page' => 1,
@@ -580,9 +580,11 @@ class N8nClient
         }
 
         // Check if BYO setup type and create porting LOA record
-        if (isset($orderData['call_setup']['setup_type']) &&
+        if (
+            isset($orderData['call_setup']['setup_type']) &&
             $orderData['call_setup']['setup_type'] === 'byo' &&
-            !empty($orderData['call_setup']['numbers_to_port'])) {
+            !empty($orderData['call_setup']['numbers_to_port'])
+        ) {
 
             $this->log('[submitOrder] BYO setup detected, creating porting LOA record', 'info', [
                 'phone_count' => count($orderData['call_setup']['numbers_to_port']),
@@ -791,28 +793,84 @@ class N8nClient
         // Use the select method with proper parameters
         $response = $this->select(
             'porting_loas',
-            ['*'],
+            [
+                'phone_numbers_and_providers',
+                'signed',
+                'user_id'
+            ],
             ['uuid' => $uuid]
         );
 
-        $this->log('[getLoaByUuid] Response received', 'info', [
+        $this->log('[getLoaByUuid] LOA Response received', 'info', [
             'success' => $response['success'] ?? false,
             'found' => !empty($response['data'])
         ]);
 
-        if (isset($response['success']) && $response['success'] && !empty($response['data'])) {
-            // Return first result (UUID should be unique)
+        if (!isset($response['success']) || !$response['success'] || empty($response['data'])) {
             return [
-                'success' => true,
-                'data' => $response['data'][0] ?? null,
-                'error' => null
+                'success' => false,
+                'data' => null,
+                'error' => $response['error'] ?? 'LOA not found'
             ];
         }
 
+        $loaData = $response['data'][0] ?? null;
+
+        if (!$loaData) {
+            return [
+                'success' => false,
+                'data' => null,
+                'error' => 'LOA data is empty'
+            ];
+        }
+
+        // Decode the phone_numbers_and_providers JSON string
+        if (!empty($loaData['phone_numbers_and_providers'])) {
+            $loaData['phone_numbers_and_providers'] = json_decode($loaData['phone_numbers_and_providers'], true);
+        }
+
+        // Fetch user info from users table using user_id (backend ID, not WordPress ID)
+        $userId = $loaData['user_id'] ?? null;
+
+        if ($userId) {
+            $this->log('[getLoaByUuid] Fetching user info', 'info', [
+                'user_id' => $userId
+            ]);
+
+            $userResponse = $this->select(
+                'users',
+                [
+                    'first_name',
+                    'last_name',
+                    'email',
+                    'phone',
+                    'address',
+                    'city',
+                    'state',
+                    'zip'
+                ],
+                ['id' => $userId]
+            );
+
+            if (isset($userResponse['success']) && $userResponse['success'] && !empty($userResponse['data'])) {
+                $loaData['user_info'] = $userResponse['data'][0] ?? null;
+
+                $this->log('[getLoaByUuid] User info retrieved', 'info', [
+                    'has_user_info' => !empty($loaData['user_info'])
+                ]);
+            } else {
+                $this->log('[getLoaByUuid] User info not found', 'warning', [
+                    'user_id' => $userId,
+                    'error' => $userResponse['error'] ?? 'Unknown error'
+                ]);
+                $loaData['user_info'] = null;
+            }
+        }
+
         return [
-            'success' => false,
-            'data' => null,
-            'error' => $response['error'] ?? 'LOA not found'
+            'success' => true,
+            'data' => $loaData,
+            'error' => null
         ];
     }
 
