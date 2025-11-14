@@ -46,7 +46,9 @@ class ApiProxy
         'create_user',
         'validate_phone',
         'submit_porting_loa',
-        'validate_coupon'
+        'validate_coupon',
+        'get_loa_by_uuid',
+        'update_loa_signature'
     ];
 
     private bool $isTest = true;
@@ -693,6 +695,51 @@ class ApiProxy
     </body>
     </html>
 HTML;
+    }
+
+    /**
+     * Handle get_loa_by_uuid action
+     *
+     * @param array $data
+     * @return array
+     */
+    private function handleGetLoaByUuid($data)
+    {
+        if (empty($data['uuid'])) {
+            return [
+                'success' => false,
+                'error' => 'Missing required field: uuid',
+                'error_code' => 'MISSING_UUID'
+            ];
+        }
+
+        return $this->n8nClient->getLoaByUuid($data['uuid']);
+    }
+
+    /**
+     * Handle update_loa_signature action
+     *
+     * @param array $data
+     * @return array
+     */
+    private function handleUpdateLoaSignature($data)
+    {
+        if (empty($data['uuid']) || empty($data['loa_html'])) {
+            return [
+                'success' => false,
+                'error' => 'Missing required fields: uuid and loa_html',
+                'error_code' => 'MISSING_FIELDS'
+            ];
+        }
+
+        return $this->n8nClient->updatePortingLoaSignature(
+            $data['uuid'],
+            $data['loa_html'],
+            $data['utility_bill_base64'] ?? null,
+            $data['utility_bill_filename'] ?? null,
+            $data['utility_bill_mime_type'] ?? null,
+            $data['utility_bill_extension'] ?? null
+        );
     }
 
     /**

@@ -482,10 +482,13 @@ class PortingLoaWidget {
             data: data
         };
 
+        // Add WordPress AJAX action to URL so WordPress routes to handle_api_proxy
+        const url = this.config.ajaxUrl + '?action=aipw_api_proxy';
+
         console.log('[apiCall] Request:', action, data);
 
         try {
-            const response = await fetch(this.config.ajaxUrl, {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
