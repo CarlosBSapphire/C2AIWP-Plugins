@@ -358,13 +358,37 @@
 
 .aipw-phone-number-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr auto;
     gap: 20px;
     margin-bottom: 15px;
     padding: 20px;
     background: var(--input-bg);
     border-radius: 8px;
     border: 1px solid var(--border);
+    position: relative;
+}
+
+.aipw-btn-remove-phone {
+    background: var(--failed);
+    color: var(--text);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-self: center;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.aipw-btn-remove-phone:hover {
+    background: #e02538;
+    transform: scale(1.1);
 }
 
 /* ============================================

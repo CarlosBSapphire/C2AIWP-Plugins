@@ -89,31 +89,23 @@ class PortingLoaWidget {
         document.getElementById('aipwLoaLoading').style.display = 'none';
         document.getElementById('aipwLoaForm').style.display = 'block';
 
-        // Parse phone numbers
+        // Get phone numbers (already parsed as array from backend)
         let phoneNumbers = [];
-        try {
-            phoneNumbers = JSON.parse(this.currentLoa.phone_numbers_and_providers);
-        } catch (e) {
-            console.error('Failed to parse phone numbers:', e);
+        if (Array.isArray(this.currentLoa.phone_numbers_and_providers)) {
+            phoneNumbers = this.currentLoa.phone_numbers_and_providers;
+        } else if (typeof this.currentLoa.phone_numbers_and_providers === 'string') {
+            try {
+                phoneNumbers = JSON.parse(this.currentLoa.phone_numbers_and_providers);
+            } catch (e) {
+                console.error('Failed to parse phone numbers:', e);
+            }
         }
 
+        // Store initial phone numbers
+        this.phoneNumbers = phoneNumbers;
+
         // Generate phone number input fields
-        const phoneFields = phoneNumbers.map((phone, index) => `
-            <div class="aipw-phone-number-row">
-                <div class="aipw-form-group">
-                    <label class="aipw-form-label">Phone Number ${index + 1}*</label>
-                    <input type="tel" class="aipw-form-input"
-                           value="${phone.phone_number || ''}"
-                           readonly>
-                </div>
-                <div class="aipw-form-group">
-                    <label class="aipw-form-label">Service Provider*</label>
-                    <input type="text" class="aipw-form-input"
-                           value="${phone.service_provider || ''}"
-                           readonly>
-                </div>
-            </div>
-        `).join('');
+        const phoneFields = this.generatePhoneNumberFields();
 
         // Render the form
         const formHtml = `
@@ -171,7 +163,13 @@ class PortingLoaWidget {
                     <div class="aipw-form-section-title">3. Phone Numbers to Port</div>
                 </div>
 
-                ${phoneFields}
+                <div id="aipwPhoneNumbersContainer">
+                    ${phoneFields}
+                </div>
+
+                <button type="button" id="aipwAddPhoneNumber" class="aipw-btn aipw-btn-secondary" style="margin-bottom: 20px;">
+                    + Add Phone Number
+                </button>
 
                 <div class="aipw-form-section">
                     <div class="aipw-form-section-title">4. Utility Bill Upload</div>
@@ -214,12 +212,107 @@ class PortingLoaWidget {
 
         document.getElementById('aipwLoaForm').innerHTML = formHtml;
 
+        // Prefill user info if available
+        this.prefillUserInfo();
+
         // Initialize signature pad
         this.initializeSignaturePad();
 
         // Add event listeners
         document.getElementById('aipwLoaSigningForm').addEventListener('submit', (e) => this.submitLoa(e));
         document.getElementById('aipwUtilityBillUpload').addEventListener('change', (e) => this.handleFileUpload(e));
+        document.getElementById('aipwAddPhoneNumber').addEventListener('click', () => this.addPhoneNumberField());
+    }
+
+    /**
+     * Generate phone number fields HTML
+     */
+    generatePhoneNumberFields() {
+        return this.phoneNumbers.map((phone, index) => `
+            <div class="aipw-phone-number-row" data-index="${index}">
+                <div class="aipw-form-group">
+                    <label class="aipw-form-label">Phone Number ${index + 1}*</label>
+                    <input type="tel" class="aipw-form-input phone-number-input"
+                           data-index="${index}"
+                           value="${phone.phone_number || ''}"
+                           placeholder="(555) 555-5555"
+                           required>
+                </div>
+                <div class="aipw-form-group">
+                    <label class="aipw-form-label">Service Provider*</label>
+                    <input type="text" class="aipw-form-input service-provider-input"
+                           data-index="${index}"
+                           value="${phone.service_provider || ''}"
+                           placeholder="e.g., Verizon, AT&T"
+                           required>
+                </div>
+                ${index > 0 ? `<button type="button" class="aipw-btn-remove-phone" data-index="${index}">×</button>` : ''}
+            </div>
+        `).join('');
+    }
+
+    /**
+     * Add a new phone number field
+     */
+    addPhoneNumberField() {
+        this.phoneNumbers.push({
+            phone_number: '',
+            service_provider: ''
+        });
+
+        // Re-render phone number fields
+        const container = document.getElementById('aipwPhoneNumbersContainer');
+        container.innerHTML = this.generatePhoneNumberFields();
+
+        // Re-attach remove button listeners
+        this.attachPhoneNumberListeners();
+    }
+
+    /**
+     * Remove a phone number field
+     */
+    removePhoneNumberField(index) {
+        if (this.phoneNumbers.length <= 1) {
+            alert('You must have at least one phone number.');
+            return;
+        }
+
+        this.phoneNumbers.splice(index, 1);
+
+        // Re-render phone number fields
+        const container = document.getElementById('aipwPhoneNumbersContainer');
+        container.innerHTML = this.generatePhoneNumberFields();
+
+        // Re-attach remove button listeners
+        this.attachPhoneNumberListeners();
+    }
+
+    /**
+     * Attach event listeners to phone number remove buttons
+     */
+    attachPhoneNumberListeners() {
+        document.querySelectorAll('.aipw-btn-remove-phone').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const index = parseInt(e.target.getAttribute('data-index'));
+                this.removePhoneNumberField(index);
+            });
+        });
+    }
+
+    /**
+     * Prefill user info from backend
+     */
+    prefillUserInfo() {
+        const userInfo = this.currentLoa.user_info;
+        if (!userInfo) return;
+
+        const form = document.getElementById('aipwLoaSigningForm');
+        if (userInfo.first_name) form.querySelector('[name="first_name"]').value = userInfo.first_name;
+        if (userInfo.last_name) form.querySelector('[name="last_name"]').value = userInfo.last_name;
+        if (userInfo.address) form.querySelector('[name="address"]').value = userInfo.address;
+        if (userInfo.city) form.querySelector('[name="city"]').value = userInfo.city;
+        if (userInfo.state) form.querySelector('[name="state"]').value = userInfo.state;
+        if (userInfo.zip) form.querySelector('[name="zip"]').value = userInfo.zip;
     }
 
     /**
@@ -373,13 +466,17 @@ class PortingLoaWidget {
      * Generate LOA HTML for PDF
      */
     generateLoaHtml(formData, signature) {
-        // Parse phone numbers
-        let phoneNumbers = [];
-        try {
-            phoneNumbers = JSON.parse(this.currentLoa.phone_numbers_and_providers);
-        } catch (e) {
-            console.error('Failed to parse phone numbers:', e);
-        }
+        // Collect phone numbers from form inputs
+        const phoneNumberInputs = document.querySelectorAll('.phone-number-input');
+        const serviceProviderInputs = document.querySelectorAll('.service-provider-input');
+
+        const phoneNumbers = [];
+        phoneNumberInputs.forEach((input, index) => {
+            phoneNumbers.push({
+                phone_number: input.value,
+                service_provider: serviceProviderInputs[index].value
+            });
+        });
 
         const phoneRows = phoneNumbers.map(p =>
             `<tr><td>${p.phone_number}</td><td>${p.service_provider}</td></tr>`
