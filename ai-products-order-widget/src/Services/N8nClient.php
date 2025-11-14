@@ -46,8 +46,11 @@ class N8nClient
     public string $CREATE_WEBSITE_PRICING_RECORDS;
     public string $DECREMENT_AVAILABLE_USES;
     public string $CREATE_PORTING_LOA_RECORD;
+    public string $LOAD_UNSIGNED_LOA;
 
     public string $DEFAULT_PRICING_ID;
+
+    
 
 
     /**
@@ -785,15 +788,12 @@ class N8nClient
             'uuid' => $uuid
         ]);
 
-        $payload = [
-            'table' => 'porting_loas',
-            'where' => [
-                'uuid' => $uuid
-            ],
-            'select' => '*'
-        ];
-
-        $response = $this->request($this->ENDPOINT_SELECT, 'POST', $payload);
+        // Use the select method with proper parameters
+        $response = $this->select(
+            'porting_loas',
+            ['*'],
+            ['uuid' => $uuid]
+        );
 
         $this->log('[getLoaByUuid] Response received', 'info', [
             'success' => $response['success'] ?? false,
