@@ -157,6 +157,7 @@ class AI_Products_Order_Widget
     {
         add_action('init', [$this, 'init']);
         add_shortcode('ai_products_widget', [$this, 'render_widget']);
+        add_shortcode('ai_porting_loa', [$this, 'render_porting_loa']);
 
         // Legacy AJAX handler (for old form-based widget)
         add_action('wp_ajax_aipw_submit_order', [$this, 'handle_order_submission']);
@@ -165,6 +166,10 @@ class AI_Products_Order_Widget
         // New API proxy handlers (for modal widget)
         add_action('wp_ajax_aipw_api_proxy', [$this, 'handle_api_proxy']);
         add_action('wp_ajax_nopriv_aipw_api_proxy', [$this, 'handle_api_proxy']);
+
+        // Porting LOA API handlers
+        add_action('wp_ajax_aipw_loa_proxy', [$this, 'handle_loa_proxy']);
+        add_action('wp_ajax_nopriv_aipw_loa_proxy', [$this, 'handle_loa_proxy']);
 
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
     }
@@ -211,6 +216,107 @@ class AI_Products_Order_Widget
 
         // Return JSON response
         wp_send_json($result);
+    }
+
+    /**
+     * Handle LOA-specific API proxy requests
+     */
+    public function handle_loa_proxy()
+    {
+        // Get request data from JSON body
+        $input = file_get_contents('php://input');
+        $request = json_decode($input, true);
+
+        $nonce = $request['nonce'] ?? '';
+
+        // Verify nonce
+        if (!wp_verify_nonce($nonce, 'aipw_loa_proxy')) {
+            error_log('[AIPW] LOA Proxy nonce verification failed');
+            wp_send_json_error([
+                'message' => 'Security verification failed',
+                'error_code' => 'INVALID_NONCE'
+            ]);
+            return;
+        }
+
+        $action = $request['action'] ?? '';
+        $data = $request['data'] ?? [];
+
+        error_log('[AIPW] LOA Proxy action: ' . $action);
+
+        try {
+            switch ($action) {
+                case 'aipw_get_loa_by_uuid':
+                    $uuid = $data['uuid'] ?? '';
+
+                    if (empty($uuid)) {
+                        wp_send_json_error([
+                            'message' => 'Missing required field: uuid',
+                            'error_code' => 'MISSING_UUID'
+                        ]);
+                        return;
+                    }
+
+                    $result = $this->n8nClient->getLoaByUuid($uuid);
+
+                    if ($result['success']) {
+                        wp_send_json_success($result['data']);
+                    } else {
+                        wp_send_json_error([
+                            'message' => $result['error'],
+                            'error_code' => 'FETCH_FAILED'
+                        ]);
+                    }
+                    break;
+
+                case 'aipw_update_loa_signature':
+                    $uuid = $data['uuid'] ?? '';
+                    $loaHtml = $data['loa_html'] ?? '';
+                    $utilityBillBase64 = $data['utility_bill_base64'] ?? null;
+                    $utilityBillFilename = $data['utility_bill_filename'] ?? null;
+                    $utilityBillMimeType = $data['utility_bill_mime_type'] ?? null;
+                    $utilityBillExtension = $data['utility_bill_extension'] ?? null;
+
+                    if (empty($uuid) || empty($loaHtml)) {
+                        wp_send_json_error([
+                            'message' => 'Missing required fields: uuid and loa_html',
+                            'error_code' => 'MISSING_FIELDS'
+                        ]);
+                        return;
+                    }
+
+                    $result = $this->n8nClient->updatePortingLoaSignature(
+                        $uuid,
+                        $loaHtml,
+                        $utilityBillBase64,
+                        $utilityBillFilename,
+                        $utilityBillMimeType,
+                        $utilityBillExtension
+                    );
+
+                    if ($result['success']) {
+                        wp_send_json_success($result['data']);
+                    } else {
+                        wp_send_json_error([
+                            'message' => $result['error'],
+                            'error_code' => 'UPDATE_FAILED'
+                        ]);
+                    }
+                    break;
+
+                default:
+                    wp_send_json_error([
+                        'message' => 'Unknown action: ' . $action,
+                        'error_code' => 'UNKNOWN_ACTION'
+                    ]);
+            }
+        } catch (Exception $e) {
+            error_log('[AIPW] LOA Proxy exception: ' . $e->getMessage());
+            wp_send_json_error([
+                'message' => 'Server error: ' . $e->getMessage(),
+                'error_code' => 'SERVER_ERROR'
+            ]);
+        }
     }
 
     /**
@@ -271,13 +377,39 @@ class AI_Products_Order_Widget
     }
 
     /**
+     * Render standalone porting LOA form shortcode
+     *
+     * @param array $atts Shortcode attributes
+     * @return string
+     */
+    public function render_porting_loa($atts)
+    {
+        // Only show for logged-in users
+        if (!is_user_logged_in()) {
+            return '<p>Please log in to access your porting forms.</p>';
+        }
+
+        // Include template file
+        ob_start();
+        include AIPW_PLUGIN_DIR . 'templates/porting-loa-standalone.php';
+        return ob_get_clean();
+    }
+
+    /**
      * Enqueue assets
      */
     public function enqueue_assets()
     {
-        // Only enqueue on pages that use the shortcode
+        // Only enqueue on pages that use the shortcodes
         global $post;
-        if (!is_a($post, 'WP_Post') || !has_shortcode($post->post_content, 'ai_products_widget')) {
+        if (!is_a($post, 'WP_Post')) {
+            return;
+        }
+
+        $has_product_widget = has_shortcode($post->post_content, 'ai_products_widget');
+        $has_loa_widget = has_shortcode($post->post_content, 'ai_porting_loa');
+
+        if (!$has_product_widget && !$has_loa_widget) {
             return;
         }
 
@@ -324,6 +456,32 @@ class AI_Products_Order_Widget
             [],
             AIPW_VERSION
         );
+
+        // Enqueue LOA standalone widget scripts (if LOA shortcode is present)
+        if ($has_loa_widget) {
+            // Enqueue CSS
+            wp_enqueue_style(
+                'aipw-loa-standalone',
+                AIPW_PLUGIN_URL . 'assets/css/loa-standalone.css',
+                [],
+                AIPW_VERSION
+            );
+
+            // Enqueue JS
+            wp_enqueue_script(
+                'aipw-loa-standalone',
+                AIPW_PLUGIN_URL . 'assets/js/loa-standalone.js',
+                ['jquery'],
+                AIPW_VERSION,
+                true
+            );
+
+            wp_localize_script('aipw-loa-standalone', 'aipwLoaConfig', [
+                'ajaxUrl' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce('aipw_loa_proxy'),
+                'userId' => get_current_user_id()
+            ]);
+        }
     }
 
     /**

@@ -2880,8 +2880,12 @@
          * Show success message
          */
         showSuccess() {
+            const header = document.getElementById('aipwModalHeader');
             const body = document.getElementById('aipwModalBody');
             const footer = document.getElementById('aipwModalFooter');
+
+            // Hide the header (instead of clearing, to preserve content)
+            header.style.display = 'none';
 
             body.innerHTML = `
                 <div class="aipw-success">

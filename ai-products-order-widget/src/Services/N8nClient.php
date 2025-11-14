@@ -774,6 +774,103 @@ class N8nClient
     }
 
     /**
+     * Get porting LOA by UUID
+     *
+     * @param string $uuid LOA UUID
+     * @return array
+     */
+    public function getLoaByUuid($uuid)
+    {
+        $this->log('[getLoaByUuid] Fetching LOA', 'info', [
+            'uuid' => $uuid
+        ]);
+
+        $payload = [
+            'table' => 'porting_loas',
+            'where' => [
+                'uuid' => $uuid
+            ],
+            'select' => '*'
+        ];
+
+        $response = $this->request($this->ENDPOINT_SELECT, 'POST', $payload);
+
+        $this->log('[getLoaByUuid] Response received', 'info', [
+            'success' => $response['success'] ?? false,
+            'found' => !empty($response['data'])
+        ]);
+
+        if (isset($response['success']) && $response['success'] && !empty($response['data'])) {
+            // Return first result (UUID should be unique)
+            return [
+                'success' => true,
+                'data' => $response['data'][0] ?? null,
+                'error' => null
+            ];
+        }
+
+        return [
+            'success' => false,
+            'data' => null,
+            'error' => $response['error'] ?? 'LOA not found'
+        ];
+    }
+
+    /**
+     * Update porting LOA with signature by UUID
+     *
+     * @param string $uuid LOA UUID
+     * @param string $loaHtml Base64 encoded LOA HTML with signature
+     * @param string $utilityBillBase64 Base64 encoded utility bill (optional)
+     * @param string $utilityBillFilename Utility bill filename (optional)
+     * @param string $utilityBillMimeType Utility bill MIME type (optional)
+     * @param string $utilityBillExtension Utility bill extension (optional)
+     * @return array
+     */
+    public function updatePortingLoaSignature($uuid, $loaHtml, $utilityBillBase64 = null, $utilityBillFilename = null, $utilityBillMimeType = null, $utilityBillExtension = null)
+    {
+        $this->log('[updatePortingLoaSignature] Updating LOA signature', 'info', [
+            'uuid' => $uuid,
+            'has_utility_bill' => !empty($utilityBillBase64)
+        ]);
+
+        $loaData = [
+            'uuid' => $uuid,
+            'loa_html' => $loaHtml,
+            'signed' => true,
+            'utility_bill_base64' => $utilityBillBase64,
+            'utility_bill_filename' => $utilityBillFilename,
+            'utility_bill_mime_type' => $utilityBillMimeType,
+            'utility_bill_extension' => $utilityBillExtension
+        ];
+
+        $this->log('[updatePortingLoaSignature] Sending to webhook', 'info', [
+            'endpoint' => $this->ENDPOINT_SUBMIT_PORTING_LOA
+        ]);
+
+        $response = $this->request($this->ENDPOINT_SUBMIT_PORTING_LOA, 'POST', $loaData);
+
+        $this->log('[updatePortingLoaSignature] Response received', 'info', [
+            'success' => $response['success'] ?? false,
+            'error' => $response['error'] ?? null
+        ]);
+
+        if (isset($response['success']) && $response['success']) {
+            return [
+                'success' => true,
+                'data' => $response['data'] ?? [],
+                'error' => null
+            ];
+        }
+
+        return [
+            'success' => false,
+            'data' => null,
+            'error' => $response['error'] ?? 'Failed to update LOA signature'
+        ];
+    }
+
+    /**
      * Execute HTTP request via adapter
      *
      * @param string $url
